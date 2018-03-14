@@ -23,7 +23,6 @@ inline boost::dynamic_bitset<> make_bitset(size_t pos)
 
 class DFAFunctionCalculator : public ASTVisitor {
 public:
-    explicit DFAFunctionCalculator(ASTNode& re);
     explicit DFAFunctionCalculator(ASTNode* re);
 
     void visit(StarNode& node) override;
@@ -70,7 +69,7 @@ public:
     //@formatter:on
 
 private:
-    ASTNode& tree_;
+    ASTNode* tree_;
     std::unordered_map<const ASTNode*, bool> nullable_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> firstpos_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> lastpos_;

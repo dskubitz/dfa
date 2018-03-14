@@ -2,11 +2,6 @@
 #include "DFAFunctionCalculator.h"
 
 DFAFunctionCalculator::DFAFunctionCalculator(ASTNode* re)
-        :DFAFunctionCalculator(*re)
-{
-}
-
-DFAFunctionCalculator::DFAFunctionCalculator(ASTNode& re)
         :tree_(re)
 {
     followpos_.resize(CharNode::max_id());
@@ -14,7 +9,7 @@ DFAFunctionCalculator::DFAFunctionCalculator(ASTNode& re)
     for (int i = 0; i < CharNode::max_id(); ++i)
         followpos_[i] = make_bitset();
 
-    tree_.accept(*this);
+    tree_->accept(*this);
 }
 
 void DFAFunctionCalculator::visit(StarNode& node)

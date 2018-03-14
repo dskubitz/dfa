@@ -7,12 +7,6 @@
 #include "Parser.h"
 #include "DFAFunctionCalculator.h"
 
-/*
-ASTNode* add_endmarker(ASTNode* tree)
-{
-    return new CatNode(tree, new EndmarkerNode(std::string()));
-}
-*/
 
 ASTNode* unify(ASTNode* node)
 {

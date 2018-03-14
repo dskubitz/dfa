@@ -5,6 +5,7 @@
 #include <memory>
 #include <iterator>
 #include <array>
+#include <string>
 
 constexpr static const std::array<int, 100>
         alphabet = {9, 10, 11, 12, 13, 32, 33, 34, 35, 36,
@@ -112,10 +113,13 @@ public:
 
 class EndmarkerNode : public CharNode {
 public:
-    EndmarkerNode();
+    explicit EndmarkerNode(std::string name);
 
     void accept(ASTVisitor& v) override;
     EndmarkerNode* clone() const override;
+    const std::string& name() const noexcept;
+private:
+    std::string name_;
 };
 
 #endif //RE_H

@@ -7,10 +7,12 @@
 #include "Parser.h"
 #include "DFAFunctionCalculator.h"
 
+/*
 ASTNode* add_endmarker(ASTNode* tree)
 {
-    return new CatNode(tree, new EndmarkerNode);
+    return new CatNode(tree, new EndmarkerNode(std::string()));
 }
+*/
 
 ASTNode* unify(ASTNode* node)
 {
@@ -32,7 +34,7 @@ Parser parser;
 
 ASTNode* create_regexes(const std::string& pattern)
 {
-    return add_endmarker(parser.parse(pattern));
+    return new CatNode(parser.parse(pattern), new EndmarkerNode(pattern));
 }
 
 ASTNode* create_regexes(const std::string& pat1, const std::string& pat2)
@@ -52,6 +54,7 @@ std::unique_ptr<ASTNode> make_all(Ts... args)
 {
     return std::unique_ptr<ASTNode>(create_regexes(args...));
 }
+
 void test(const TransitionTable& table)
 {
 }
@@ -75,17 +78,12 @@ void test(const TransitionTable& table, const std::string& s, Args... args)
 
 int main()
 {
-    auto regex = make_all("and", "class", "false", "fun", "for", "if", "then", "else", "[A-Za-z_][A-Za-z0-9_]*", "[1-9][0-9]*");
-    Printer{std::cout}.print(*regex);
-    auto dtrans = make_transition_table(*regex);
+    auto regex = make_all("if", "then", "else", "[A-Za-z_][A-Za-z0-9_]*",
+                          "[1-9][0-9]*");
+    auto dtrans = make_transition_table(regex.get());
     std::cout << dtrans.size() << '\n';
-    for (auto& state : dtrans) {
-        for (auto& trans : state) {
-            std::cout << trans << ' ';
-        }
-        std::cout << '\n';
-    }
-    test(dtrans, "123", "and ", "class ", "false ", "fun ", "for ", "if ", "then ", "else ", "hello123 ", "_Hello__world__ ", "123hello ", "__123 ", "123__ ");
+
+    test(dtrans, "AahcdefghijKLMNOP_qRs10tuvwxzy ", "if ", "then ", "else ");
 
     return 0;
 }

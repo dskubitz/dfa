@@ -26,6 +26,6 @@ public:
     }
 };
 
-TransitionTable make_transition_table(ASTNode& node);
+TransitionTable make_transition_table(ASTNode* node);
 
 #endif //DFA_H

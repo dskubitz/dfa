@@ -1,13 +1,19 @@
+#include <iostream>
 #include "DFAFunctionCalculator.h"
 
+DFAFunctionCalculator::DFAFunctionCalculator(ASTNode* re)
+        :DFAFunctionCalculator(*re)
+{
+}
+
 DFAFunctionCalculator::DFAFunctionCalculator(ASTNode& re)
-        : tree_(re)
+        :tree_(re)
 {
     followpos_.resize(CharNode::max_id());
     symbols_.resize(CharNode::max_id());
-    for (int i = 0; i < CharNode::max_id(); ++i) {
+    for (int i = 0; i < CharNode::max_id(); ++i)
         followpos_[i] = make_bitset();
-    }
+
     tree_.accept(*this);
 }
 
@@ -87,4 +93,7 @@ void DFAFunctionCalculator::visit(EndmarkerNode& node)
     firstpos_[&node] = make_bitset(node.id());
     lastpos_[&node] = make_bitset(node.id());
     symbols_[node.id()] = node.value();
+    acceptpos_[node.id()] = node.name();
 }
+
+

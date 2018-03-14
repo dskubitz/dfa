@@ -7,22 +7,30 @@
 
 using Dstate = boost::dynamic_bitset<>;
 
-TransitionTable make_transition_table(ASTNode& node)
+TransitionTable make_transition_table(ASTNode* node)
 {
     DFAFunctionCalculator calc(node);
     int state_num = 0;
 
-    std::vector<Dstate> stack{calc.firstpos().at(&node)};
+    std::vector<Dstate> stack {calc.firstpos().at(node)};
 
-    std::map<Dstate, int> unseen{{calc.firstpos().at(&node), state_num++}};
+    std::map<Dstate, int> unseen {{calc.firstpos().at(node), state_num++}};
     std::map<Dstate, int> seen;
-    TransitionTable table;
 
+    TransitionTable table;
     table.add_state();
+
     while (!stack.empty()) {
         Dstate S = stack.back();
         stack.pop_back();
         seen.emplace(S, unseen.at(S));
+
+        for (auto& final : calc.acceptpos()) {
+            if (S.test(final.first)) {
+                std::cout << seen.at(S) << ' ' << final.second << '\n';
+                break;
+            }
+        }
 
         for (auto ch : alphabet) {
             Dstate U = make_bitset();

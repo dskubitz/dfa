@@ -3,8 +3,8 @@
 size_t CharNode::num_ = 0;
 
 CharNode::CharNode(char value)
-        : value_(value),
-          id_(num_++)
+        :value_(value),
+         id_(num_++)
 {
 }
 
@@ -28,7 +28,7 @@ size_t CharNode::max_id()
 }
 
 StarNode::StarNode(ASTNode* node)
-        : expr_(node)
+        :expr_(node)
 {
 }
 
@@ -50,7 +50,7 @@ StarNode* StarNode::clone() const
 }
 
 CatNode::CatNode(ASTNode* left, ASTNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -75,7 +75,7 @@ CatNode* CatNode::clone() const
 }
 
 UnionNode::UnionNode(ASTNode* left, ASTNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -119,5 +119,7 @@ EndmarkerNode* EndmarkerNode::clone() const
     return new EndmarkerNode(*this);
 }
 
-EndmarkerNode::EndmarkerNode()
-        : CharNode('#') { }
+EndmarkerNode::EndmarkerNode(std::string name)
+        :CharNode('#'), name_(std::move(name)) { }
+
+const std::string& EndmarkerNode::name() const noexcept { return name_; }

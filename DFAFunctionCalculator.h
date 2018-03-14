@@ -24,6 +24,7 @@ inline boost::dynamic_bitset<> make_bitset(size_t pos)
 class DFAFunctionCalculator : public ASTVisitor {
 public:
     explicit DFAFunctionCalculator(ASTNode& re);
+    explicit DFAFunctionCalculator(ASTNode* re);
 
     void visit(StarNode& node) override;
     void visit(CatNode& node) override;
@@ -32,6 +33,7 @@ public:
     void visit(EpsilonNode& node) override;
     void visit(EndmarkerNode& node) override;
 
+    //@formatter:off
     std::unordered_map<const ASTNode*, bool>&
     nullable() noexcept { return nullable_; };
 
@@ -60,6 +62,13 @@ public:
 
     std::vector<char> symbols() noexcept { return symbols_; }
 
+    std::map<int, std::string>& acceptpos() noexcept
+    { return acceptpos_; }
+
+    const std::map<int, std::string>& acceptpos() const noexcept
+    { return acceptpos_; }
+    //@formatter:on
+
 private:
     ASTNode& tree_;
     std::unordered_map<const ASTNode*, bool> nullable_;
@@ -67,7 +76,7 @@ private:
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> lastpos_;
     std::vector<boost::dynamic_bitset<>> followpos_;
     std::vector<char> symbols_;
-private:
+    std::map<int, std::string> acceptpos_;
 };
 
 #endif //LEXER_DFAFUNCTIONCALCULATOR_H

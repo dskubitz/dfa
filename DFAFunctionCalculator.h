@@ -38,6 +38,7 @@ public:
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> firstpos_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> lastpos_;
     std::vector<boost::dynamic_bitset<>> followpos_;
+    std::vector<char> symbols_;
 private:
 };
 #endif //LEXER_DFAFUNCTIONCALCULATOR_H

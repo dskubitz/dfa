@@ -8,6 +8,7 @@ Printer::Printer(std::ostream& os)
 void Printer::print(ASTNode& tree)
 {
     tree.accept(*this);
+    os_ << '\n';
 }
 
 void Printer::visit(StarNode& node)

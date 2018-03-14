@@ -1,6 +1,6 @@
 #include "ASTNode.h"
 
-size_t CharNode::num_ = 1;
+size_t CharNode::num_ = 0;
 
 CharNode::CharNode(char value)
         :value_(value),
@@ -118,3 +118,6 @@ EndmarkerNode* EndmarkerNode::clone() const
 {
     return new EndmarkerNode(*this);
 }
+
+EndmarkerNode::EndmarkerNode()
+        : CharNode('#') { }

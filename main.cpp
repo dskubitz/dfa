@@ -5,7 +5,6 @@
 #include "Printer.h"
 #include "DFA.h"
 #include "Parser.h"
-#include "TransitionTable.h"
 #include "DFAFunctionCalculator.h"
 
 ASTNode* unify(ASTNode* node)
@@ -29,24 +28,40 @@ ASTNode* add_endmarker(ASTNode* tree)
     return new CatNode(tree, new EndmarkerNode);
 }
 
+Parser parser;
+
+ASTNode* create_regexes(const std::string& pattern)
+{
+    return parser.parse(pattern);
+}
+
+ASTNode* create_regexes(const std::string& pat1, const std::string& pat2)
+{
+    return unify(parser.parse(pat1), parser.parse(pat2));
+}
+
+template<class ... Ts>
+ASTNode* create_regexes(const std::string& pat1, const std::string& pat2, Ts... rest)
+{
+    return unify(create_regexes(pat1, pat2), create_regexes(rest...));
+}
+
+template<class ... Ts>
+std::unique_ptr<ASTNode> make_all(Ts... args)
+{
+    return std::unique_ptr<ASTNode>(add_endmarker(create_regexes(args...)));
+}
+
 int main()
 {
-    Parser parser;
-
-    std::string pat1("if");
-    std::string pat2("then");
-    ASTNode* regex1 = parser.parse(pat1);
-    ASTNode* regex2 = parser.parse(pat2);
-    auto regex = std::unique_ptr<ASTNode>(add_endmarker(unify(regex1, regex2)));
-    std::cout << *regex << '\n';
+    auto regex = make_all("(a|b)*abb");
+    Printer{std::cout}.print(*regex);
 
     DFAFunctionCalculator calculator(*regex);
     int num = 0;
     for (auto& i : calculator.followpos_) {
-        std::cout << ++num << ' ' << i << '\n';
+        std::cout << calculator.symbols_[num] << ' ' << ++num << ' ' << i << '\n';
     }
-
-//    print_pos_sets(*regex3);
 
     return 0;
 }

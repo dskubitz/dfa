@@ -79,7 +79,13 @@ int main()
     Printer{std::cout}.print(*regex);
     auto dtrans = make_transition_table(*regex);
     std::cout << dtrans.size() << '\n';
-    test(dtrans, "and ", "class ", "false ", "fun ", "for ", "if ", "then ", "else ", "hello123 ", "_Hello__world__ ", "123hello ", "__123 ", "123__ ");
+    for (auto& state : dtrans) {
+        for (auto& trans : state) {
+            std::cout << trans << ' ';
+        }
+        std::cout << '\n';
+    }
+    test(dtrans, "123", "and ", "class ", "false ", "fun ", "for ", "if ", "then ", "else ", "hello123 ", "_Hello__world__ ", "123hello ", "__123 ", "123__ ");
 
     return 0;
 }

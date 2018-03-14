@@ -89,6 +89,7 @@ void DFAFunctionCalculator::visit(EndmarkerNode& node)
     lastpos_[&node] = make_bitset(node.id());
     symbols_[node.id()] = node.value();
     acceptpos_[node.id()] = node.name();
+    std::cout << node.id() << ' ' << node.name() << '\n';
 }
 
 

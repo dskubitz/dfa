@@ -1,52 +1,42 @@
 #include <iostream>
-#include <boost/dynamic_bitset.hpp>
 
 #include "ASTNode.h"
-#include "Printer.h"
 #include "DFA.h"
 #include "Parser.h"
 #include "DFAFunctionCalculator.h"
 
-
-ASTNode* unify(ASTNode* node)
-{
-    return node;
-}
-
 ASTNode* unify(ASTNode* left, ASTNode* right)
 {
-    return new UnionNode(unify(left), unify(right));
-}
-
-template<typename... Ts>
-ASTNode* unify(ASTNode* left, ASTNode* right, Ts... rest)
-{
-    return unify(unify(left, right), unify(rest...));
+    return new UnionNode(left, right);
 }
 
 Parser parser;
 
-ASTNode* create_regexes(const std::string& pattern)
+ASTNode* parse(const std::string& pattern)
 {
     return new CatNode(parser.parse(pattern), new EndmarkerNode(pattern));
 }
 
-ASTNode* create_regexes(const std::string& pat1, const std::string& pat2)
+template<class Iter,
+         class = typename std::enable_if<
+                 std::is_convertible<
+                         typename std::iterator_traits<Iter>::iterator_category,
+                         std::input_iterator_tag>::value>::type>
+ASTNode* create_regexes(Iter b, Iter e)
 {
-    return unify(create_regexes(pat1), create_regexes(pat2));
+    if (b == e)
+        return nullptr;
+
+    ASTNode* node = parse(*b++);
+    for (; b != e; ++b) {
+        node = unify(node, parse(*b));
+    }
+    return node;
 }
 
-template<class ... Ts>
-ASTNode*
-create_regexes(const std::string& pat1, const std::string& pat2, Ts... rest)
+std::unique_ptr<ASTNode> make_all(std::initializer_list<const char*> list)
 {
-    return unify(create_regexes(pat1, pat2), create_regexes(rest...));
-}
-
-template<class ... Ts>
-std::unique_ptr<ASTNode> make_all(Ts... args)
-{
-    return std::unique_ptr<ASTNode>(create_regexes(args...));
+    return std::unique_ptr<ASTNode>(create_regexes(list.begin(), list.end()));
 }
 
 void test(const TransitionTable& table)
@@ -72,9 +62,12 @@ void test(const TransitionTable& table, const std::string& s, Args... args)
 
 int main()
 {
-    auto regex = make_all("if", "then", "else", "[A-Za-z_][A-Za-z0-9_]*",
-                          "[1-9][0-9]*");
-    auto dtrans = make_transition_table(regex.get());
+    auto regex = make_all({"if", "then", "else",
+                           "[A-Za-z_][A-Za-z0-9_]*", "[1-9][0-9]*"
+                          });
+    DFAFunctionCalculator calc(regex.get());
+    auto dtrans = make_transition_table(calc);
+
     std::cout << dtrans.size() << '\n';
 
     test(dtrans, "AahcdefghijKLMNOP_qRs10tuvwxzy ", "if ", "then ", "else ");

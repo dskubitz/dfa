@@ -32,7 +32,10 @@ public:
     void visit(EpsilonNode& node) override;
     void visit(EndmarkerNode& node) override;
 
-    //@formatter:off
+    ASTNode* tree() noexcept { return tree_; }
+
+    const ASTNode* tree() const noexcept { return tree_; }
+
     std::unordered_map<const ASTNode*, bool>&
     nullable() noexcept { return nullable_; };
 
@@ -61,12 +64,10 @@ public:
 
     std::vector<char> symbols() noexcept { return symbols_; }
 
-    std::map<int, std::string>& acceptpos() noexcept
-    { return acceptpos_; }
+    std::map<int, std::string>& acceptpos() noexcept { return acceptpos_; }
 
-    const std::map<int, std::string>& acceptpos() const noexcept
-    { return acceptpos_; }
-    //@formatter:on
+    const std::map<int, std::string>&
+    acceptpos() const noexcept { return acceptpos_; }
 
 private:
     ASTNode* tree_;

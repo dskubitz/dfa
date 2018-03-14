@@ -1,6 +1,9 @@
 #ifndef DFA_H
 #define DFA_H
 
+#include <vector>
+#include <array>
+
 using state_type = std::array<int, 128>;
 
 class TransitionTable : private std::vector<state_type> {
@@ -26,6 +29,9 @@ public:
     }
 };
 
-TransitionTable make_transition_table(ASTNode* node);
+class DFAFunctionCalculator;
+
+TransitionTable
+make_transition_table(DFAFunctionCalculator& calc);
 
 #endif //DFA_H

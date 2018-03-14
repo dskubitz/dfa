@@ -1,7 +1,7 @@
 #ifndef DFA_H
 #define DFA_H
 
-using state_type = std::array<unsigned, 128>;
+using state_type = std::array<int, 128>;
 
 class TransitionTable : private std::vector<state_type> {
     using base = std::vector<state_type>;

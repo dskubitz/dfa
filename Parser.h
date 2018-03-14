@@ -27,9 +27,9 @@ private:
     std::string character_class();
     std::string range();
 
-
-    std::string expr {};
-    std::string::size_type pos {0};
-    size_t leaf_count {0};
+    std::string expr{};
+    std::string::size_type pos{0};
+    size_t leaf_count{0};
 };
+
 #endif //LEXER_PARSER_H

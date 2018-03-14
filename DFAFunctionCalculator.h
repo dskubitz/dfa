@@ -11,7 +11,7 @@
 
 inline boost::dynamic_bitset<> make_bitset()
 {
-    return boost::dynamic_bitset<> (CharNode::max_id());
+    return boost::dynamic_bitset<>(CharNode::max_id());
 }
 
 inline boost::dynamic_bitset<> make_bitset(size_t pos)
@@ -32,8 +32,36 @@ public:
     void visit(EpsilonNode& node) override;
     void visit(EndmarkerNode& node) override;
 
-    ASTNode& tree_;
+    std::unordered_map<const ASTNode*, bool>&
+    nullable() noexcept { return nullable_; };
 
+    const std::unordered_map<const ASTNode*, bool>&
+    nullable() const noexcept { return nullable_; };
+
+    const std::unordered_map<const ASTNode*, boost::dynamic_bitset<>>&
+    firstpos() const noexcept { return firstpos_; };
+
+    std::unordered_map<const ASTNode*, boost::dynamic_bitset<>>&
+    firstpos() noexcept { return firstpos_; };
+
+    const std::unordered_map<const ASTNode*, boost::dynamic_bitset<>>&
+    lastpos() const noexcept { return lastpos_; };
+
+    std::unordered_map<const ASTNode*, boost::dynamic_bitset<>>&
+    lastpos() noexcept { return lastpos_; };
+
+    const std::vector<boost::dynamic_bitset<>>&
+    followpos() const noexcept { return followpos_; };
+
+    std::vector<boost::dynamic_bitset<>>&
+    followpos() noexcept { return followpos_; };
+
+    const std::vector<char> symbols() const noexcept { return symbols_; }
+
+    std::vector<char> symbols() noexcept { return symbols_; }
+
+private:
+    ASTNode& tree_;
     std::unordered_map<const ASTNode*, bool> nullable_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> firstpos_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> lastpos_;
@@ -41,4 +69,5 @@ public:
     std::vector<char> symbols_;
 private:
 };
+
 #endif //LEXER_DFAFUNCTIONCALCULATOR_H

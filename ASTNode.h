@@ -6,7 +6,7 @@
 #include <iterator>
 #include <array>
 
-constexpr static const std::array<char, 100>
+constexpr static const std::array<int, 100>
         alphabet = {9, 10, 11, 12, 13, 32, 33, 34, 35, 36,
                     37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
                     50, 51, 52, 53, 54, 55, 56, 57,
@@ -21,12 +21,14 @@ constexpr static const std::array<char, 100>
                     120, 121, 122, 123, 124, 125, 126,
 };
 
+//@formatter:off
 class StarNode;
 class CatNode;
 class UnionNode;
 class CharNode;
 class EpsilonNode;
 class EndmarkerNode;
+//@formatter:on
 
 class ASTVisitor {
 public:
@@ -62,7 +64,7 @@ class CatNode : public ASTNode {
 public:
     CatNode(ASTNode* left, ASTNode* right);
     void accept(ASTVisitor& v) override;
-    ASTNode* left() ;
+    ASTNode* left();
     ASTNode* right();
     ~CatNode() override;
     CatNode* clone() const override;
@@ -76,7 +78,7 @@ class UnionNode : public ASTNode {
 public:
     UnionNode(ASTNode* left, ASTNode* right);
     void accept(ASTVisitor& v) override;
-    ASTNode* left() ;
+    ASTNode* left();
     ASTNode* right();
     ~UnionNode() override;
     UnionNode* clone() const override;
@@ -98,8 +100,8 @@ protected:
     static size_t num_;
 
 private:
-    const char value_;
     size_t id_;
+    const char value_;
 };
 
 class EpsilonNode : public ASTNode {

@@ -1,7 +1,7 @@
 #include "Printer.h"
 
 Printer::Printer(std::ostream& os)
-        :os_(os)
+        : os_(os)
 {
 }
 

@@ -1,4 +1,3 @@
-#include <iostream>
 #include "DFAFunctionCalculator.h"
 
 DFAFunctionCalculator::DFAFunctionCalculator(ASTNode& re)
@@ -23,7 +22,6 @@ void DFAFunctionCalculator::visit(StarNode& node)
     auto& lastpos = lastpos_[&node];
 
     firstpos = lastpos = firstpos_.at(expr);
-    std::cout << firstpos << ' ' << lastpos << '\n';
 
     for (size_t i = 0; i < CharNode::max_id(); ++i)
         if (lastpos.test(i))

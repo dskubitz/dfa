@@ -34,9 +34,19 @@ ASTNode* create_regexes(Iter b, Iter e)
     return node;
 }
 
+template<class Iter,
+         class = typename std::enable_if<
+                 std::is_convertible<
+                         typename std::iterator_traits<Iter>::iterator_category,
+                         std::input_iterator_tag>::value>::type>
+std::unique_ptr<ASTNode> make_all(Iter begin, Iter end)
+{
+    return std::unique_ptr<ASTNode>(create_regexes(begin, end));
+}
+
 std::unique_ptr<ASTNode> make_all(std::initializer_list<const char*> list)
 {
-    return std::unique_ptr<ASTNode>(create_regexes(list.begin(), list.end()));
+    return make_all(list.begin(), list.end());
 }
 
 void test(const TransitionTable& table, const std::string& s)
@@ -52,6 +62,12 @@ void test(const TransitionTable& table, const std::string& s)
         }
         state = next_state;
         std::cout << state << ' ' << ch << '\n';
+    }
+    if (state != 1) {
+        auto it = table.find_final(state);
+        if (it != table.final_states_end()) {
+            std::cout << "parsed a(n) " << it->second << '\n';
+        }
     }
     std::cout << '\n';
 }
@@ -73,7 +89,7 @@ int main()
 
     std::cout << dtrans.size() << '\n';
 
-    test(dtrans, "if ", "then ", "else ");
+    test(dtrans, "if ", "then ", "else ", "HelloWorld");
 
     return 0;
 }

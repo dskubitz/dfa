@@ -11,22 +11,20 @@ TransitionTable make_transition_table(DFAFunctionCalculator& calc)
 {
     unsigned int state_num = 0;
 
-    std::vector<Dstate> stack{calc.firstpos().at(calc.tree())};
-    std::map<Dstate, unsigned int> unseen{
+    std::vector<Dstate> unmarked{calc.firstpos().at(calc.tree())};
+    std::map<Dstate, unsigned int> dstates {
             {calc.firstpos().at(calc.tree()), state_num++}};
-    std::map<Dstate, unsigned int> seen;
 
     TransitionTable table;
     table.add_state();
 
-    while (!stack.empty()) {
-        Dstate S = stack.back();
-        stack.pop_back();
-        seen.emplace(S, unseen.at(S));
+    while (!unmarked.empty()) {
+        Dstate S = unmarked.back();
+        unmarked.pop_back();
 
         for (auto& final : calc.acceptpos())
             if (S.test(final.first)) {
-                table.add_final_state(seen.at(S), final.second);
+                table.add_final_state(dstates.at(S), final.second);
                 break;
             }
 
@@ -36,13 +34,12 @@ TransitionTable make_transition_table(DFAFunctionCalculator& calc)
                 if (S.test(i) && calc.symbols().at(i) == ch)
                     U |= calc.followpos().at(i);
 
-            auto it = seen.find(U);
-            if (it == seen.end() && unseen.emplace(U, state_num).second) {
+            if (dstates.emplace(U, state_num).second) {
                 state_num++;
-                stack.emplace_back(U);
+                unmarked.emplace_back(U);
                 table.add_state();
             }
-            table[seen.at(S)][ch] = unseen.at(U);
+            table[dstates.at(S)][ch] = dstates.at(U);
         }
     }
 

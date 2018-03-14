@@ -64,9 +64,9 @@ public:
 
     std::vector<char> symbols() noexcept { return symbols_; }
 
-    std::map<int, std::string>& acceptpos() noexcept { return acceptpos_; }
+    std::map<unsigned int, std::string>& acceptpos() noexcept { return acceptpos_; }
 
-    const std::map<int, std::string>&
+    const std::map<unsigned int, std::string>&
     acceptpos() const noexcept { return acceptpos_; }
 
 private:
@@ -76,7 +76,7 @@ private:
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> lastpos_;
     std::vector<boost::dynamic_bitset<>> followpos_;
     std::vector<char> symbols_;
-    std::map<int, std::string> acceptpos_;
+    std::map<unsigned int, std::string> acceptpos_;
 };
 
 #endif //LEXER_DFAFUNCTIONCALCULATOR_H

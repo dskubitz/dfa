@@ -6,6 +6,7 @@ DFAFunctionCalculator::DFAFunctionCalculator(ASTNode* re)
 {
     followpos_.resize(CharNode::max_id());
     symbols_.resize(CharNode::max_id());
+
     for (int i = 0; i < CharNode::max_id(); ++i)
         followpos_[i] = make_bitset();
 
@@ -89,7 +90,6 @@ void DFAFunctionCalculator::visit(EndmarkerNode& node)
     lastpos_[&node] = make_bitset(node.id());
     symbols_[node.id()] = node.value();
     acceptpos_[node.id()] = node.name();
-    std::cout << node.id() << ' ' << node.name() << '\n';
 }
 
 

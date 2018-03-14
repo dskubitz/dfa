@@ -9,11 +9,12 @@ using Dstate = boost::dynamic_bitset<>;
 
 TransitionTable make_transition_table(DFAFunctionCalculator& calc)
 {
-    int state_num = 0;
+    unsigned int state_num = 0;
 
-    std::vector<Dstate> stack {calc.firstpos().at(calc.tree())};
-    std::map<Dstate, int> unseen {{calc.firstpos().at(calc.tree()), state_num++}};
-    std::map<Dstate, int> seen;
+    std::vector<Dstate> stack{calc.firstpos().at(calc.tree())};
+    std::map<Dstate, unsigned int> unseen{
+            {calc.firstpos().at(calc.tree()), state_num++}};
+    std::map<Dstate, unsigned int> seen;
 
     TransitionTable table;
     table.add_state();
@@ -23,27 +24,23 @@ TransitionTable make_transition_table(DFAFunctionCalculator& calc)
         stack.pop_back();
         seen.emplace(S, unseen.at(S));
 
-        for (auto& final : calc.acceptpos()) {
+        for (auto& final : calc.acceptpos())
             if (S.test(final.first)) {
-                std::cout << seen.at(S) << ' ' << final.second << '\n';
+                table.add_final_state(seen.at(S), final.second);
                 break;
             }
-        }
 
         for (auto ch : alphabet) {
             Dstate U = make_bitset();
-            for (size_t i = 0; i < CharNode::max_id(); ++i) {
-                if (S.test(i) && calc.symbols().at(i) == ch) {
+            for (size_t i = 0; i < CharNode::max_id(); ++i)
+                if (S.test(i) && calc.symbols().at(i) == ch)
                     U |= calc.followpos().at(i);
-                }
-            }
+
             auto it = seen.find(U);
-            if (it == seen.end()) {
-                if (unseen.emplace(U, state_num).second) {
-                    state_num++;
-                    stack.emplace_back(U);
-                    table.add_state();
-                }
+            if (it == seen.end() && unseen.emplace(U, state_num).second) {
+                state_num++;
+                stack.emplace_back(U);
+                table.add_state();
             }
             table[seen.at(S)][ch] = unseen.at(U);
         }

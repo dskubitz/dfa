@@ -43,13 +43,6 @@ void make_transition_table(const TreeFunctions& calc, TransitionTable& table)
     }
 }
 
-TransitionTable make_transition_table(const TreeFunctions& calc)
-{
-    TransitionTable table;
-    make_transition_table(calc, table);
-    return table;
-}
-
 TransitionTable::TransitionTable(const TreeFunctions& calc)
 {
     make_transition_table(calc, *this);

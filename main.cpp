@@ -32,8 +32,7 @@ void test(const TransitionTable& table, const std::string& s, Args... args)
 
 int main()
 {
-    Parser parser;
-    std::unique_ptr<ASTNode> regex(parser.parse(
+    std::unique_ptr<ASTNode> regex(Parser{}.parse(
             {
                     {"if",                     "if"},
                     {"then",                   "then"},

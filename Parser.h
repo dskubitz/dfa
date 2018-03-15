@@ -5,8 +5,6 @@
 
 #include "ASTNode.h"
 
-std::string stoupper(const std::string& str);
-
 class Parser {
 public:
     /**

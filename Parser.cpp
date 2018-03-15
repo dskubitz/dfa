@@ -28,7 +28,7 @@ ASTNode* Parser::parse(const std::string& regexp, const std::string& name)
     expr = regexp;
     pos = 0;
 
-    return new CatNode(expression(), new EndmarkerNode(stoupper(name)));
+    return new CatNode(expression(), new EndmarkerNode(name));
 }
 
 ASTNode* Parser::expression()
@@ -220,11 +220,4 @@ char Parser::consume(char ch, const std::string& msg)
     error(msg);
 }
 
-std::string stoupper(const std::string& str)
-{
-    std::string res;
-    for (auto ch : str) {
-        res.push_back(static_cast<char>(toupper(ch)));
-    }
-    return res;
-}
+

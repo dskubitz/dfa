@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <array>
-#include <unordered_map>
+#include <map>
 #include <string>
 
 class TreeFunctions;
@@ -12,7 +12,7 @@ using state_type = std::array<int, 128>;
 
 class TransitionTable : private std::vector<state_type> {
     using base = std::vector<state_type>;
-    std::unordered_map<size_type, std::string> final_states_;
+    std::map<size_type, std::string> final_states_;
 public:
     using base::operator[];
     using base::at;
@@ -27,10 +27,10 @@ public:
      */
     void add_state() { this->emplace_back(); }
 
-    std::unordered_map<size_type, std::string>&
+    std::map<size_type, std::string>&
     final_states() noexcept { return final_states_; }
 
-    const std::unordered_map<size_type, std::string>&
+    const std::map<size_type, std::string>&
     final_states() const noexcept { return final_states_; }
 };
 

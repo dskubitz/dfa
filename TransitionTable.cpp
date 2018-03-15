@@ -16,6 +16,8 @@ void make_transition_table(const TreeFunctions& calc, TransitionTable& table)
             {calc.firstpos().at(calc.tree()), state_num++}};
 
     table.add_state();
+    table.final_states().emplace(0, "start");
+    table.final_states().emplace(1, "dead");
 
     while (!unmarked.empty()) {
         Dstate S = unmarked.back();
@@ -27,7 +29,7 @@ void make_transition_table(const TreeFunctions& calc, TransitionTable& table)
                 break;
             }
 
-        for (auto ch : alphabet) {
+        for (int ch = 0; ch < 128; ++ch) {
             Dstate U = make_bitset();
             for (size_t i = 0; i < CharNode::max_id(); ++i)
                 if (S.test(i) && calc.symbols().at(i) == ch)

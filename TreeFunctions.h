@@ -21,9 +21,9 @@ inline boost::dynamic_bitset<> make_bitset(size_t pos)
     return bitset;
 }
 
-class DFAFunctionCalculator : public ASTVisitor {
+class TreeFunctions : public ASTVisitor {
 public:
-    explicit DFAFunctionCalculator(ASTNode* re);
+    explicit TreeFunctions(ASTNode* re);
 
     void visit(StarNode& node) override;
     void visit(CatNode& node) override;

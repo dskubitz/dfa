@@ -1,7 +1,7 @@
 #include <iostream>
-#include "DFAFunctionCalculator.h"
+#include "TreeFunctions.h"
 
-DFAFunctionCalculator::DFAFunctionCalculator(ASTNode* re)
+TreeFunctions::TreeFunctions(ASTNode* re)
         :tree_(re)
 {
     followpos_.resize(CharNode::max_id());
@@ -13,7 +13,7 @@ DFAFunctionCalculator::DFAFunctionCalculator(ASTNode* re)
     tree_->accept(*this);
 }
 
-void DFAFunctionCalculator::visit(StarNode& node)
+void TreeFunctions::visit(StarNode& node)
 {
     ASTNode* expr = node.expr();
 
@@ -30,7 +30,7 @@ void DFAFunctionCalculator::visit(StarNode& node)
             followpos_[i] |= firstpos;
 }
 
-void DFAFunctionCalculator::visit(CatNode& node)
+void TreeFunctions::visit(CatNode& node)
 {
     ASTNode* left = node.left();
     ASTNode* right = node.right();
@@ -56,7 +56,7 @@ void DFAFunctionCalculator::visit(CatNode& node)
             followpos_[i] |= firstpos_c2;
 }
 
-void DFAFunctionCalculator::visit(UnionNode& node)
+void TreeFunctions::visit(UnionNode& node)
 {
     ASTNode* left = node.left();
     ASTNode* right = node.right();
@@ -68,7 +68,7 @@ void DFAFunctionCalculator::visit(UnionNode& node)
     lastpos_[&node] = firstpos_.at(left) | firstpos_.at(right);
 }
 
-void DFAFunctionCalculator::visit(CharNode& node)
+void TreeFunctions::visit(CharNode& node)
 {
     nullable_[&node] = false;
     firstpos_[&node] = make_bitset(node.id());
@@ -76,14 +76,14 @@ void DFAFunctionCalculator::visit(CharNode& node)
     symbols_[node.id()] = node.value();
 }
 
-void DFAFunctionCalculator::visit(EpsilonNode& node)
+void TreeFunctions::visit(EpsilonNode& node)
 {
     nullable_[&node] = true;
     firstpos_[&node] = make_bitset();
     lastpos_[&node] = make_bitset();
 }
 
-void DFAFunctionCalculator::visit(EndmarkerNode& node)
+void TreeFunctions::visit(EndmarkerNode& node)
 {
     nullable_[&node] = false;
     firstpos_[&node] = make_bitset(node.id());

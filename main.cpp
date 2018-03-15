@@ -1,16 +1,16 @@
 #include <iostream>
 
 #include "ASTNode.h"
-#include "DFA.h"
+#include "TransitionTable.h"
 #include "Parser.h"
-#include "DFAFunctionCalculator.h"
+#include "TreeFunctions.h"
+
+static Parser parser;
 
 ASTNode* unify(ASTNode* left, ASTNode* right)
 {
     return new UnionNode(left, right);
 }
-
-Parser parser;
 
 ASTNode* parse(const std::string& pattern)
 {
@@ -55,19 +55,14 @@ void test(const TransitionTable& table, const std::string& s)
     for (char ch : s) {
         int next_state = table[state][ch];
         if (next_state == 1) {
-            auto it = table.find_final(state);
-            if (it != table.final_states_end()) {
-                std::cout << "parsed a(n) " << it->second << '\n';
-            }
+            break;
         }
         state = next_state;
         std::cout << state << ' ' << ch << '\n';
     }
-    if (state != 1) {
-        auto it = table.find_final(state);
-        if (it != table.final_states_end()) {
-            std::cout << "parsed a(n) " << it->second << '\n';
-        }
+    auto it = table.find_final(state);
+    if (it != table.final_states_end()) {
+        std::cout << "parsed a(n) " << it->second << '\n';
     }
     std::cout << '\n';
 }
@@ -81,12 +76,17 @@ void test(const TransitionTable& table, const std::string& s, Args... args)
 
 int main()
 {
-    auto regex = make_all({"if", "then", "else",
-                           "[A-Za-z_][A-Za-z0-9_]*", "[1-9][0-9]*"
-                          });
-    DFAFunctionCalculator calc(regex.get());
+    auto regex = make_all(
+            {"auto", "break", "case", "char", "const", "continue", "default",
+             "do", "double", "else", "enum", "extern", "float", "for", "goto",
+             "if", "int", "long", "register", "return", "short", "signed",
+             "sizeof", "static", "struct", "switch", "typedef", "union",
+             "unsigned",
+             "void", "volatile", "while",
+             "[A-Za-z_][A-Za-z0-9_]*", "[1-9][0-9]*"
+            });
+    TreeFunctions calc(regex.get());
     auto dtrans = make_transition_table(calc);
-
     std::cout << dtrans.size() << '\n';
 
     test(dtrans, "if ", "then ", "else ", "HelloWorld");

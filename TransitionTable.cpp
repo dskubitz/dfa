@@ -2,12 +2,12 @@
 #include <iostream>
 
 #include "ASTNode.h"
-#include "DFAFunctionCalculator.h"
-#include "DFA.h"
+#include "TreeFunctions.h"
+#include "TransitionTable.h"
 
 using Dstate = boost::dynamic_bitset<>;
 
-TransitionTable make_transition_table(DFAFunctionCalculator& calc)
+TransitionTable make_transition_table(TreeFunctions& calc)
 {
     unsigned int state_num = 0;
 

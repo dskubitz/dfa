@@ -58,9 +58,9 @@ public:
     }
 };
 
-class DFAFunctionCalculator;
+class TreeFunctions;
 
 TransitionTable
-make_transition_table(DFAFunctionCalculator& calc);
+make_transition_table(TreeFunctions& calc);
 
 #endif //DFA_H

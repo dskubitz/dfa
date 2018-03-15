@@ -8,4 +8,4 @@ include_directories(${Boost_INCLUDE_DIR})
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(lexer main.cpp DFA.cpp DFA.h ASTNode.cpp ASTNode.h Printer.cpp Printer.h Parser.cpp Parser.h DFAFunctionCalculator.cpp DFAFunctionCalculator.h)
+add_executable(lexer main.cpp TransitionTable.cpp TransitionTable.h ASTNode.cpp ASTNode.h Printer.cpp Printer.h Parser.cpp Parser.h TreeFunctions.cpp TreeFunctions.h)

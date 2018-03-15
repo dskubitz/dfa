@@ -7,7 +7,7 @@
 
 using Dstate = boost::dynamic_bitset<>;
 
-TransitionTable make_transition_table(TreeFunctions& calc)
+void make_transition_table(const TreeFunctions& calc, TransitionTable& table)
 {
     unsigned int state_num = 0;
 
@@ -15,7 +15,6 @@ TransitionTable make_transition_table(TreeFunctions& calc)
     std::map<Dstate, unsigned int> dstates {
             {calc.firstpos().at(calc.tree()), state_num++}};
 
-    TransitionTable table;
     table.add_state();
 
     while (!unmarked.empty()) {
@@ -24,7 +23,7 @@ TransitionTable make_transition_table(TreeFunctions& calc)
 
         for (auto& final : calc.acceptpos())
             if (S.test(final.first)) {
-                table.add_final_state(dstates.at(S), final.second);
+                table.final_states().emplace(dstates.at(S), final.second);
                 break;
             }
 
@@ -42,6 +41,16 @@ TransitionTable make_transition_table(TreeFunctions& calc)
             table[dstates.at(S)][ch] = dstates.at(U);
         }
     }
+}
 
+TransitionTable make_transition_table(const TreeFunctions& calc)
+{
+    TransitionTable table;
+    make_transition_table(calc, table);
     return table;
+}
+
+TransitionTable::TransitionTable(const TreeFunctions& calc)
+{
+    make_transition_table(calc, *this);
 }

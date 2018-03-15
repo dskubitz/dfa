@@ -5,50 +5,6 @@
 #include "Parser.h"
 #include "TreeFunctions.h"
 
-static Parser parser;
-
-ASTNode* unify(ASTNode* left, ASTNode* right)
-{
-    return new UnionNode(left, right);
-}
-
-ASTNode* parse(const std::string& pattern)
-{
-    return new CatNode(parser.parse(pattern), new EndmarkerNode(pattern));
-}
-
-template<class Iter,
-         class = typename std::enable_if<
-                 std::is_convertible<
-                         typename std::iterator_traits<Iter>::iterator_category,
-                         std::input_iterator_tag>::value>::type>
-ASTNode* create_regexes(Iter b, Iter e)
-{
-    if (b == e)
-        return nullptr;
-
-    ASTNode* node = parse(*b++);
-    for (; b != e; ++b) {
-        node = unify(node, parse(*b));
-    }
-    return node;
-}
-
-template<class Iter,
-         class = typename std::enable_if<
-                 std::is_convertible<
-                         typename std::iterator_traits<Iter>::iterator_category,
-                         std::input_iterator_tag>::value>::type>
-std::unique_ptr<ASTNode> make_all(Iter begin, Iter end)
-{
-    return std::unique_ptr<ASTNode>(create_regexes(begin, end));
-}
-
-std::unique_ptr<ASTNode> make_all(std::initializer_list<const char*> list)
-{
-    return make_all(list.begin(), list.end());
-}
-
 void test(const TransitionTable& table, const std::string& s)
 {
     int state = 0;
@@ -60,9 +16,9 @@ void test(const TransitionTable& table, const std::string& s)
         state = next_state;
         std::cout << state << ' ' << ch << '\n';
     }
-    auto it = table.find_final(state);
-    if (it != table.final_states_end()) {
-        std::cout << "parsed a(n) " << it->second << '\n';
+    auto it = table.final_states().find(state);
+    if (it != table.final_states().end()) {
+        std::cout << it->second << '\n';
     }
     std::cout << '\n';
 }
@@ -76,20 +32,35 @@ void test(const TransitionTable& table, const std::string& s, Args... args)
 
 int main()
 {
-    auto regex = make_all(
-            {"auto", "break", "case", "char", "const", "continue", "default",
-             "do", "double", "else", "enum", "extern", "float", "for", "goto",
-             "if", "int", "long", "register", "return", "short", "signed",
-             "sizeof", "static", "struct", "switch", "typedef", "union",
-             "unsigned",
-             "void", "volatile", "while",
-             "[A-Za-z_][A-Za-z0-9_]*", "[1-9][0-9]*"
-            });
+    Parser parser;
+    std::unique_ptr<ASTNode> regex(parser.parse(
+            {
+                    {"if",                     "if"},
+                    {"then",                   "then"},
+                    {"else",                   "else"},
+                    {"[A-Za-z_][A-Za-z0-9_]*", "identifier"}}));
     TreeFunctions calc(regex.get());
-    auto dtrans = make_transition_table(calc);
+    TransitionTable dtrans(calc);
     std::cout << dtrans.size() << '\n';
 
-    test(dtrans, "if ", "then ", "else ", "HelloWorld");
+    test(dtrans, "a", "if", "then", "else", "HelloWorld");
 
+    /*
+    std::cout << "int dtrans[" << dtrans.size() << "][128] = {\n";
+    for (auto& state:dtrans){
+        std::cout << "\n\t{";
+        for (int i = 0; i < 128; ) {
+            std::cout << state[i++];
+            if (i == 128) {
+                break;
+            }
+            std::cout << ", ";
+            if (i % 16 == 0)
+                std::cout << "\n\t";
+        }
+        std::cout << "},\n";
+    }
+    std::cout << "};";
+    */
     return 0;
 }

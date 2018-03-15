@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <string>
 
+class TreeFunctions;
 using state_type = std::array<int, 128>;
 
 class TransitionTable : private std::vector<state_type> {
@@ -22,6 +23,8 @@ public:
     using base::reserve;
     using base::resize;
 
+    explicit TransitionTable(const TreeFunctions& calc);
+
     /**
      * Add a new state to the table and return its index.
      */
@@ -31,36 +34,14 @@ public:
         return this->size() - 1;
     }
 
-    void add_final_state(size_type index, const std::string& str)
-    {
-        final_states_.emplace(index, str);
-    }
+    std::unordered_map<size_type, std::string>&
+    final_states() noexcept { return final_states_; }
 
-    auto find_final(size_type index) -> decltype(final_states_.find(index))
-    {
-        return final_states_.find(index);
-    }
-
-    auto final_states_end() -> decltype(final_states_.end())
-    {
-        return final_states_.end();
-    }
-
-    const auto
-    find_final(size_type index) const -> decltype(final_states_.find(index))
-    {
-        return final_states_.find(index);
-    }
-
-    const auto final_states_end() const -> decltype(final_states_.end())
-    {
-        return final_states_.end();
-    }
+    const std::unordered_map<size_type, std::string>&
+    final_states() const noexcept { return final_states_; }
 };
 
-class TreeFunctions;
-
-TransitionTable
-make_transition_table(TreeFunctions& calc);
+TransitionTable make_transition_table(const TreeFunctions& calc);
+void make_transition_table(const TreeFunctions& calc, TransitionTable& table);
 
 #endif //DFA_H

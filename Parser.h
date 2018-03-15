@@ -5,9 +5,51 @@
 
 #include "ASTNode.h"
 
+std::string stoupper(const std::string& str);
+
 class Parser {
 public:
-    ASTNode* parse(std::string regexp);
+    /**
+     * The syntax trees produced by this parser are augmented by concatenation
+     * of an endmarker.
+     */
+    ASTNode* parse(const std::string& regexp, const std::string& name);
+
+    /**
+     * Overload to allow for iterating over any range of pairs
+     */
+    ASTNode* parse(std::pair<std::string, std::string> pair)
+    {
+        return parse(pair.first, pair.second);
+    }
+
+    /**
+     * Parse and unify any range of pair<string, string>
+     */
+    template<class Iter,
+             class = typename std::enable_if<
+                     std::is_convertible<
+                             typename std::iterator_traits<Iter>::iterator_category,
+                             std::input_iterator_tag>::value
+                     && std::is_constructible<std::pair<std::string, std::string>,
+                                              typename std::iterator_traits<Iter>::reference>::value>::type>
+    ASTNode* parse(Iter b, Iter e)
+    {
+        if (b == e)
+            throw std::runtime_error("create_regexes() with empty range");
+
+        ASTNode* node = parse(*b++);
+        for (; b != e; ++b) {
+            node = unify(node, parse(*b));
+        }
+        return node;
+    }
+
+    ASTNode* parse(std::initializer_list<std::pair<std::string, std::string>> list)
+    {
+        return parse(list.begin(), list.end());
+    }
+
 private:
     bool match(char ch);
     bool check(char ch);
@@ -27,9 +69,13 @@ private:
     std::string character_class();
     std::string range();
 
+    ASTNode* unify(ASTNode* left, ASTNode* right)
+    {
+        return new UnionNode(left, right);
+    }
+
     std::string expr{};
     std::string::size_type pos{0};
-    size_t leaf_count{0};
 };
 
 #endif //LEXER_PARSER_H

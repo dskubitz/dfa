@@ -4,6 +4,7 @@
 
 #include "Parser.h"
 
+namespace {
 bool is_meta(char ch)
 {
     return ch == '*' || ch == '+' || ch == '-' || ch == '|' || ch == '.'
@@ -20,63 +21,14 @@ bool is_char(char ch)
 {
     throw std::runtime_error{msg};
 }
+}
 
-ASTNode* Parser::parse(std::string regexp)
+ASTNode* Parser::parse(const std::string& regexp, const std::string& name)
 {
-    if (regexp.size() == 1) {
-        if (is_char(regexp[0]))
-            return new CharNode(regexp[0]);
-        else
-            error("invalid expression: " + regexp);
-    }
-
-    expr = std::move(regexp);
+    expr = regexp;
     pos = 0;
 
-    return expression();
-}
-
-bool Parser::match(char ch)
-{
-    if (check(ch)) {
-        advance();
-        return true;
-    }
-    return false;
-}
-
-bool Parser::check(char ch)
-{
-    return !at_end() && peek() == ch;
-}
-
-char Parser::advance()
-{
-    if (!at_end())
-        ++pos;
-    return previous();
-}
-
-bool Parser::at_end()
-{
-    return pos == expr.size();
-}
-
-char Parser::peek()
-{
-    return expr.at(pos);
-}
-
-char Parser::previous()
-{
-    return expr.at(pos - 1);
-}
-
-char Parser::consume(char ch, const std::string& msg)
-{
-    if (check(ch))
-        return advance();
-    error(msg);
+    return new CatNode(expression(), new EndmarkerNode(stoupper(name)));
 }
 
 ASTNode* Parser::expression()
@@ -223,4 +175,56 @@ std::string Parser::range()
         ss << left;
     }
     return ss.str();
+}
+
+bool Parser::match(char ch)
+{
+    if (check(ch)) {
+        advance();
+        return true;
+    }
+    return false;
+}
+
+bool Parser::check(char ch)
+{
+    return !at_end() && peek() == ch;
+}
+
+char Parser::advance()
+{
+    if (!at_end())
+        ++pos;
+    return previous();
+}
+
+bool Parser::at_end()
+{
+    return pos == expr.size();
+}
+
+char Parser::peek()
+{
+    return expr.at(pos);
+}
+
+char Parser::previous()
+{
+    return expr.at(pos - 1);
+}
+
+char Parser::consume(char ch, const std::string& msg)
+{
+    if (check(ch))
+        return advance();
+    error(msg);
+}
+
+std::string stoupper(const std::string& str)
+{
+    std::string res;
+    for (auto ch : str) {
+        res.push_back(static_cast<char>(toupper(ch)));
+    }
+    return res;
 }

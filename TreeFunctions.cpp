@@ -1,7 +1,7 @@
 #include <iostream>
 #include "TreeFunctions.h"
 
-TreeFunctions::TreeFunctions(ASTNode* re)
+TreeFunctions::TreeFunctions(const ASTNode* re)
         :tree_(re)
 {
     followpos_.resize(CharNode::max_id());

@@ -5,6 +5,7 @@
 #include "ASTNode.h"
 #include "TransitionTable.h"
 #include "TreeFunctions.h"
+#include "Parser.h"
 
 std::string stoupper(const std::string& str)
 {
@@ -112,7 +113,47 @@ void output_transition_table(const TransitionTable& table)
 
 int main()
 {
-//    output_transition_table(dtrans);
+    auto regex = Parser{}.parse(
+            {
+                    {"and",                    "and"},
+                    {"class",                  "class"},
+                    {"else",                   "else"},
+                    {"false",                  "false"},
+                    {"for",                    "for"},
+                    {"fun",                    "fun"},
+                    {"if",                     "if"},
+                    {"nil",                    "nil"},
+                    {"or",                     "or"},
+                    {"print",                  "print"},
+                    {"return",                 "return"},
+                    {"super",                  "super"},
+                    {"this",                   "this"},
+                    {"true",                   "true"},
+                    {"var",                    "var"},
+                    {"while",                  "while"},
+                    {"[0-9]+",                 "number"},
+                    {"[0-9]+\\.[0-9]+",        "float"},
+                    {"\\\"[^\\\"]*\"",         "string"},
+                    {"[A-Za-z_][A-Za-z0-9_]*", "identifier"},
+                    {"==",                     "equal_equal"},
+                    {"!=",                     "bang_equal"},
+                    {"<=",                     "less_equal"},
+                    {">=",                     "greater_equal"},
+                    {"\\<",                    "less"},
+                    {"\\>",                    "greater"},
+                    {"\\+",                    "plus"},
+                    {"\\-",                    "minus"},
+                    {"\\*",                    "star"},
+                    {"\\/",                    "slash"},
+                    {"\\=",                    "equal"},
+                    {"\\.",                    "dot"},
+                    {"\n",                     "new_line"},
+                    {"[ \t\v\f]+",             "space"},
+                    {".",                      "error"},
+            }
+    );
+    auto table = make_transition_table(regex.get());
+    output_transition_table(table);
 
     return 0;
 }

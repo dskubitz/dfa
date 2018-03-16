@@ -7,6 +7,7 @@
 #include <string>
 
 class TreeFunctions;
+class ASTNode;
 
 using state_type = std::array<int, 128>;
 
@@ -35,5 +36,5 @@ public:
 };
 
 void make_transition_table(const TreeFunctions& calc, TransitionTable& table);
-
+TransitionTable make_transition_table(const ASTNode* ast);
 #endif //DFA_H

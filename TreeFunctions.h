@@ -23,7 +23,7 @@ inline boost::dynamic_bitset<> make_bitset(size_t pos)
 
 class TreeFunctions : public ASTVisitor {
 public:
-    explicit TreeFunctions(ASTNode* re);
+    explicit TreeFunctions(const ASTNode* re);
 
     void visit(const StarNode* node) override;
     void visit(const CatNode* node) override;
@@ -53,7 +53,7 @@ public:
     const std::vector<char> symbols() const noexcept { return symbols_; }
 
 private:
-    ASTNode* tree_;
+    const ASTNode* tree_;
     std::unordered_map<const ASTNode*, bool> nullable_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> firstpos_;
     std::unordered_map<const ASTNode*, boost::dynamic_bitset<>> lastpos_;

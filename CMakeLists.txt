@@ -9,9 +9,10 @@ add_subdirectory(test)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCES TransitionTable.cpp ASTNode.cpp PrettyPrinter.cpp Parser.cpp TreeFunctions.cpp)
+set(SOURCES TransitionTable.cpp ASTNode.cpp PrettyPrinter.cpp Parser.cpp TreeFunctions.cpp Lexer.cpp Lexer.h)
 add_library(core STATIC ${SOURCES})
-target_include_directories(core PUBLIC ${Boost_INCLUDE_DIR})
+target_include_directories(core PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR})
 add_executable(lexer main.cpp)
 target_link_libraries(lexer core)
-target_include_directories(lexer PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(lexer PRIVATE ${CMAKE_SOURCE_DIR})

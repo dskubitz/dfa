@@ -12,7 +12,7 @@ void make_transition_table(const TreeFunctions& calc, TransitionTable& table)
     unsigned int state_num = 0;
 
     std::vector<Dstate> unmarked{calc.firstpos().at(calc.tree())};
-    std::map<Dstate, unsigned int> dstates {
+    std::map<Dstate, unsigned int> dstates{
             {calc.firstpos().at(calc.tree()), state_num++}};
 
     table.add_state();
@@ -48,4 +48,9 @@ void make_transition_table(const TreeFunctions& calc, TransitionTable& table)
 TransitionTable::TransitionTable(const TreeFunctions& calc)
 {
     make_transition_table(calc, *this);
+}
+
+TransitionTable make_transition_table(const ASTNode* ast)
+{
+    return TransitionTable(TreeFunctions(ast));
 }

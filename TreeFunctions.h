@@ -25,15 +25,22 @@ class TreeFunctions : public ASTVisitor {
 public:
     explicit TreeFunctions(ASTNode* re);
 
-    void visit(StarNode& node) override;
-    void visit(CatNode& node) override;
-    void visit(UnionNode& node) override;
-    void visit(CharNode& node) override;
-    void visit(EpsilonNode& node) override;
-    void visit(EndmarkerNode& node) override;
+    void visit(const StarNode* node) override;
+    void visit(const CatNode* node) override;
+    void visit(const UnionNode* node) override;
+    void visit(const CharNode* node) override;
+    void visit(const EpsilonNode* node) override;
+    void visit(const EndmarkerNode* node) override;
+    void visit(const ASTNode* node) override;
+
+    const std::unordered_map<const ASTNode*, bool>& nullable() const noexcept
+    { return nullable_; }
 
     const std::unordered_map<const ASTNode*, boost::dynamic_bitset<>>&
     firstpos() const noexcept { return firstpos_; };
+
+    const std::unordered_map<const ASTNode*, boost::dynamic_bitset<>>&
+    lastpos() const noexcept { return lastpos_; };
 
     const std::vector<boost::dynamic_bitset<>>&
     followpos() const noexcept { return followpos_; };

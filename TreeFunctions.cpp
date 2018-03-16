@@ -10,18 +10,18 @@ TreeFunctions::TreeFunctions(ASTNode* re)
     for (int i = 0; i < CharNode::max_id(); ++i)
         followpos_[i] = make_bitset();
 
-    tree_->accept(*this);
+    tree_->accept(this);
 }
 
-void TreeFunctions::visit(StarNode& node)
+void TreeFunctions::visit(const StarNode* node)
 {
-    ASTNode* expr = node.expr();
+    const ASTNode* expr = node->expr();
 
-    expr->accept(*this);
+    expr->accept(this);
 
-    nullable_[&node] = true;
-    auto& firstpos = firstpos_[&node];
-    auto& lastpos = lastpos_[&node];
+    nullable_[node] = true;
+    auto& firstpos = firstpos_[node];
+    auto& lastpos = lastpos_[node];
 
     firstpos = lastpos = firstpos_.at(expr);
 
@@ -30,23 +30,23 @@ void TreeFunctions::visit(StarNode& node)
             followpos_[i] |= firstpos;
 }
 
-void TreeFunctions::visit(CatNode& node)
+void TreeFunctions::visit(const CatNode* node)
 {
-    ASTNode* left = node.left();
-    ASTNode* right = node.right();
+    const ASTNode* left = node->left();
+    const ASTNode* right = node->right();
 
-    left->accept(*this);
-    right->accept(*this);
+    left->accept(this);
+    right->accept(this);
 
-    nullable_[&node] = nullable_.at(left) && nullable_.at(right);
+    nullable_[node] = nullable_.at(left) && nullable_.at(right);
 
-    firstpos_[&node] = firstpos_.at(left);
+    firstpos_[node] = firstpos_.at(left);
     if (nullable_.at(left))
-        firstpos_[&node] |= firstpos_.at(right);
+        firstpos_[node] |= firstpos_.at(right);
 
-    lastpos_[&node] = firstpos_.at(right);
+    lastpos_[node] = firstpos_.at(right);
     if (nullable_.at(right))
-        lastpos_[&node] |= firstpos_.at(left);
+        lastpos_[node] |= firstpos_.at(left);
 
     auto& lastpos_c1 = lastpos_.at(left);
     auto& firstpos_c2 = firstpos_.at(right);
@@ -56,40 +56,45 @@ void TreeFunctions::visit(CatNode& node)
             followpos_[i] |= firstpos_c2;
 }
 
-void TreeFunctions::visit(UnionNode& node)
+void TreeFunctions::visit(const UnionNode* node)
 {
-    ASTNode* left = node.left();
-    ASTNode* right = node.right();
-    left->accept(*this);
-    right->accept(*this);
+    const ASTNode* left = node->left();
+    const ASTNode* right = node->right();
+    left->accept(this);
+    right->accept(this);
 
-    nullable_[&node] = nullable_.at(left) || nullable_.at(right);
-    firstpos_[&node] = firstpos_.at(left) | firstpos_.at(right);
-    lastpos_[&node] = firstpos_.at(left) | firstpos_.at(right);
+    nullable_[node] = nullable_.at(left) || nullable_.at(right);
+    firstpos_[node] = firstpos_.at(left) | firstpos_.at(right);
+    lastpos_[node] = firstpos_.at(left) | firstpos_.at(right);
 }
 
-void TreeFunctions::visit(CharNode& node)
+void TreeFunctions::visit(const CharNode* node)
 {
-    nullable_[&node] = false;
-    firstpos_[&node] = make_bitset(node.id());
-    lastpos_[&node] = make_bitset(node.id());
-    symbols_[node.id()] = node.value();
+    nullable_[node] = false;
+    firstpos_[node] = make_bitset(node->id());
+    lastpos_[node] = make_bitset(node->id());
+    symbols_[node->id()] = node->value();
 }
 
-void TreeFunctions::visit(EpsilonNode& node)
+void TreeFunctions::visit(const EpsilonNode* node)
 {
-    nullable_[&node] = true;
-    firstpos_[&node] = make_bitset();
-    lastpos_[&node] = make_bitset();
+    nullable_[node] = true;
+    firstpos_[node] = make_bitset();
+    lastpos_[node] = make_bitset();
 }
 
-void TreeFunctions::visit(EndmarkerNode& node)
+void TreeFunctions::visit(const EndmarkerNode* node)
 {
-    nullable_[&node] = false;
-    firstpos_[&node] = make_bitset(node.id());
-    lastpos_[&node] = make_bitset(node.id());
-    symbols_[node.id()] = node.value();
-    acceptpos_[node.id()] = node.name();
+    nullable_[node] = false;
+    firstpos_[node] = make_bitset(node->id());
+    lastpos_[node] = make_bitset(node->id());
+    symbols_[node->id()] = node->value();
+    acceptpos_[node->id()] = node->name();
+}
+
+void TreeFunctions::visit(const ASTNode* node)
+{
+    node->accept(this);
 }
 
 

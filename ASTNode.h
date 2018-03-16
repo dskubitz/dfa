@@ -23,6 +23,7 @@ constexpr static const std::array<int, 100>
 };
 
 //@formatter:off
+class ASTNode;
 class StarNode;
 class CatNode;
 class UnionNode;
@@ -35,26 +36,27 @@ class ASTVisitor {
 public:
     virtual ~ASTVisitor() = default;
 
-    virtual void visit(StarNode&)=0;
-    virtual void visit(CatNode&)=0;
-    virtual void visit(UnionNode&)=0;
-    virtual void visit(CharNode&)=0;
-    virtual void visit(EpsilonNode&)=0;
-    virtual void visit(EndmarkerNode&)=0;
+    virtual void visit(const ASTNode*) = 0;
+    virtual void visit(const StarNode*) =0;
+    virtual void visit(const CatNode*)=0;
+    virtual void visit(const UnionNode*)=0;
+    virtual void visit(const CharNode*)=0;
+    virtual void visit(const EpsilonNode*)=0;
+    virtual void visit(const EndmarkerNode*)=0;
 };
 
 class ASTNode {
 public:
     virtual ~ASTNode() = default;
-    virtual void accept(ASTVisitor& v) = 0;
+    virtual void accept(ASTVisitor* v) const = 0;
     virtual ASTNode* clone() const = 0;
 };
 
 class StarNode : public ASTNode {
 public:
     explicit StarNode(ASTNode* node);
-    void accept(ASTVisitor& v) override;
-    ASTNode* expr();
+    void accept(ASTVisitor* v) const override;
+    const ASTNode* expr() const;
     ~StarNode() override;
     StarNode* clone() const override;
 private:
@@ -64,9 +66,9 @@ private:
 class CatNode : public ASTNode {
 public:
     CatNode(ASTNode* left, ASTNode* right);
-    void accept(ASTVisitor& v) override;
-    ASTNode* left();
-    ASTNode* right();
+    void accept(ASTVisitor* v) const override;
+    const ASTNode* left() const;
+    const ASTNode* right() const;
     ~CatNode() override;
     CatNode* clone() const override;
 
@@ -78,9 +80,9 @@ private:
 class UnionNode : public ASTNode {
 public:
     UnionNode(ASTNode* left, ASTNode* right);
-    void accept(ASTVisitor& v) override;
-    ASTNode* left();
-    ASTNode* right();
+    void accept(ASTVisitor* v) const override;
+    const ASTNode* left() const;
+    const ASTNode* right() const;
     ~UnionNode() override;
     UnionNode* clone() const override;
 
@@ -92,7 +94,7 @@ private:
 class CharNode : public ASTNode {
 public:
     explicit CharNode(char value);
-    void accept(ASTVisitor& v) override;
+    void accept(ASTVisitor* v) const override;
     char value() const;
     size_t id() const;
     CharNode* clone() const override;
@@ -107,7 +109,7 @@ private:
 
 class EpsilonNode : public ASTNode {
 public:
-    void accept(ASTVisitor& v) override;
+    void accept(ASTVisitor* v) const override;
     EpsilonNode* clone() const override;
 };
 
@@ -115,7 +117,7 @@ class EndmarkerNode : public CharNode {
 public:
     explicit EndmarkerNode(std::string name);
 
-    void accept(ASTVisitor& v) override;
+    void accept(ASTVisitor* v) const override;
     EndmarkerNode* clone() const override;
     const std::string& name() const noexcept;
 private:

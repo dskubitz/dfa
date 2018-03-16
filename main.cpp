@@ -4,7 +4,6 @@
 
 #include "ASTNode.h"
 #include "TransitionTable.h"
-#include "Parser.h"
 #include "TreeFunctions.h"
 
 std::string stoupper(const std::string& str)
@@ -14,31 +13,6 @@ std::string stoupper(const std::string& str)
         res.push_back(static_cast<char>(toupper(ch)));
     }
     return res;
-}
-
-void test(const TransitionTable& table, const std::string& s)
-{
-    int state = 0;
-    for (char ch : s) {
-        int next_state = table[state][ch];
-        if (next_state == 1) {
-            break;
-        }
-        state = next_state;
-        std::cout << state << ' ' << ch << '\n';
-    }
-    auto it = table.final_states().find(state);
-    if (it != table.final_states().end()) {
-        std::cout << it->second << '\n';
-    }
-    std::cout << '\n';
-}
-
-template<typename...Args>
-void test(const TransitionTable& table, const std::string& s, Args... args)
-{
-    test(table, s);
-    test(table, args...);
 }
 
 // Hack solution for indenting
@@ -138,51 +112,6 @@ void output_transition_table(const TransitionTable& table)
 
 int main()
 {
-    std::unique_ptr<ASTNode> regex(Parser{}.parse(
-            {
-                    {"and",                    "and"},
-                    {"class",                  "class"},
-                    {"else",                   "else"},
-                    {"false",                  "false"},
-                    {"for",                    "for"},
-                    {"fun",                    "fun"},
-                    {"if",                     "if"},
-                    {"nil",                    "nil"},
-                    {"or",                     "or"},
-                    {"print",                  "print"},
-                    {"return",                 "return"},
-                    {"super",                  "super"},
-                    {"this",                   "this"},
-                    {"true",                   "true"},
-                    {"var",                    "var"},
-                    {"while",                  "while"},
-                    {"[0-9]+",                 "number"},
-                    {"[0-9]+\\.[0-9]+",        "float"},
-                    {"\\\"[^\\\"]*\"",         "string"},
-                    {"[A-Za-z_][A-Za-z0-9_]*", "identifier"},
-                    {"==",                     "equal_equal"},
-                    {"!=",                     "bang_equal"},
-                    {"<=",                     "less_equal"},
-                    {">=",                     "greater_equal"},
-                    {"\\<",                    "less"},
-                    {"\\>",                    "greater"},
-                    {"\\+",                    "plus"},
-                    {"\\-",                    "minus"},
-                    {"\\*",                    "star"},
-                    {"\\/",                    "slash"},
-                    {"\\=",                    "equal"},
-                    {"\\.",                    "dot"},
-                    {"\n",                     "new_line"},
-                    {"[ \t\v\f]+",             "space"},
-                    {".",                      "error"},
-            }
-    ));
-    TreeFunctions calc(regex.get());
-    TransitionTable dtrans(calc);
-    std::cout << dtrans.size() << '\n';
-
-    test(dtrans, "a", "if", "then",
-         "else", "HelloWorld", "\"Hello world!\"", "42", "3.14159");
 //    output_transition_table(dtrans);
 
     return 0;

@@ -8,9 +8,9 @@ CharNode::CharNode(char value)
 {
 }
 
-void CharNode::accept(ASTVisitor& v)
+void CharNode::accept(ASTVisitor* v) const
 {
-    v.visit(*this);
+    v->visit(this);
 }
 
 char CharNode::value() const { return value_; }
@@ -32,12 +32,12 @@ StarNode::StarNode(ASTNode* node)
 {
 }
 
-void StarNode::accept(ASTVisitor& v)
+void StarNode::accept(ASTVisitor* v) const
 {
-    v.visit(*this);
+    v->visit(this);
 }
 
-ASTNode* StarNode::expr() { return expr_; }
+const ASTNode* StarNode::expr() const { return expr_; }
 
 StarNode::~StarNode()
 {
@@ -54,14 +54,14 @@ CatNode::CatNode(ASTNode* left, ASTNode* right)
 {
 }
 
-void CatNode::accept(ASTVisitor& v)
+void CatNode::accept(ASTVisitor* v) const
 {
-    v.visit(*this);
+    v->visit(this);
 }
 
-ASTNode* CatNode::left() { return left_; }
+const ASTNode* CatNode::left() const { return left_; }
 
-ASTNode* CatNode::right() { return right_; }
+const ASTNode* CatNode::right() const { return right_; }
 
 CatNode::~CatNode()
 {
@@ -79,14 +79,14 @@ UnionNode::UnionNode(ASTNode* left, ASTNode* right)
 {
 }
 
-void UnionNode::accept(ASTVisitor& v)
+void UnionNode::accept(ASTVisitor* v) const
 {
-    v.visit(*this);
+    v->visit(this);
 }
 
-ASTNode* UnionNode::left() { return left_; }
+const ASTNode* UnionNode::left()const { return left_; }
 
-ASTNode* UnionNode::right() { return right_; }
+const ASTNode* UnionNode::right()const { return right_; }
 
 UnionNode::~UnionNode()
 {
@@ -99,9 +99,9 @@ UnionNode* UnionNode::clone() const
     return new UnionNode(left_->clone(), right_->clone());
 }
 
-void EpsilonNode::accept(ASTVisitor& v)
+void EpsilonNode::accept(ASTVisitor* v) const
 {
-    v.visit(*this);
+    v->visit(this);
 }
 
 EpsilonNode* EpsilonNode::clone() const
@@ -109,9 +109,9 @@ EpsilonNode* EpsilonNode::clone() const
     return new EpsilonNode(*this);
 }
 
-void EndmarkerNode::accept(ASTVisitor& v)
+void EndmarkerNode::accept(ASTVisitor* v) const
 {
-    v.visit(*this);
+    v->visit(this);
 }
 
 EndmarkerNode* EndmarkerNode::clone() const

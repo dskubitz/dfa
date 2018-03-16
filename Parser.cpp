@@ -19,16 +19,24 @@ bool is_char(char ch)
 
 [[noreturn]] void error(const std::string& msg)
 {
-    throw std::runtime_error{msg};
+    throw ParserError{msg};
 }
 }
 
-ASTNode* Parser::parse(const std::string& regexp, const std::string& name)
+ASTNode* Parser::parse_impl(const std::string& regexp, const std::string& name)
 {
     expr = regexp;
     pos = 0;
-
-    return new CatNode(expression(), new EndmarkerNode(name));
+    paren_count = 0;
+    try {
+        return new CatNode(expression(), new EndmarkerNode(name));
+    }
+    catch (std::out_of_range& e) {
+        throw ParserError(e.what());
+    }
+    catch (ParserError&) {
+        throw;
+    }
 }
 
 ASTNode* Parser::expression()
@@ -49,9 +57,18 @@ ASTNode* Parser::term()
 
     while (!at_end()) {
         char c = peek();
-        if (c == '|' || c == ')') break;
-        auto right = factor();
-        left = new CatNode(left, right);
+
+        if (c == '|') {
+            break;
+        } else if (c == ')') {
+            if (paren_count==0)
+                error("unmatched parenthesis");
+            --paren_count;
+            break;
+        } else {
+            auto right = factor();
+            left = new CatNode(left, right);
+        }
     }
 
     return left;
@@ -61,12 +78,13 @@ ASTNode* Parser::factor()
 {
     auto left = primary();
 
-    if (match('*'))
+    if (match('*')) {
         left = new StarNode(left);
-    else if (match('+'))
+    } else if (match('+')) {
         left = new CatNode(left, new StarNode(left->clone()));
-    else if (match('?'))
+    } else if (match('?')) {
         left = new UnionNode(left, new EpsilonNode);
+    }
 
     return left;
 }
@@ -89,8 +107,9 @@ ASTNode* Parser::primary()
         }
         return left;
     } else if (match('(')) {
+        ++paren_count;
         auto expr = expression();
-        consume(')', "expected ')' after expression");
+        consume(')', "unmatched parenthesis");
         return expr;
     } else if (match('[')) {
         ASTNode* class_expr = nullptr;
@@ -98,11 +117,10 @@ ASTNode* Parser::primary()
             class_expr = make_negated_character_class(character_class());
         else
             class_expr = make_character_class(character_class());
-
-        consume(']', "expected ']' after character class");
+        consume(']', "unmatched bracket");
         return class_expr;
     } else {
-        error("unexpected token: " + std::to_string(expr[pos]));
+        error("unrecognized");
     }
 }
 
@@ -120,15 +138,18 @@ ASTNode* Parser::make_character_class(std::string&& str)
 ASTNode* Parser::make_negated_character_class(std::string&& str)
 {
     std::vector<char> chars(128);
+
     for (auto c : str) {
         chars[static_cast<int>(c)] = 1;
     }
 
     ASTNode* expr = nullptr;
 
-    size_t it = 0;
+    // Can't meaningfully match ascii nul, so start at ws chars
+    size_t it = 9;
     size_t end = chars.size();
 
+    // Find the first unset value in chars
     while (it != end)
         if (chars[it] == 0) {
             expr = new CharNode(static_cast<char>(it++));
@@ -193,14 +214,13 @@ bool Parser::check(char ch)
 
 char Parser::advance()
 {
-    if (!at_end())
-        ++pos;
+    ++pos;
     return previous();
 }
 
 bool Parser::at_end()
 {
-    return pos == expr.size();
+    return pos == expr.length();
 }
 
 char Parser::peek()

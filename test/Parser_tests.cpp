@@ -6,7 +6,7 @@ class ParserTests : public ::testing::Test {
 protected:
     Parser parser;
     std::ostringstream out;
-    PrettyPrinter printer {out};
+    PrettyPrinter printer{out};
 };
 
 TEST_F(ParserTests, SingleCharactersBad)

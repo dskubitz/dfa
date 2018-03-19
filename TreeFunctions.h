@@ -62,4 +62,5 @@ private:
     std::map<unsigned int, std::string> acceptpos_;
 };
 
+void followpos_graphviz(const TreeFunctions& functions);
 #endif //LEXER_DFAFUNCTIONCALCULATOR_H

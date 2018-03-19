@@ -2,6 +2,9 @@
 #define LEXER_PRETTYPRINTER_H
 
 #include <ostream>
+#include <deque>
+#include <cassert>
+#include <stack>
 
 #include "ASTNode.h"
 

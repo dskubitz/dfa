@@ -33,6 +33,7 @@ Token Lexer::scan()
     state_ = table_[state_][c];
 
     while (input_.good()) {
+        std::cout << char(c) << ' ' << state_ << " ";
 
         lexeme_.push_back(static_cast<char>(c));
 
@@ -47,10 +48,12 @@ Token Lexer::scan()
 
         // Peek to the next state
         int nextc = input_.peek();
+        std::cout << char(nextc) << ' ';
         if (nextc == EOF)
             break;
 
         int next_state = table_[state_][nextc];
+        std::cout << next_state << '\n';
 
         // If next state id the dead state
         if (next_state == 1)

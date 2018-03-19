@@ -1,8 +1,13 @@
 #include <iostream>
 #include "TreeFunctions.h"
 
+void TreeFunctions::visit(const ASTNode* node)
+{
+    node->accept(this);
+}
+
 TreeFunctions::TreeFunctions(const ASTNode* re)
-        :tree_(re)
+        : tree_(re)
 {
     followpos_.resize(CharNode::max_id());
     symbols_.resize(CharNode::max_id());
@@ -92,9 +97,19 @@ void TreeFunctions::visit(const EndmarkerNode* node)
     acceptpos_[node->id()] = node->name();
 }
 
-void TreeFunctions::visit(const ASTNode* node)
+void followpos_graphviz(const TreeFunctions& functions)
 {
-    node->accept(this);
+    std::cout << "digraph {\n";
+    size_t n = 0;
+    for (auto& pos : functions.followpos()) {
+        std::cout << "\t" << functions.symbols().at(n) << " -> {";
+        for (size_t i = 0, sz = pos.size(); i < sz; ++i) {
+            if (pos.test(i)) {
+                std::cout << "" << functions.symbols().at(i) << " ";
+            }
+        }
+        std::cout << "};\n";
+        n++;
+    }
+    std::cout << "}\n";
 }
-
-

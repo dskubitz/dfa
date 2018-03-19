@@ -15,6 +15,7 @@ class TransitionTable : private std::vector<state_type> {
     using base = std::vector<state_type>;
     std::map<size_type, std::string> final_states_;
 public:
+    using base::vector;
     using base::operator[];
     using base::at;
     using base::begin;

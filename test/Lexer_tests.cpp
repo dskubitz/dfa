@@ -45,19 +45,52 @@ TEST_F(LexerTests, ScanNumber)
 TEST_F(LexerTests, ScanMultiple)
 {
     input << "helloWorld1234 1234helloWorld\n1234.5678";
-    std::vector<std::pair<std::string, std::string>> expects {
+    std::vector<std::pair<std::string, std::string>> expects{
             {"helloWorld1234", "identifier"},
-            {" ", "space"},
-            {"1234", "number"},
-            {"helloWorld", "identifier"},
-            {"\n", "new_line"},
-            {"1234.5678", "float"},
+            {" ",              "space"},
+            {"1234",           "number"},
+            {"helloWorld",     "identifier"},
+            {"\n",             "new_line"},
+            {"1234.5678",      "float"},
     };
     auto& stoi_table = lexer->stoitoken_kinds();
     for (auto& expect : expects) {
         Token tok = lexer->scan();
         EXPECT_EQ(tok.lexeme, expect.first);
         EXPECT_EQ(tok.kind, stoi_table.at(expect.second));
+    }
+}
+
+class NumberTests : public ::testing::Test {
+protected:
+    std::stringstream input;
+    std::unique_ptr<ASTNode> re;
+    std::unique_ptr<TransitionTable> tbl;
+    std::unique_ptr<Lexer> lex;
+
+    // No macros for my regexes, so for reference...
+    // FS			(f|F|l|L)
+    // D			[0-9]
+    // E			[Ee][+-]?{D}+
+    // float1 {D}+{E}{FS}?
+    void SetUp() override
+    {
+        re = Parser{}.parse(
+                {
+                        {"[0-9]+[Ee][+-]?[0-9]+(f|F|l|L)?", "float"},
+                }
+        );
+        tbl = std::make_unique<TransitionTable>(make_transition_table(re.get()));
+        lex = std::make_unique<Lexer>(*tbl, input);
+    }
+};
+
+TEST_F(NumberTests, TestName)
+{
+    input << "1e9";
+    while (lex->good()) {
+        auto tok = lex->scan();
+        std::cout << tok.lexeme << ' ' << lex->itostoken_kinds().at(tok.kind) << '\n';
     }
 
 }

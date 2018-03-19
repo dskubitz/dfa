@@ -186,6 +186,12 @@ std::string Parser::range()
     if (!match('-'))
         return ss.str();
 
+    // If '-' is at the end of the character class it is not a range.
+    if (peek() == ']') {
+        ss << previous();
+        return ss.str();
+    }
+
     auto right = advance();
 
     if (left > right)

@@ -6,6 +6,8 @@
 #include "TransitionTable.h"
 #include "TreeFunctions.h"
 #include "Parser.h"
+#include "PrettyPrinter.h"
+#include "Lexer.h"
 
 std::string stoupper(const std::string& str)
 {
@@ -113,6 +115,23 @@ void output_transition_table(const TransitionTable& table)
 
 int main()
 {
+    std::unique_ptr<ASTNode> re = Parser{}.parse(
+            {
+                    {"[0-9]+[Ee](\\+|\\-)?[0-9]+", "float"},
+            }
+    );
+    PrettyPrinter{std::cout}.print(re.get());
+    TreeFunctions functions(re.get());
+    TransitionTable table;
+    make_transition_table(functions, table);
+
+    std::stringstream ss;
+    Lexer lexer(table, ss);
+    ss << "123456789E123456789";
+//    output_transition_table(table);
+
+    followpos_graphviz(functions);
+    /*
     auto regex = Parser{}.parse(
             {
                     {"and",                    "and"},
@@ -155,5 +174,6 @@ int main()
     auto table = make_transition_table(regex.get());
     output_transition_table(table);
 
+    */
     return 0;
 }

@@ -8,25 +8,25 @@ PrettyPrinter::PrettyPrinter(std::ostream& os)
 void PrettyPrinter::visit(const StarNode* node)
 {
     os_ << "(star ";
-    node->expr()->accept(this);
+    visit(node->expr());
     os_ << ")";
 }
 
 void PrettyPrinter::visit(const CatNode* node)
 {
     os_ << "(cat ";
-    node->left()->accept(this);
+    visit(node->left());
     os_ << " ";
-    node->right()->accept(this);
+    visit(node->right());
     os_ << ")";
 }
 
 void PrettyPrinter::visit(const UnionNode* node)
 {
     os_ << "(union ";
-    node->left()->accept(this);
+    visit(node->left());
     os_ << " ";
-    node->right()->accept(this);
+    visit(node->right());
     os_ << ")";
 }
 
@@ -47,7 +47,7 @@ void PrettyPrinter::visit(const EndmarkerNode* node)
 
 void PrettyPrinter::print(const ASTNode* tree)
 {
-    tree->accept(this);
+    visit(tree);
     os_ << '\n';
 }
 

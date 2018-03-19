@@ -1,6 +1,5 @@
 #include <iostream>
 #include "TreeFunctions.h"
-
 void TreeFunctions::visit(const ASTNode* node)
 {
     node->accept(this);
@@ -15,14 +14,14 @@ TreeFunctions::TreeFunctions(const ASTNode* re)
     for (int i = 0; i < CharNode::max_id(); ++i)
         followpos_[i] = make_bitset();
 
-    tree_->accept(this);
+    visit(tree_);
 }
 
 void TreeFunctions::visit(const StarNode* node)
 {
     const ASTNode* expr = node->expr();
 
-    expr->accept(this);
+    visit(expr);
 
     nullable_[node] = true;
     auto& firstpos = firstpos_[node];
@@ -40,8 +39,8 @@ void TreeFunctions::visit(const CatNode* node)
     const ASTNode* left = node->left();
     const ASTNode* right = node->right();
 
-    left->accept(this);
-    right->accept(this);
+    visit(left);
+    visit(right);
 
     nullable_[node] = nullable_.at(left) && nullable_.at(right);
 
@@ -65,8 +64,8 @@ void TreeFunctions::visit(const UnionNode* node)
 {
     const ASTNode* left = node->left();
     const ASTNode* right = node->right();
-    left->accept(this);
-    right->accept(this);
+    visit(left);
+    visit(right);
 
     nullable_[node] = nullable_.at(left) || nullable_.at(right);
     firstpos_[node] = firstpos_.at(left) | firstpos_.at(right);
@@ -96,6 +95,8 @@ void TreeFunctions::visit(const EndmarkerNode* node)
     symbols_[node->id()] = node->value();
     acceptpos_[node->id()] = node->name();
 }
+
+
 
 void followpos_graphviz(const TreeFunctions& functions)
 {

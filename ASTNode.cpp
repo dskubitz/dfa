@@ -19,7 +19,7 @@ size_t CharNode::id() const { return id_; }
 
 CharNode* CharNode::clone() const
 {
-    return new CharNode(*this);
+    return new CharNode(value_);
 }
 
 size_t CharNode::max_id()
@@ -106,7 +106,7 @@ void EpsilonNode::accept(ASTVisitor* v) const
 
 EpsilonNode* EpsilonNode::clone() const
 {
-    return new EpsilonNode(*this);
+    return new EpsilonNode;
 }
 
 void EndmarkerNode::accept(ASTVisitor* v) const

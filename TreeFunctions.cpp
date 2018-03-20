@@ -64,6 +64,7 @@ void TreeFunctions::visit(const UnionNode* node)
 {
     const ASTNode* left = node->left();
     const ASTNode* right = node->right();
+
     visit(left);
     visit(right);
 
@@ -96,17 +97,16 @@ void TreeFunctions::visit(const EndmarkerNode* node)
     acceptpos_[node->id()] = node->name();
 }
 
-
-
 void followpos_graphviz(const TreeFunctions& functions)
 {
     std::cout << "digraph {\n";
+    std::string sep = "_";
     size_t n = 0;
     for (auto& pos : functions.followpos()) {
-        std::cout << "\t" << functions.symbols().at(n) << " -> {";
+        std::cout << "\t" <<functions.symbols().at(n) +sep+ std::to_string(n+1) << " -> {";
         for (size_t i = 0, sz = pos.size(); i < sz; ++i) {
             if (pos.test(i)) {
-                std::cout << "" << functions.symbols().at(i) << " ";
+                std::cout << "" << functions.symbols().at(i) +sep+ std::to_string(i+1) << " ";
             }
         }
         std::cout << "};\n";

@@ -3,29 +3,28 @@
 #include <Parser.h>
 #include <TransitionTable.h>
 
-namespace {
-std::unique_ptr<ASTNode> regex = Parser{}.parse(
-        {
-                {"\n",                     "new_line"},
-                {"[ \t\v\f]+",             "space"},
-                {".",                      "error"},
-                {"[0-9]+",                 "number"},
-                {"[0-9]+\\.[0-9]+",        "float"},
-                {"\\\"[^\\\"]*\"",         "string"},
-                {"[A-Za-z_][A-Za-z0-9_]*", "identifier"},
-        }
-);
-
-std::unique_ptr<TransitionTable> table = std::make_unique<TransitionTable>(
-        make_transition_table(regex.get()));
-}
 class LexerTests : public ::testing::Test {
 protected:
+    std::unique_ptr<ASTNode> regex;
     std::stringstream input;
+    std::unique_ptr<TransitionTable> table;
     std::unique_ptr<Lexer> lexer;
 
     void SetUp() override
     {
+        regex = Parser{}.parse(
+                {
+                        {"\n",                     "new_line"},
+                        {"[ \t\v\f]+",             "space"},
+                        {".",                      "error"},
+                        {"[0-9]+",                 "number"},
+                        {"[0-9]+\\.[0-9]+",        "float"},
+                        {"\\\"[^\\\"]*\"",         "string"},
+                        {"[A-Za-z_][A-Za-z0-9_]*", "identifier"},
+                }
+        );
+        table = std::make_unique<TransitionTable>(
+                make_transition_table(regex.get()));
         lexer = std::make_unique<Lexer>(*table, input);
     }
 };
@@ -44,14 +43,16 @@ TEST_F(LexerTests, ScanNumber)
 
 TEST_F(LexerTests, ScanMultiple)
 {
-    input << "helloWorld1234 1234helloWorld\n1234.5678";
+    input << "helloWorld1234 1234helloWorld\nhello_world__123__\n1.2345";
     std::vector<std::pair<std::string, std::string>> expects{
-            {"helloWorld1234", "identifier"},
-            {" ",              "space"},
-            {"1234",           "number"},
-            {"helloWorld",     "identifier"},
-            {"\n",             "new_line"},
-            {"1234.5678",      "float"},
+            {"helloWorld1234",     "identifier"},
+            {" ",                  "space"},
+            {"1234",               "number"},
+            {"helloWorld",         "identifier"},
+            {"\n",                 "new_line"},
+            {"hello_world__123__", "identifier"},
+            {"\n",                 "new_line"},
+            {"1.2345",             "float"},
     };
     auto& stoi_table = lexer->stoitoken_kinds();
     for (auto& expect : expects) {
@@ -61,6 +62,38 @@ TEST_F(LexerTests, ScanMultiple)
     }
 }
 
+class OptionalRegexTests : public ::testing::Test {
+protected:
+    std::stringstream input;
+    std::unique_ptr<ASTNode> re;
+    std::unique_ptr<TransitionTable> tbl;
+    std::unique_ptr<Lexer> lex;
+
+    void SetUp() override
+    {
+        re = Parser{}.parse(
+                {
+                        {"colou?r", "1"},
+                        {" ",       "space"},
+                        {".",       "error"},
+                }
+        );
+        tbl = std::make_unique<TransitionTable>(
+                make_transition_table(re.get()));
+        lex = std::make_unique<Lexer>(*tbl, input);
+    }
+};
+
+TEST_F(OptionalRegexTests, test)
+{
+    input << "colour color";
+    auto tok = lex->scan();
+    EXPECT_EQ(tok.lexeme, "colour");
+    tok = lex->scan();
+    tok = lex->scan();
+    EXPECT_EQ(tok.lexeme, "color");
+}
+
 class NumberTests : public ::testing::Test {
 protected:
     std::stringstream input;
@@ -68,29 +101,27 @@ protected:
     std::unique_ptr<TransitionTable> tbl;
     std::unique_ptr<Lexer> lex;
 
-    // No macros for my regexes, so for reference...
-    // FS			(f|F|l|L)
-    // D			[0-9]
-    // E			[Ee][+-]?{D}+
-    // float1 {D}+{E}{FS}?
     void SetUp() override
     {
         re = Parser{}.parse(
                 {
-                        {"[0-9]+[Ee][+-]?[0-9]+(f|F|l|L)?", "float"},
+                        {"([0-9]+(\\.)?([0-9]+))", "float"},
+                        {".",                      "error"},
                 }
         );
-        tbl = std::make_unique<TransitionTable>(make_transition_table(re.get()));
+        tbl = std::make_unique<TransitionTable>(
+                make_transition_table(re.get()));
         lex = std::make_unique<Lexer>(*tbl, input);
     }
 };
 
 TEST_F(NumberTests, TestName)
 {
-    input << "1e9";
+    input << " 10.19 1";
     while (lex->good()) {
         auto tok = lex->scan();
-        std::cout << tok.lexeme << ' ' << lex->itostoken_kinds().at(tok.kind) << '\n';
+        std::cout << tok.lexeme << ' ' << lex->itostoken_kinds().at(tok.kind)
+                  << '\n';
     }
 
 }

@@ -106,3 +106,27 @@ TEST_F(ParserTests, Precedence)
     std::string str2 = out.str();
     EXPECT_EQ(str1, str2);
 }
+
+TEST_F(ParserTests, CharacterClassVersusUnion)
+{
+    auto re1 = parser.parse("[0-9]+(E|e)[0-9]+");
+    auto re2 = parser.parse("[0-9]+[Ee][0-9]+");
+    printer.print(re1.get());
+    std::string str1 = out.str();
+    out = std::ostringstream{};
+    printer.print(re2.get());
+    std::string str2 = out.str();
+    EXPECT_EQ(str1, str2);
+}
+
+TEST_F(ParserTests, StarAndPlus)
+{
+    auto re1 = parser.parse("[AB]+");
+    auto re2 = parser.parse("[AB][AB]*");
+    printer.print(re1.get());
+    std::string str1 = out.str();
+    out = std::ostringstream{};
+    printer.print(re2.get());
+    std::string str2 = out.str();
+    std::cout << str1 << ' ' << str2 << '\n';
+}

@@ -115,21 +115,20 @@ void output_transition_table(const TransitionTable& table)
 
 int main()
 {
-    std::unique_ptr<ASTNode> re = Parser{}.parse(
+
+    auto regex = Parser{}.parse(
             {
-                    {"[0-9]+[Ee](\\+|\\-)?[0-9]+", "float"},
+                    {"[0-1][0-1]*",        "float"},
             }
     );
-    PrettyPrinter{std::cout}.print(re.get());
-    TreeFunctions functions(re.get());
-    TransitionTable table;
-    make_transition_table(functions, table);
-
-    std::stringstream ss;
-    Lexer lexer(table, ss);
-    ss << "123456789E123456789";
-//    output_transition_table(table);
-
+    PrettyPrinter{std::cout}.print(regex.get());
+    TreeFunctions functions(regex.get());
+    auto first = functions.firstpos().at(regex.get());
+    for (int i = 0; i < first.size(); ++i) {
+        if (first.test(i))
+            std::cout << i << ' ' ;
+    }
+    std::cout << '\n';
     followpos_graphviz(functions);
     /*
     auto regex = Parser{}.parse(

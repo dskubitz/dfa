@@ -78,13 +78,12 @@ ASTNode* Parser::factor()
 {
     auto left = primary();
 
-    if (match('*')) {
+    if (match('*'))
         left = new StarNode(left);
-    } else if (match('+')) {
+    else if (match('+'))
         left = new CatNode(left, new StarNode(left->clone()));
-    } else if (match('?')) {
+    else if (match('?'))
         left = new UnionNode(left, new EpsilonNode);
-    }
 
     return left;
 }

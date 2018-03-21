@@ -7,14 +7,14 @@ PrettyPrinter::PrettyPrinter(std::ostream& os)
 
 void PrettyPrinter::visit(const StarNode* node)
 {
-    os_ << "(star ";
+    os_ << "(* ";
     visit(node->expr());
     os_ << ")";
 }
 
 void PrettyPrinter::visit(const CatNode* node)
 {
-    os_ << "(cat ";
+    os_ << "(. ";
     visit(node->left());
     os_ << " ";
     visit(node->right());
@@ -23,7 +23,7 @@ void PrettyPrinter::visit(const CatNode* node)
 
 void PrettyPrinter::visit(const UnionNode* node)
 {
-    os_ << "(union ";
+    os_ << "(| ";
     visit(node->left());
     os_ << " ";
     visit(node->right());
@@ -54,4 +54,20 @@ void PrettyPrinter::visit(const ASTNode* node)
 void PrettyPrinter::visit(const EmptyNode* node)
 {
     os_ << "\u2205";
+}
+
+void PrettyPrinter::visit(const IntersectionNode* node)
+{
+    os_ << "(& ";
+    visit(node->left());
+    os_ << " ";
+    visit(node->right());
+    os_ << ")";
+}
+
+void PrettyPrinter::visit(const ComplementNode* node)
+{
+    os_ << "(~ ";
+    visit(node->expr());
+    os_ << ")";
 }

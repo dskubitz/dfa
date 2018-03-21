@@ -21,6 +21,8 @@ public:
     void visit(const UnionNode* node) override;
     void visit(const CharNode* node) override;
     void visit(const EpsilonNode* node) override;
+    void visit(const IntersectionNode* node) override;
+    void visit(const ComplementNode* node) override;
     void visit(const EmptyNode* node) override;
 //    void visit(const EndmarkerNode* node) override;
 private:

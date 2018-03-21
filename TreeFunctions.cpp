@@ -93,6 +93,16 @@ void TreeFunctions::visit(const EmptyNode* node)
 
 }
 
+void TreeFunctions::visit(const IntersectionNode* node)
+{
+
+}
+
+void TreeFunctions::visit(const ComplementNode* node)
+{
+
+}
+
 /*
 void TreeFunctions::visit(const EndmarkerNode* node)
 {

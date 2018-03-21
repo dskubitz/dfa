@@ -16,6 +16,8 @@ public:
     void visit(const UnionNode* node) override;
     void visit(const CharNode* node) override;
     void visit(const EmptyNode* node) override;
+    void visit(const IntersectionNode* node) override;
+    void visit(const ComplementNode* node) override;
     void visit(const EpsilonNode* node) override;
     bool evaluate(const ASTNode* node);
 private:
@@ -33,6 +35,8 @@ public:
     void visit(const CatNode* node) override;
     void visit(const UnionNode* node) override;
     void visit(const CharNode* node) override;
+    void visit(const IntersectionNode* node) override;
+    void visit(const ComplementNode* node) override;
     void visit(const EmptyNode* node) override;
     void visit(const EpsilonNode* node) override;
 private:
@@ -42,8 +46,5 @@ private:
     char dA;
 };
 
-ASTNode* make_union_regex(ASTNode* left, ASTNode* right);
-ASTNode* make_cat_regex(ASTNode* left, ASTNode* right);
-ASTNode* make_star_regex(ASTNode* expr);
 
 #endif //LEXER_DERIVATIVE_H

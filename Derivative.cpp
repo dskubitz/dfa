@@ -8,21 +8,21 @@ void Derivative::visit(const ASTNode* node)
 void Derivative::visit(const StarNode* node)
 {
     stack.push_back(
-            make_cat_regex(
+            make_cat(
                     evaluate(
                             node->expr()->clone()),
-                    make_star_regex(
+                    make_star(
                             node->expr()->clone())));
 }
 
 void Derivative::visit(const CatNode* node)
 {
     stack.push_back(
-            make_union_regex(
-                    make_cat_regex(
+            make_union(
+                    make_cat(
                             evaluate(node->left()),
                             node->right()->clone()),
-                    make_cat_regex(
+                    make_cat(
                             helper(node->left()),
                             evaluate(node->right()->clone()))));
 }
@@ -30,9 +30,19 @@ void Derivative::visit(const CatNode* node)
 void Derivative::visit(const UnionNode* node)
 {
     stack.push_back(
-            make_union_regex(
+            make_union(
                     evaluate(node->left()->clone()),
                     evaluate(node->right()->clone())));
+}
+
+void Derivative::visit(const IntersectionNode* node)
+{
+
+}
+
+void Derivative::visit(const ComplementNode* node)
+{
+
 }
 
 void Derivative::visit(const CharNode* node)
@@ -81,6 +91,8 @@ std::unique_ptr<ASTNode> Derivative::derive(const ASTNode* tree)
     return std::unique_ptr<ASTNode>(tree->clone());
 }
 
+
+
 void Nullable::visit(const ASTNode* node)
 {
     node->accept(this);
@@ -124,53 +136,17 @@ bool Nullable::evaluate(const ASTNode* node)
     return res;
 }
 
-ASTNode* make_union_regex(ASTNode* left, ASTNode* right)
+void Nullable::visit(const IntersectionNode* node)
 {
-    if (dynamic_cast<EmptyNode*>(left)) {
-        delete left;
-        return right;
-    } else if (dynamic_cast<EmptyNode*>(right)) {
-        delete right;
-        return left;
-    } else if (*left == *right) {
-        delete right;
-        return left;
-    } else {
-        return new UnionNode(left, right);
-    }
+    stack.push_back(evaluate(node->left()) && evaluate(node->right()));
 }
 
-ASTNode* make_cat_regex(ASTNode* left, ASTNode* right)
+void Nullable::visit(const ComplementNode* node)
 {
-    if (dynamic_cast<EmptyNode*>(left) || dynamic_cast<EmptyNode*>(right)) {
-        delete right;
-        return left;
-    } else if (dynamic_cast<EpsilonNode*>(left)) {
-        delete left;
-        return right;
-    } else if (dynamic_cast<EpsilonNode*>(right)) {
-        delete right;
-        return left;
-    } else {
-        return new CatNode(left, right);
-    }
+    stack.push_back(!evaluate(node->expr()));
 }
 
-ASTNode* make_star_regex(ASTNode* expr)
-{
-    if (dynamic_cast<EmptyNode*>(expr)) {
-        delete expr;
-        return new EpsilonNode;
-    } else if (dynamic_cast<EpsilonNode*>(expr)) {
-        return expr;
-    } else if (auto p = dynamic_cast<StarNode*>(expr)) {
-        ASTNode* q = p->expr()->clone();
-        delete p;
-        return make_star_regex(q);
-    } else {
-        return new StarNode(expr);
-    }
-}
+
 
 ASTNode* helper(const ASTNode* node)
 {

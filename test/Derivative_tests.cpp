@@ -23,42 +23,61 @@ TEST(Nullable, Test)
     EXPECT_FALSE(Nullable{}.evaluate(re.get()));
 }
 
-class SimplifyRegex : public ::testing::Test {
-};
 
-TEST(SimplifyRegex, UnionNode)
+TEST(SimplifyRegex, Union)
 {
     std::unique_ptr<ASTNode> re(
-            make_union_regex(new EmptyNode, new CharNode('a')));
+            make_union(new EmptyNode, new CharNode('a')));
     auto p = dynamic_cast<CharNode*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_EQ(p->value(), 'a');
-    re.reset(make_union_regex(new CharNode('a'), new CharNode('a')));
+    re.reset(make_union(new CharNode('a'), new CharNode('a')));
     p = dynamic_cast<CharNode*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_EQ(p->value(), 'a');
 }
 
-TEST(SimplifyRegex, CatNode)
+TEST(SimplifyRegex, Cat)
 {
     std::unique_ptr<ASTNode> re(
-            make_cat_regex(new EmptyNode, new CharNode('a')));
+            make_cat(new EmptyNode, new CharNode('a')));
     auto p = dynamic_cast<EmptyNode*>(re.get());
     ASSERT_NE(p, nullptr);
-    re.reset(make_cat_regex(new EpsilonNode, new CharNode('a')));
+    re.reset(make_cat(new EpsilonNode, new CharNode('a')));
     auto q = dynamic_cast<CharNode*>(re.get());
     ASSERT_NE(q, nullptr);
     EXPECT_EQ(q->value(), 'a');
 }
 
-TEST(SimplifyRegex, StarNode)
+TEST(SimplifyRegex, Star)
 {
     std::unique_ptr<ASTNode> re(
-            make_star_regex(new StarNode(new StarNode(new CharNode('a')))));
+            make_star(new StarNode(new StarNode(new CharNode('a')))));
     auto p = dynamic_cast<StarNode*>(re.get());
     ASSERT_NE(p, nullptr);
     auto q = dynamic_cast<const CharNode*>(p->expr());
     ASSERT_NE(q, nullptr);
+}
+
+TEST(SimplifyRegex, Intersection)
+{
+    std::unique_ptr<ASTNode> re(
+            make_intersection(new EmptyNode, new CharNode('a')));
+    auto p = dynamic_cast<EmptyNode*>(re.get());
+    ASSERT_NE(p, nullptr);
+    re.reset(make_intersection(new CharNode('a'), new CharNode('a')));
+    auto p2 = dynamic_cast<CharNode*>(re.get());
+    ASSERT_NE(p2, nullptr);
+    EXPECT_EQ(p2->value(), 'a');
+}
+
+TEST(SimplifyRegex, Complement)
+{
+    std::unique_ptr<ASTNode> re(
+            make_complement(new ComplementNode(new CharNode('a'))));
+    auto p = dynamic_cast<CharNode*>(re.get());
+    ASSERT_NE(p, nullptr);
+    EXPECT_EQ(p->value(), 'a');
 }
 
 TEST(RegexCompare, Test)

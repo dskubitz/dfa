@@ -39,8 +39,8 @@ class ASTVisitor {
 public:
     virtual ~ASTVisitor() = default;
 
-    virtual void visit(const ASTNode*) = 0;
-    virtual void visit(const StarNode*) =0;
+    virtual void visit(const ASTNode*)=0;
+    virtual void visit(const StarNode*)=0;
     virtual void visit(const CatNode*)=0;
     virtual void visit(const UnionNode*)=0;
     virtual void visit(const IntersectionNode*)=0;
@@ -55,15 +55,15 @@ public:
     virtual ~ASTNode() = default;
     virtual void accept(ASTVisitor* v) const = 0;
     virtual ASTNode* clone() const = 0;
-    virtual bool operator==(const ASTNode& node) const = 0;
-    virtual bool operator==(const StarNode& node) const = 0;
-    virtual bool operator==(const CatNode& node) const = 0;
-    virtual bool operator==(const UnionNode& node) const = 0;
-    virtual bool operator==(const IntersectionNode& node) const = 0;
-    virtual bool operator==(const ComplementNode& node) const = 0;
-    virtual bool operator==(const CharNode& node) const = 0;
-    virtual bool operator==(const EpsilonNode& node) const = 0;
-    virtual bool operator==(const EmptyNode& node) const = 0;
+    virtual bool operator==(const ASTNode& node) const =0;
+    virtual bool operator==(const StarNode& node) const =0;
+    virtual bool operator==(const CatNode& node) const =0;
+    virtual bool operator==(const UnionNode& node) const =0;
+    virtual bool operator==(const IntersectionNode& node) const =0;
+    virtual bool operator==(const ComplementNode& node) const =0;
+    virtual bool operator==(const CharNode& node) const =0;
+    virtual bool operator==(const EpsilonNode& node) const =0;
+    virtual bool operator==(const EmptyNode& node) const =0;
 };
 
 class StarNode : public ASTNode {

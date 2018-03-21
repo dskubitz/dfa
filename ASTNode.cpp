@@ -3,8 +3,8 @@
 size_t CharNode::num_ = 0;
 
 CharNode::CharNode(char value)
-        : value_(value),
-          id_(num_++)
+        :value_(value),
+         id_(num_++)
 {
 }
 
@@ -44,7 +44,7 @@ bool CharNode::operator==(const CharNode& node) const
 }
 
 StarNode::StarNode(ASTNode* node)
-        : expr_(node)
+        :expr_(node)
 {
 }
 
@@ -82,7 +82,7 @@ bool StarNode::operator==(const StarNode& node) const
 }
 
 CatNode::CatNode(ASTNode* left, ASTNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -123,7 +123,7 @@ bool CatNode::operator==(const CatNode& node) const
 }
 
 UnionNode::UnionNode(ASTNode* left, ASTNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -237,7 +237,7 @@ IntersectionNode::~IntersectionNode()
 }
 
 IntersectionNode::IntersectionNode(ASTNode* left, ASTNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -270,7 +270,7 @@ bool ComplementNode::operator==(const ComplementNode& node) const
 ComplementNode::~ComplementNode() { delete expr_; }
 
 ComplementNode::ComplementNode(ASTNode* expr)
-        : expr_(expr) { }
+        :expr_(expr) { }
 
 const ASTNode* ComplementNode::expr() const { return expr_; }
 

@@ -3,32 +3,10 @@
 #include <Parser.h>
 #include <PrettyPrinter.h>
 
-Parser parser;
-
-TEST(Nullable, Test)
-{
-    auto re = parser.parse("a*");
-    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
-    re = parser.parse("(a*|b)");
-    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
-    re = parser.parse("a|b");
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
-    re = parser.parse("(a*b)");
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
-    re = parser.parse("ab");
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
-    re = parser.parse("");
-    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
-    re = std::make_unique<EmptyNode>();
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
-}
-
-
-
-
 class DerivativeTests : public ::testing::Test {
 protected:
     Derivative derivative;
+    Parser parser;
 };
 
 TEST_F(DerivativeTests, BasicFunctionality)
@@ -57,4 +35,22 @@ TEST_F(DerivativeTests, MatchSimple)
     EXPECT_TRUE(nullable.evaluate(r.get()));
     r = derivative.derive(r.get(), 'a');
     EXPECT_FALSE(nullable.evaluate(r.get()));
+}
+
+TEST_F(DerivativeTests, Nullable)
+{
+    auto re = parser.parse("a*");
+    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
+    re = parser.parse("(a*|b)");
+    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
+    re = parser.parse("a|b");
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
+    re = parser.parse("(a*b)");
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
+    re = parser.parse("ab");
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
+    re = parser.parse("");
+    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
+    re = std::make_unique<EmptyNode>();
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
 }

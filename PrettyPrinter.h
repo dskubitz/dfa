@@ -24,7 +24,6 @@ public:
     void visit(const IntersectionNode* node) override;
     void visit(const ComplementNode* node) override;
     void visit(const EmptyNode* node) override;
-//    void visit(const EndmarkerNode* node) override;
 private:
     std::ostream& os_;
 };

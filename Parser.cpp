@@ -23,7 +23,7 @@ bool is_char(char ch)
 }
 }
 
-ASTNode* Parser::parse_impl(const std::string& regexp, const std::string& name)
+ASTNode* Parser::parse_impl(const std::string& regexp)
 {
     expr = regexp;
     pos = 0;

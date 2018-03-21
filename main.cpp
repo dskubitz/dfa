@@ -116,20 +116,6 @@ void output_transition_table(const TransitionTable& table)
 int main()
 {
 
-    auto regex = Parser{}.parse(
-            {
-                    {"[0-1][0-1]*",        "float"},
-            }
-    );
-    PrettyPrinter{std::cout}.print(regex.get());
-    TreeFunctions functions(regex.get());
-    auto first = functions.firstpos().at(regex.get());
-    for (int i = 0; i < first.size(); ++i) {
-        if (first.test(i))
-            std::cout << i << ' ' ;
-    }
-    std::cout << '\n';
-    followpos_graphviz(functions);
     /*
     auto regex = Parser{}.parse(
             {

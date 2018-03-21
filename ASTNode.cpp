@@ -27,6 +27,18 @@ size_t CharNode::max_id()
     return num_;
 }
 
+//@formatter:off
+bool CharNode::operator==(const ASTNode& node) const { return node == *this; }
+bool CharNode::operator==(const StarNode& node) const { return false; }
+bool CharNode::operator==(const CatNode& node) const { return false; }
+bool CharNode::operator==(const UnionNode& node) const { return false; }
+bool CharNode::operator==(const EpsilonNode& node) const { return false; }
+bool CharNode::operator==(const EmptyNode& node) const { return false; }
+//@formatter:on
+
+bool CharNode::operator==(const CharNode& node) const
+{ return value_ == node.value_; }
+
 StarNode::StarNode(ASTNode* node)
         :expr_(node)
 {
@@ -48,6 +60,18 @@ StarNode* StarNode::clone() const
 {
     return new StarNode(expr_->clone());
 }
+
+//@formatter:off
+bool StarNode::operator==(const ASTNode& node) const { return node == *this; }
+bool StarNode::operator==(const CatNode& node) const { return false; }
+bool StarNode::operator==(const UnionNode& node) const { return false; }
+bool StarNode::operator==(const CharNode& node) const { return false; }
+bool StarNode::operator==(const EpsilonNode& node) const { return false; }
+bool StarNode::operator==(const EmptyNode& node) const { return false; }
+//@formatter:on
+
+bool StarNode::operator==(const StarNode& node) const
+{ return expr_->operator==(*node.expr_); }
 
 CatNode::CatNode(ASTNode* left, ASTNode* right)
         :left_(left), right_(right)
@@ -74,6 +98,18 @@ CatNode* CatNode::clone() const
     return new CatNode(left_->clone(), right_->clone());
 }
 
+//@formatter:off
+bool CatNode::operator==(const ASTNode& node) const { return node == *this; }
+bool CatNode::operator==(const StarNode& node) const { return false; }
+bool CatNode::operator==(const UnionNode& node) const { return false; }
+bool CatNode::operator==(const CharNode& node) const { return false; }
+bool CatNode::operator==(const EpsilonNode& node) const { return false; }
+bool CatNode::operator==(const EmptyNode& node) const { return false; }
+//@formatter:on
+
+bool CatNode::operator==(const CatNode& node) const
+{ return left_->operator==(*node.left_) && right_->operator==(*node.right_); }
+
 UnionNode::UnionNode(ASTNode* left, ASTNode* right)
         :left_(left), right_(right)
 {
@@ -99,6 +135,18 @@ UnionNode* UnionNode::clone() const
     return new UnionNode(left_->clone(), right_->clone());
 }
 
+//@formatter:off
+bool UnionNode::operator==(const ASTNode& node) const { return node == *this; }
+bool UnionNode::operator==(const StarNode& node) const { return false; }
+bool UnionNode::operator==(const CatNode& node) const { return false; }
+bool UnionNode::operator==(const CharNode& node) const { return false; }
+bool UnionNode::operator==(const EpsilonNode& node) const { return false; }
+bool UnionNode::operator==(const EmptyNode& node) const { return false; }
+//@formatter:on
+
+bool UnionNode::operator==(const UnionNode& node) const
+{ return left_->operator==(*node.left_) && right_->operator==(*node.right_); }
+
 void EpsilonNode::accept(ASTVisitor* v) const
 {
     v->visit(this);
@@ -109,17 +157,33 @@ EpsilonNode* EpsilonNode::clone() const
     return new EpsilonNode;
 }
 
-void EndmarkerNode::accept(ASTVisitor* v) const
+//@formatter:off
+bool EpsilonNode::operator==(const ASTNode& node) const { return node == *this; }
+bool EpsilonNode::operator==(const StarNode& node) const { return false; }
+bool EpsilonNode::operator==(const CatNode& node) const { return false; }
+bool EpsilonNode::operator==(const UnionNode& node) const { return false; }
+bool EpsilonNode::operator==(const CharNode& node) const { return false; }
+bool EpsilonNode::operator==(const EpsilonNode& node) const { return true; }
+bool EpsilonNode::operator==(const EmptyNode& node) const { return false; }
+//@formatter:on
+
+void EmptyNode::accept(ASTVisitor* v) const
 {
     v->visit(this);
 }
 
-EndmarkerNode* EndmarkerNode::clone() const
+ASTNode* EmptyNode::clone() const
 {
-    return new EndmarkerNode(*this);
+    return new EmptyNode;
 }
 
-EndmarkerNode::EndmarkerNode(std::string name)
-        :CharNode('#'), name_(std::move(name)) { }
+//@formatter:off
+bool EmptyNode::operator==(const ASTNode& node) const { return node == *this; }
+bool EmptyNode::operator==(const StarNode& node) const { return false; }
+bool EmptyNode::operator==(const CatNode& node) const { return false; }
+bool EmptyNode::operator==(const UnionNode& node) const { return false; }
+bool EmptyNode::operator==(const CharNode& node) const { return false; }
+bool EmptyNode::operator==(const EpsilonNode& node) const { return false; }
+bool EmptyNode::operator==(const EmptyNode& node) const { return true; }
+//@formatter:on
 
-const std::string& EndmarkerNode::name() const noexcept { return name_; }

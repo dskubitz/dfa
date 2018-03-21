@@ -40,11 +40,6 @@ void PrettyPrinter::visit(const EpsilonNode* node)
     os_ << "\u03B5";
 }
 
-void PrettyPrinter::visit(const EndmarkerNode* node)
-{
-    os_ << '#';
-}
-
 void PrettyPrinter::print(const ASTNode* tree)
 {
     visit(tree);
@@ -54,4 +49,9 @@ void PrettyPrinter::print(const ASTNode* tree)
 void PrettyPrinter::visit(const ASTNode* node)
 {
     node->accept(this);
+}
+
+void PrettyPrinter::visit(const EmptyNode* node)
+{
+    os_ << "\u2205";
 }

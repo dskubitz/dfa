@@ -6,7 +6,6 @@ class ParserTests : public ::testing::Test {
 protected:
     Parser parser;
     std::ostringstream out;
-    PrettyPrinter printer{out};
 };
 
 TEST_F(ParserTests, SingleCharactersBad)
@@ -45,88 +44,4 @@ TEST_F(ParserTests, InvalidRange)
 {
     EXPECT_THROW(parser.parse("[b-a]"), ParserError);
 
-}
-
-TEST_F(ParserTests, CharacterClassTwoChars)
-{
-    auto regex1 = parser.parse("[ab]");
-    printer.print(regex1.get());
-    EXPECT_EQ(out.str(), "(cat (union a b) #)\n");
-}
-
-TEST_F(ParserTests, CharacterClassTwoCharRange)
-{
-    auto regex1 = parser.parse("[a-b]");
-    printer.print(regex1.get());
-    EXPECT_EQ(out.str(), "(cat (union a b) #)\n");
-}
-
-TEST_F(ParserTests, CharacterClassTwoCharRangePlusThird)
-{
-    auto regex1 = parser.parse("[a-be]");
-    printer.print(regex1.get());
-    EXPECT_EQ(out.str(), "(cat (union (union a b) e) #)\n");
-}
-
-TEST_F(ParserTests, NegatedCharacterClassRange)
-{
-    auto regex1 = parser.parse("[^A-Za-z0-9!-/:-~\n]");
-    printer.print(regex1.get());
-    EXPECT_EQ(out.str(),
-              "(cat (union (union (union (union \t \v) \f) \r)  ) #)\n");
-}
-
-TEST_F(ParserTests, SingleCharactersGood)
-{
-    auto regex1 = parser.parse("a");
-    printer.print(regex1.get());
-    EXPECT_EQ(out.str(), "(cat a #)\n");
-}
-
-TEST_F(ParserTests, MultipleStars)
-{
-    EXPECT_THROW(parser.parse("a**"), ParserError);
-    EXPECT_THROW(parser.parse("a?*"), ParserError);
-    EXPECT_THROW(parser.parse("a*?"), ParserError);
-    EXPECT_THROW(parser.parse("a+*"), ParserError);
-    EXPECT_THROW(parser.parse("a*+"), ParserError);
-    auto regex = parser.parse("(a*)*");
-    printer.print(regex.get());
-    EXPECT_EQ(out.str(), "(cat (star (star a)) #)\n");
-}
-
-TEST_F(ParserTests, Precedence)
-{
-    auto regex1 = parser.parse("((ab*)c)|(def*)");
-    auto regex2 = parser.parse("ab*c|def*");
-    printer.print(regex1.get());
-    std::string str1 = out.str();
-    out = std::ostringstream{};
-    printer.print(regex2.get());
-    std::string str2 = out.str();
-    EXPECT_EQ(str1, str2);
-}
-
-TEST_F(ParserTests, CharacterClassVersusUnion)
-{
-    auto re1 = parser.parse("[0-9]+(E|e)[0-9]+");
-    auto re2 = parser.parse("[0-9]+[Ee][0-9]+");
-    printer.print(re1.get());
-    std::string str1 = out.str();
-    out = std::ostringstream{};
-    printer.print(re2.get());
-    std::string str2 = out.str();
-    EXPECT_EQ(str1, str2);
-}
-
-TEST_F(ParserTests, StarAndPlus)
-{
-    auto re1 = parser.parse("[AB]+");
-    auto re2 = parser.parse("[AB][AB]*");
-    printer.print(re1.get());
-    std::string str1 = out.str();
-    out = std::ostringstream{};
-    printer.print(re2.get());
-    std::string str2 = out.str();
-    std::cout << str1 << ' ' << str2 << '\n';
 }

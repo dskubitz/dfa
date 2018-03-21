@@ -29,7 +29,10 @@ ASTNode* Parser::parse_impl(const std::string& regexp, const std::string& name)
     pos = 0;
     paren_count = 0;
     try {
-        return new CatNode(expression(), new EndmarkerNode(name));
+//        return new CatNode(expression(), new EndmarkerNode(name));
+        if (expr.empty())
+            return new EpsilonNode;
+         return expression();
     }
     catch (std::out_of_range& e) {
         throw ParserError(e.what());

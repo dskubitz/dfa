@@ -29,7 +29,8 @@ class CatNode;
 class UnionNode;
 class CharNode;
 class EpsilonNode;
-class EndmarkerNode;
+class EmptyNode;
+//class EndmarkerNode;
 //@formatter:on
 
 class ASTVisitor {
@@ -42,7 +43,8 @@ public:
     virtual void visit(const UnionNode*)=0;
     virtual void visit(const CharNode*)=0;
     virtual void visit(const EpsilonNode*)=0;
-    virtual void visit(const EndmarkerNode*)=0;
+    virtual void visit(const EmptyNode*)=0;
+//    virtual void visit(const EndmarkerNode*)=0;
 };
 
 class ASTNode {
@@ -50,6 +52,13 @@ public:
     virtual ~ASTNode() = default;
     virtual void accept(ASTVisitor* v) const = 0;
     virtual ASTNode* clone() const = 0;
+    virtual bool operator==(const ASTNode& node) const = 0;
+    virtual bool operator==(const StarNode& node) const = 0;
+    virtual bool operator==(const CatNode& node) const = 0;
+    virtual bool operator==(const UnionNode& node) const = 0;
+    virtual bool operator==(const CharNode& node) const = 0;
+    virtual bool operator==(const EpsilonNode& node) const = 0;
+    virtual bool operator==(const EmptyNode& node) const = 0;
 };
 
 class StarNode : public ASTNode {
@@ -58,6 +67,13 @@ public:
     void accept(ASTVisitor* v) const override;
     const ASTNode* expr() const;
     ~StarNode() override;
+    bool operator==(const ASTNode& node) const override;
+    bool operator==(const StarNode& node) const override;
+    bool operator==(const CatNode& node) const override;
+    bool operator==(const UnionNode& node) const override;
+    bool operator==(const CharNode& node) const override;
+    bool operator==(const EpsilonNode& node) const override;
+    bool operator==(const EmptyNode& node) const override;
     StarNode* clone() const override;
 private:
     ASTNode* expr_;
@@ -69,6 +85,13 @@ public:
     void accept(ASTVisitor* v) const override;
     const ASTNode* left() const;
     const ASTNode* right() const;
+    bool operator==(const ASTNode& node) const override;
+    bool operator==(const StarNode& node) const override;
+    bool operator==(const CatNode& node) const override;
+    bool operator==(const UnionNode& node) const override;
+    bool operator==(const CharNode& node) const override;
+    bool operator==(const EpsilonNode& node) const override;
+    bool operator==(const EmptyNode& node) const override;
     ~CatNode() override;
     CatNode* clone() const override;
 
@@ -83,6 +106,13 @@ public:
     void accept(ASTVisitor* v) const override;
     const ASTNode* left() const;
     const ASTNode* right() const;
+    bool operator==(const ASTNode& node) const override;
+    bool operator==(const StarNode& node) const override;
+    bool operator==(const CatNode& node) const override;
+    bool operator==(const UnionNode& node) const override;
+    bool operator==(const CharNode& node) const override;
+    bool operator==(const EpsilonNode& node) const override;
+    bool operator==(const EmptyNode& node) const override;
     ~UnionNode() override;
     UnionNode* clone() const override;
 
@@ -99,6 +129,13 @@ public:
     size_t id() const;
     CharNode* clone() const override;
     static size_t max_id();
+    bool operator==(const ASTNode& node) const override;
+    bool operator==(const StarNode& node) const override;
+    bool operator==(const CatNode& node) const override;
+    bool operator==(const UnionNode& node) const override;
+    bool operator==(const CharNode& node) const override;
+    bool operator==(const EpsilonNode& node) const override;
+    bool operator==(const EmptyNode& node) const override;
 protected:
     static size_t num_;
 
@@ -110,9 +147,35 @@ private:
 class EpsilonNode : public ASTNode {
 public:
     void accept(ASTVisitor* v) const override;
+    bool operator==(const ASTNode& node) const override;
+    bool operator==(const StarNode& node) const override;
+    bool operator==(const CatNode& node) const override;
+    bool operator==(const UnionNode& node) const override;
+    bool operator==(const CharNode& node) const override;
+    bool operator==(const EpsilonNode& node) const override;
+    bool operator==(const EmptyNode& node) const override;
     EpsilonNode* clone() const override;
 };
 
+class EmptyNode : public ASTNode {
+public:
+    void accept(ASTVisitor* v) const override;
+    ASTNode* clone() const override;
+    bool operator==(const ASTNode& node) const override;
+    bool operator==(const StarNode& node) const override;
+    bool operator==(const CatNode& node) const override;
+    bool operator==(const UnionNode& node) const override;
+    bool operator==(const CharNode& node) const override;
+    bool operator==(const EpsilonNode& node) const override;
+    bool operator==(const EmptyNode& node) const override;
+};
+
+inline bool operator!=(const ASTNode& lhs, const ASTNode& rhs)
+{
+    return !(lhs.operator==(rhs));
+}
+
+/*
 class EndmarkerNode : public CharNode {
 public:
     explicit EndmarkerNode(std::string name);
@@ -123,5 +186,6 @@ public:
 private:
     std::string name_;
 };
+*/
 
 #endif //RE_H

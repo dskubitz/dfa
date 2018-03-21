@@ -88,6 +88,12 @@ void TreeFunctions::visit(const EpsilonNode* node)
     lastpos_[node] = make_bitset();
 }
 
+void TreeFunctions::visit(const EmptyNode* node)
+{
+
+}
+
+/*
 void TreeFunctions::visit(const EndmarkerNode* node)
 {
     nullable_[node] = false;
@@ -96,6 +102,7 @@ void TreeFunctions::visit(const EndmarkerNode* node)
     symbols_[node->id()] = node->value();
     acceptpos_[node->id()] = node->name();
 }
+*/
 
 void followpos_graphviz(const TreeFunctions& functions)
 {

@@ -37,12 +37,17 @@ void Derivative::visit(const UnionNode* node)
 
 void Derivative::visit(const IntersectionNode* node)
 {
-
+    stack.push_back(
+            make_intersection(
+                    evaluate(node->left()->clone()),
+                    evaluate(node->right()->clone())));
 }
 
 void Derivative::visit(const ComplementNode* node)
 {
-
+    stack.push_back(
+            make_complement(
+                    evaluate(node->expr()->clone())));
 }
 
 void Derivative::visit(const CharNode* node)
@@ -90,8 +95,6 @@ std::unique_ptr<ASTNode> Derivative::derive(const ASTNode* tree)
     dA = 0;
     return std::unique_ptr<ASTNode>(tree->clone());
 }
-
-
 
 void Nullable::visit(const ASTNode* node)
 {
@@ -145,8 +148,6 @@ void Nullable::visit(const ComplementNode* node)
 {
     stack.push_back(!evaluate(node->expr()));
 }
-
-
 
 ASTNode* helper(const ASTNode* node)
 {

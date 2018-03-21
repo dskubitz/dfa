@@ -2,6 +2,7 @@
 #include <Derivative.h>
 #include <Parser.h>
 #include <PrettyPrinter.h>
+#include <unordered_set>
 
 Parser parser;
 
@@ -22,7 +23,6 @@ TEST(Nullable, Test)
     re = std::make_unique<EmptyNode>();
     EXPECT_FALSE(Nullable{}.evaluate(re.get()));
 }
-
 
 TEST(SimplifyRegex, Union)
 {

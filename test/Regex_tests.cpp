@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <ASTNode.h>
 #include <Parser.h>
+#include <PrettyPrinter.h>
 
 class RegexTests : public ::testing::Test {
 protected:
@@ -68,12 +69,19 @@ TEST_F(RegexTests, Test)
     auto re1 = parser.parse("");
     auto re2 = parser.parse("a");
     auto re3 = parser.parse("");
-    EXPECT_NE(*re1, *re2);
+    EXPECT_NE(re1->compare(re2.get()), 0);
+    EXPECT_FALSE(*re1 == *re2);
+
+    EXPECT_EQ(re1->compare(re3.get()), 0);
     EXPECT_EQ(*re1, *re3);
+
     auto re4 = parser.parse("(a|b)*abb");
     auto re5 = parser.parse("(ab*|cd*)");
+    EXPECT_NE(re4->compare(re5.get()), 0);
     EXPECT_NE(*re4, *re5);
+
     auto re6 = parser.parse("(a|b)*abb");
-    EXPECT_EQ(*re4, *re6);
+    EXPECT_EQ(re4->compare(re6.get()), 0);
+    EXPECT_TRUE(*re4 == *re6);
 }
 

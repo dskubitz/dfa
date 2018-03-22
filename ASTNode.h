@@ -56,16 +56,15 @@ public:
     virtual ~ASTNode() = default;
     virtual void accept(ASTVisitor* v) const =0;
     virtual ASTNode* clone() const = 0;
-    // changed signature from bool to int to possibly allow for 3-way compare
-    virtual int compare(const ASTNode* node) const =0;
-    virtual int compare(const StarNode& node) const =0;
-    virtual int compare(const CatNode& node) const =0;
-    virtual int compare(const UnionNode& node) const =0;
-    virtual int compare(const IntersectionNode& node) const =0;
-    virtual int compare(const ComplementNode& node) const =0;
-    virtual int compare(const CharNode& node) const =0;
-    virtual int compare(const EpsilonNode& node) const =0;
-    virtual int compare(const EmptyNode& node) const =0;
+    virtual bool equiv(const ASTNode* node) const =0;
+    virtual bool equiv(const StarNode& node) const =0;
+    virtual bool equiv(const CatNode& node) const =0;
+    virtual bool equiv(const UnionNode& node) const =0;
+    virtual bool equiv(const IntersectionNode& node) const =0;
+    virtual bool equiv(const ComplementNode& node) const =0;
+    virtual bool equiv(const CharNode& node) const =0;
+    virtual bool equiv(const EpsilonNode& node) const =0;
+    virtual bool equiv(const EmptyNode& node) const =0;
 };
 
 class StarNode : public ASTNode {
@@ -74,15 +73,15 @@ public:
     void accept(ASTVisitor* v) const override;
     const ASTNode* expr() const;
     ~StarNode() override;
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
     StarNode* clone() const override;
 private:
     ASTNode* expr_;
@@ -94,15 +93,15 @@ public:
     void accept(ASTVisitor* v) const override;
     const ASTNode* left() const;
     const ASTNode* right() const;
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
     ~CatNode() override;
     CatNode* clone() const override;
 
@@ -117,15 +116,15 @@ public:
     void accept(ASTVisitor* v) const override;
     const ASTNode* left() const;
     const ASTNode* right() const;
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
     ~UnionNode() override;
     UnionNode* clone() const override;
 
@@ -141,15 +140,15 @@ public:
     IntersectionNode* clone() const override;
     const ASTNode* left() const;
     const ASTNode* right() const;
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
     ~IntersectionNode() override;
 private:
     ASTNode* left_;
@@ -162,15 +161,15 @@ public:
     ComplementNode* clone() const override;
     explicit ComplementNode(ASTNode* expr);
     const ASTNode* expr() const;
-    int compare(const ASTNode* node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
     ~ComplementNode() override;
 private:
     ASTNode* expr_;
@@ -184,15 +183,15 @@ public:
     size_t id() const;
     CharNode* clone() const override;
     static size_t max_id();
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
 protected:
     static size_t num_;
 
@@ -204,15 +203,15 @@ private:
 class EpsilonNode : public ASTNode {
 public:
     void accept(ASTVisitor* v) const override;
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
     EpsilonNode* clone() const override;
 };
 
@@ -220,20 +219,20 @@ class EmptyNode : public ASTNode {
 public:
     void accept(ASTVisitor* v) const override;
     ASTNode* clone() const override;
-    int compare(const ASTNode* node) const override;
-    int compare(const StarNode& node) const override;
-    int compare(const IntersectionNode& node) const override;
-    int compare(const ComplementNode& node) const override;
-    int compare(const CatNode& node) const override;
-    int compare(const UnionNode& node) const override;
-    int compare(const CharNode& node) const override;
-    int compare(const EpsilonNode& node) const override;
-    int compare(const EmptyNode& node) const override;
+    bool equiv(const ASTNode* node) const override;
+    bool equiv(const StarNode& node) const override;
+    bool equiv(const IntersectionNode& node) const override;
+    bool equiv(const ComplementNode& node) const override;
+    bool equiv(const CatNode& node) const override;
+    bool equiv(const UnionNode& node) const override;
+    bool equiv(const CharNode& node) const override;
+    bool equiv(const EpsilonNode& node) const override;
+    bool equiv(const EmptyNode& node) const override;
 };
 
 inline bool operator==(const ASTNode& lhs, const ASTNode& rhs)
 {
-    return lhs.compare(&rhs) == 0;
+    return lhs.equiv(&rhs);
 }
 
 inline bool operator!=(const ASTNode& lhs, const ASTNode& rhs)

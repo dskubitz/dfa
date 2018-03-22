@@ -28,19 +28,19 @@ size_t CharNode::max_id()
 }
 
 //@formatter:off
-int CharNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int CharNode::compare(const StarNode& node) const { return 1; }
-int CharNode::compare(const CatNode& node) const { return 1; }
-int CharNode::compare(const UnionNode& node) const { return 1; }
-int CharNode::compare(const EpsilonNode& node) const { return 1; }
-int CharNode::compare(const EmptyNode& node) const { return 1; }
-int CharNode::compare(const IntersectionNode& node) const { return 1; }
-int CharNode::compare(const ComplementNode& node) const { return 1; }
+bool CharNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool CharNode::equiv(const StarNode& node) const { return false; }
+bool CharNode::equiv(const CatNode& node) const { return false; }
+bool CharNode::equiv(const UnionNode& node) const { return false; }
+bool CharNode::equiv(const EpsilonNode& node) const { return false; }
+bool CharNode::equiv(const EmptyNode& node) const { return false; }
+bool CharNode::equiv(const IntersectionNode& node) const { return false; }
+bool CharNode::equiv(const ComplementNode& node) const { return false; }
 //@formatter:on
 
-int CharNode::compare(const CharNode& node) const
+bool CharNode::equiv(const CharNode& node) const
 {
-    return node.value_ - value_;
+    return node.value_ == value_;
 }
 
 StarNode::StarNode(ASTNode* node)
@@ -66,24 +66,19 @@ StarNode* StarNode::clone() const
 }
 
 //@formatter:off
-int StarNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int StarNode::compare(const CatNode& node) const { return 1; }
-int StarNode::compare(const UnionNode& node) const { return 1; }
-int StarNode::compare(const CharNode& node) const { return 1; }
-int StarNode::compare(const IntersectionNode& node) const { return 1; }
-int StarNode::compare(const ComplementNode& node) const { return 1; }
-int StarNode::compare(const EpsilonNode& node) const { return 1; }
-int StarNode::compare(const EmptyNode& node) const { return 1; }
+bool StarNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool StarNode::equiv(const CatNode& node) const { return false; }
+bool StarNode::equiv(const UnionNode& node) const { return false; }
+bool StarNode::equiv(const CharNode& node) const { return false; }
+bool StarNode::equiv(const IntersectionNode& node) const { return false; }
+bool StarNode::equiv(const ComplementNode& node) const { return false; }
+bool StarNode::equiv(const EpsilonNode& node) const { return false; }
+bool StarNode::equiv(const EmptyNode& node) const { return false; }
 //@formatter:on
 
-int StarNode::compare(const StarNode& node) const
+bool StarNode::equiv(const StarNode& node) const
 {
-    return expr_->compare(node.expr_);
-    /*
-    if (expr_->compare(node.expr_)==0)
-        return 0;
-    return 1;
-    */
+    return expr_->equiv(node.expr_);
 }
 
 CatNode::CatNode(ASTNode* left, ASTNode* right)
@@ -112,22 +107,19 @@ CatNode* CatNode::clone() const
 }
 
 //@formatter:off
-int CatNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int CatNode::compare(const StarNode& node) const { return 1; }
-int CatNode::compare(const UnionNode& node) const { return 1; }
-int CatNode::compare(const CharNode& node) const { return 1; }
-int CatNode::compare(const EpsilonNode& node) const { return 1; }
-int CatNode::compare(const EmptyNode& node) const { return 1; }
-int CatNode::compare(const IntersectionNode& node) const { return 1; }
-int CatNode::compare(const ComplementNode& node) const { return 1; }
+bool CatNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool CatNode::equiv(const StarNode& node) const { return false; }
+bool CatNode::equiv(const UnionNode& node) const { return false; }
+bool CatNode::equiv(const CharNode& node) const { return false; }
+bool CatNode::equiv(const EpsilonNode& node) const { return false; }
+bool CatNode::equiv(const EmptyNode& node) const { return false; }
+bool CatNode::equiv(const IntersectionNode& node) const { return false; }
+bool CatNode::equiv(const ComplementNode& node) const { return false; }
 //@formatter:on
 
-int CatNode::compare(const CatNode& node) const
+bool CatNode::equiv(const CatNode& node) const
 {
-    if ((left_->compare(node.left_) == 0)
-        && (right_->compare(node.right_) == 0))
-        return 0;
-    return 1;
+    return left_->equiv(node.left_) && right_->equiv(node.right_);
 }
 
 UnionNode::UnionNode(ASTNode* left, ASTNode* right)
@@ -156,22 +148,19 @@ UnionNode* UnionNode::clone() const
 }
 
 //@formatter:off
-int UnionNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int UnionNode::compare(const StarNode& node) const { return 1; }
-int UnionNode::compare(const CatNode& node) const { return 1; }
-int UnionNode::compare(const CharNode& node) const { return 1; }
-int UnionNode::compare(const EpsilonNode& node) const { return 1; }
-int UnionNode::compare(const EmptyNode& node) const { return 1; }
-int UnionNode::compare(const IntersectionNode& node) const { return 1; }
-int UnionNode::compare(const ComplementNode& node) const { return 1; }
+bool UnionNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool UnionNode::equiv(const StarNode& node) const { return false; }
+bool UnionNode::equiv(const CatNode& node) const { return false; }
+bool UnionNode::equiv(const CharNode& node) const { return false; }
+bool UnionNode::equiv(const EpsilonNode& node) const { return false; }
+bool UnionNode::equiv(const EmptyNode& node) const { return false; }
+bool UnionNode::equiv(const IntersectionNode& node) const { return false; }
+bool UnionNode::equiv(const ComplementNode& node) const { return false; }
 //@formatter:on
 
-int UnionNode::compare(const UnionNode& node) const
+bool UnionNode::equiv(const UnionNode& node) const
 {
-    if ((left_->compare(node.left_) == 0)
-        && (right_->compare(node.right_) == 0))
-        return 0;
-    return 1;
+    return left_->equiv(node.left_) && right_->equiv(node.right_);
 }
 
 void EpsilonNode::accept(ASTVisitor* v) const
@@ -185,17 +174,17 @@ EpsilonNode* EpsilonNode::clone() const
 }
 
 //@formatter:off
-int EpsilonNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int EpsilonNode::compare(const StarNode& node) const { return 1; }
-int EpsilonNode::compare(const CatNode& node) const { return 1; }
-int EpsilonNode::compare(const UnionNode& node) const { return 1; }
-int EpsilonNode::compare(const CharNode& node) const { return 1; }
-int EpsilonNode::compare(const EmptyNode& node) const { return 1; }
-int EpsilonNode::compare(const IntersectionNode& node) const { return 1; }
-int EpsilonNode::compare(const ComplementNode& node) const { return 1; }
+bool EpsilonNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool EpsilonNode::equiv(const StarNode& node) const { return false; }
+bool EpsilonNode::equiv(const CatNode& node) const { return false; }
+bool EpsilonNode::equiv(const UnionNode& node) const { return false; }
+bool EpsilonNode::equiv(const CharNode& node) const { return false; }
+bool EpsilonNode::equiv(const EmptyNode& node) const { return false; }
+bool EpsilonNode::equiv(const IntersectionNode& node) const { return false; }
+bool EpsilonNode::equiv(const ComplementNode& node) const { return false; }
 //@formatter:on
 
-int EpsilonNode::compare(const EpsilonNode& node) const { return 0; }
+bool EpsilonNode::equiv(const EpsilonNode& node) const { return true; }
 
 void EmptyNode::accept(ASTVisitor* v) const
 {
@@ -208,17 +197,17 @@ ASTNode* EmptyNode::clone() const
 }
 
 //@formatter:off
-int EmptyNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int EmptyNode::compare(const StarNode& node) const { return 1; }
-int EmptyNode::compare(const CatNode& node) const { return 1; }
-int EmptyNode::compare(const UnionNode& node) const { return 1; }
-int EmptyNode::compare(const CharNode& node) const { return 1; }
-int EmptyNode::compare(const EpsilonNode& node) const { return 1; }
-int EmptyNode::compare(const IntersectionNode& node) const { return 1; }
-int EmptyNode::compare(const ComplementNode& node) const { return 1; }
+bool EmptyNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool EmptyNode::equiv(const StarNode& node) const { return false; }
+bool EmptyNode::equiv(const CatNode& node) const { return false; }
+bool EmptyNode::equiv(const UnionNode& node) const { return false; }
+bool EmptyNode::equiv(const CharNode& node) const { return false; }
+bool EmptyNode::equiv(const EpsilonNode& node) const { return false; }
+bool EmptyNode::equiv(const IntersectionNode& node) const { return false; }
+bool EmptyNode::equiv(const ComplementNode& node) const { return false; }
 //@formatter:on
 
-int EmptyNode::compare(const EmptyNode& node) const { return 0; }
+bool EmptyNode::equiv(const EmptyNode& node) const { return true; }
 
 void IntersectionNode::accept(ASTVisitor* v) const { v->visit(this); }
 
@@ -228,21 +217,19 @@ IntersectionNode* IntersectionNode::clone() const
 }
 
 //@formatter:off
-int IntersectionNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int IntersectionNode::compare(const StarNode& node) const { return 1; }
-int IntersectionNode::compare(const CatNode& node) const { return 1; }
-int IntersectionNode::compare(const UnionNode& node) const { return 1; }
-int IntersectionNode::compare(const CharNode& node) const { return 1; }
-int IntersectionNode::compare(const EpsilonNode& node) const { return 1; }
-int IntersectionNode::compare(const ComplementNode& node) const { return 1; }
-int IntersectionNode::compare(const EmptyNode& node) const { return 1; }
+bool IntersectionNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool IntersectionNode::equiv(const StarNode& node) const { return false; }
+bool IntersectionNode::equiv(const CatNode& node) const { return false; }
+bool IntersectionNode::equiv(const UnionNode& node) const { return false; }
+bool IntersectionNode::equiv(const CharNode& node) const { return false; }
+bool IntersectionNode::equiv(const EpsilonNode& node) const { return false; }
+bool IntersectionNode::equiv(const ComplementNode& node) const { return false; }
+bool IntersectionNode::equiv(const EmptyNode& node) const { return false; }
 //@formatter:on
 
-int IntersectionNode::compare(const IntersectionNode& node) const
+bool IntersectionNode::equiv(const IntersectionNode& node) const
 {
-    if (left_->compare(node.left_) && right_->compare(node.right_))
-        return 0;
-    return 1;
+    return left_->equiv(node.left_) && right_->equiv(node.right_);
 }
 
 IntersectionNode::~IntersectionNode()
@@ -268,21 +255,19 @@ ComplementNode* ComplementNode::clone() const
 }
 
 //@formatter:off
-int ComplementNode::compare(const ASTNode* node) const { return node->compare(*this); }
-int ComplementNode::compare(const StarNode& node) const { return 1; }
-int ComplementNode::compare(const CatNode& node) const { return 1; }
-int ComplementNode::compare(const UnionNode& node) const { return 1; }
-int ComplementNode::compare(const IntersectionNode& node) const { return 1; }
-int ComplementNode::compare(const CharNode& node) const { return 1; }
-int ComplementNode::compare(const EpsilonNode& node) const { return 1; }
-int ComplementNode::compare(const EmptyNode& node) const { return 1; }
+bool ComplementNode::equiv(const ASTNode* node) const { return node->equiv(*this); }
+bool ComplementNode::equiv(const StarNode& node) const { return false; }
+bool ComplementNode::equiv(const CatNode& node) const { return false; }
+bool ComplementNode::equiv(const UnionNode& node) const { return false; }
+bool ComplementNode::equiv(const IntersectionNode& node) const { return false; }
+bool ComplementNode::equiv(const CharNode& node) const { return false; }
+bool ComplementNode::equiv(const EpsilonNode& node) const { return false; }
+bool ComplementNode::equiv(const EmptyNode& node) const { return false; }
 //@formatter:on
 
-int ComplementNode::compare(const ComplementNode& node) const
+bool ComplementNode::equiv(const ComplementNode& node) const
 {
-    if (expr_->compare(node.expr_))
-        return 0;
-    return 1;
+    return expr_->equiv(node.expr_);
 }
 
 ComplementNode::~ComplementNode() { delete expr_; }

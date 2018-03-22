@@ -14,7 +14,6 @@ TEST_F(DerivativeTests, BasicFunctionality)
     auto re1 = parser.parse("ab*");
     auto re2 = derivative.derive(re1.get());
     auto re3 = parser.parse("b*");
-    EXPECT_EQ(re1->compare(re2.get()), 0);
     EXPECT_EQ(*re1, *re2);
     re2 = derivative.derive(re1.get(), 'a');
     EXPECT_EQ(*re2, *re3);

@@ -8,6 +8,7 @@ protected:
     Parser parser;
 
 };
+
 TEST_F(RegexTests, Cat)
 {
     std::unique_ptr<RegexNode> re(
@@ -95,10 +96,30 @@ TEST_F(RegexTests, WrapperClass)
 TEST_F(RegexTests, Hash)
 {
     std::unordered_set<Regex> regexes;
-    auto&&[it, inserted] = regexes.insert(parser.parse("(a|b)*abb"));
+    auto && [it, inserted] = regexes.insert(parser.parse("(a|b)*abb"));
     EXPECT_TRUE(inserted);
     std::tie(it, inserted) = regexes.insert(parser.parse("(a|b)*abb"));
     EXPECT_FALSE(inserted);
     auto iter = regexes.find(*it);
     EXPECT_NE(iter, regexes.end());
+}
+
+TEST_F(RegexTests, StrictWeakOrder)
+{
+    Regex re0 = parser.parse(".");
+    Regex re1 = parser.parse("[aeiou]");
+    Regex re2 = parser.parse("[0-9]");
+    Regex re3 = parser.parse("[aeiou]");
+    Regex re4 = parser.parse("[A-Z_a-z_0-9]");
+    // for all a, comp(a,a)==false
+    EXPECT_FALSE(re0 < re0);
+    EXPECT_FALSE(re1 < re1);
+    EXPECT_FALSE(re2 < re2);
+    EXPECT_FALSE(re3 < re3);
+    EXPECT_FALSE(re4 < re4);
+    // if comp(a,b)==true then comp(b,a)==false
+    EXPECT_TRUE((re0 < re1) == !(re1 < re0));
+    EXPECT_TRUE((re2 < re3) == !(re3 < re2));
+    // if comp(a,b) and comp(b,c) then comp(a,c)
+    EXPECT_TRUE(((re0 < re1) && (re2 < re3)) == (re0 < re3));
 }

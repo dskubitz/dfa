@@ -53,14 +53,8 @@ public:
     virtual void accept(RegexVisitor* v) const =0;
     virtual RegexNode* clone() const = 0;
     virtual bool equiv(const RegexNode* node) const =0;
-    virtual bool equiv(const Closure& node) const =0;
-    virtual bool equiv(const Concat& node) const =0;
-    virtual bool equiv(const Union& node) const =0;
-    virtual bool equiv(const Intersection& node) const =0;
-    virtual bool equiv(const Complement& node) const =0;
-    virtual bool equiv(const Symbol& node) const =0;
-    virtual bool equiv(const Epsilon& node) const =0;
-    virtual bool equiv(const Empty& node) const =0;
+    virtual bool comp(const RegexNode* node) const =0;
+    virtual size_t hash_code() const =0;
     virtual std::string to_string() const =0;
 };
 
@@ -71,14 +65,8 @@ public:
     void accept(RegexVisitor* v) const override;
     const RegexNode* expr() const;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
+    bool comp(const RegexNode* node) const override;
+    size_t hash_code() const override;
     Closure* clone() const override;
     std::string to_string() const override;
 private:
@@ -92,15 +80,9 @@ public:
     void accept(RegexVisitor* v) const override;
     Concat* clone() const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
+    bool comp(const RegexNode* node) const override;
     std::string to_string() const override;
+    size_t hash_code() const override;
     const RegexNode* left() const;
     const RegexNode* right() const;
 
@@ -115,16 +97,10 @@ public:
     ~Union() override;
     void accept(RegexVisitor* v) const override;
     Union* clone() const override;
+    bool comp(const RegexNode* node) const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
     const RegexNode* left() const;
+    size_t hash_code() const override;
     const RegexNode* right() const;
     std::string to_string() const override;
 
@@ -139,15 +115,9 @@ public:
     ~Intersection() override;
     void accept(RegexVisitor* v) const override;
     Intersection* clone() const override;
+    bool comp(const RegexNode* node) const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
+    size_t hash_code() const override;
     const RegexNode* left() const;
     const RegexNode* right() const;
     std::string to_string() const override;
@@ -163,15 +133,9 @@ public:
     ~Complement() override;
     void accept(RegexVisitor* v) const override;
     Complement* clone() const override;
+    bool comp(const RegexNode* node) const override;
+    size_t hash_code() const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
     const RegexNode* expr() const;
     std::string to_string() const override;
 
@@ -185,19 +149,12 @@ public:
     void accept(RegexVisitor* v) const override;
     Symbol* clone() const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
+    bool comp(const RegexNode* node) const override;
+    size_t hash_code() const override;
     char value() const;
     std::string to_string() const override;
 
 private:
-    size_t id_;
     const char value_;
 };
 
@@ -206,14 +163,8 @@ public:
     void accept(RegexVisitor* v) const override;
     Epsilon* clone() const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
+    bool comp(const RegexNode* node) const override;
+    size_t hash_code() const override;
     std::string to_string() const override;
 };
 
@@ -221,15 +172,9 @@ class Empty : public RegexNode {
 public:
     void accept(RegexVisitor* v) const override;
     RegexNode* clone() const override;
+    bool comp(const RegexNode* node) const override;
+    size_t hash_code() const override;
     bool equiv(const RegexNode* node) const override;
-    bool equiv(const Closure& node) const override;
-    bool equiv(const Intersection& node) const override;
-    bool equiv(const Complement& node) const override;
-    bool equiv(const Concat& node) const override;
-    bool equiv(const Union& node) const override;
-    bool equiv(const Symbol& node) const override;
-    bool equiv(const Epsilon& node) const override;
-    bool equiv(const Empty& node) const override;
     std::string to_string() const override;
 };
 
@@ -276,6 +221,26 @@ public:
         return !(rhs == lhs);
     }
 
+    friend bool operator<(const Regex& lhs, const Regex& rhs)
+    {
+        return lhs.ptr_->comp(rhs.get());
+    }
+
+    friend bool operator>(const Regex& lhs, const Regex& rhs)
+    {
+        return rhs < lhs;
+    }
+
+    friend bool operator<=(const Regex& lhs, const Regex& rhs)
+    {
+        return !(rhs < lhs);
+    }
+
+    friend bool operator>=(const Regex& lhs, const Regex& rhs)
+    {
+        return !(lhs < rhs);
+    }
+
     RegexNode* get() noexcept { return ptr_.get(); }
 
     const RegexNode* get() const noexcept { return ptr_.get(); }
@@ -289,7 +254,7 @@ template<>
 struct hash<Regex> {
     size_t operator()(const Regex& regex) const noexcept
     {
-        return reinterpret_cast<size_t>(regex.get());
+        return regex.get()->hash_code();
     }
 };
 }
@@ -298,18 +263,6 @@ inline void swap(Regex& lhs, Regex& rhs) noexcept
 {
     lhs.swap(rhs);
 }
-
-/*
-inline bool operator==(const RegexNode& lhs, const RegexNode& rhs)
-{
-    return lhs.equiv(&rhs);
-}
-
-inline bool operator!=(const RegexNode& lhs, const RegexNode& rhs)
-{
-    return !(lhs == rhs);
-}
-*/
 
 RegexNode* make_union(RegexNode* left, RegexNode* right);
 RegexNode* make_cat(RegexNode* left, RegexNode* right);

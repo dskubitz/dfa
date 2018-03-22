@@ -31,7 +31,7 @@ RegexNode* Parser::parse_impl(const std::string& regexp)
     try {
         if (expr.empty())
             return new Epsilon;
-         return expression();
+        return expression();
     }
     catch (std::out_of_range& e) {
         throw ParserError(e.what());
@@ -63,7 +63,7 @@ RegexNode* Parser::term()
         if (c == '|') {
             break;
         } else if (c == ')') {
-            if (paren_count==0)
+            if (paren_count == 0)
                 error("unmatched parenthesis");
             --paren_count;
             break;

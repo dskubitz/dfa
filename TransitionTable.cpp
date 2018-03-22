@@ -1,4 +1,7 @@
 #include <TransitionTable.h>
+#include <unordered_map>
+#include <Derivative.h>
+#include <iostream>
 
 /*
 #include <vector>
@@ -58,7 +61,32 @@ TransitionTable make_transition_table(const ASTNode* ast)
     return TransitionTable(TreeFunctions(ast));
 }
  */
-void make_transition_table(const Regex& regex)
+TransitionTable make_transition_table(const Regex& regex)
 {
+    Derivative deriv;
+    std::vector<Regex> unmarked{regex};
+    std::map<Regex, size_t> dstates{{regex, 0}};
+    size_t num = 1;
+    TransitionTable table;
+    table.add_state();
 
+    while (!unmarked.empty()) {
+        Regex from = unmarked.back();
+        unmarked.pop_back();
+        std::cout << from.get()->to_string() << '\n';
+
+        for (int c = 0; c < 128; ++c) {
+//            if (!isgraph(c)) continue;
+            Regex to = deriv.derive(from, c);
+
+            if (dstates.emplace(to, num).second) {
+                ++num;
+                unmarked.push_back(to);
+                table.add_state();
+            }
+            table[dstates.at(from)][c] = dstates.at(to);
+        }
+    }
+
+    return table;
 }

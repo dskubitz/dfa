@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <ASTNode.h>
+#include <Regex.h>
 #include <Parser.h>
-#include <PrettyPrinter.h>
+#include <unused/PrettyPrinter.h>
 
 class RegexTests : public ::testing::Test {
 protected:
@@ -10,56 +10,56 @@ protected:
 };
 TEST_F(RegexTests, Cat)
 {
-    std::unique_ptr<ASTNode> re(
-            make_cat(new EmptyNode, new CharNode('a')));
-    auto p = dynamic_cast<EmptyNode*>(re.get());
+    std::unique_ptr<Regex> re(
+            make_cat(new Empty, new Symbol('a')));
+    auto p = dynamic_cast<Empty*>(re.get());
     ASSERT_NE(p, nullptr);
-    re.reset(make_cat(new EpsilonNode, new CharNode('a')));
-    auto q = dynamic_cast<CharNode*>(re.get());
+    re.reset(make_cat(new Epsilon, new Symbol('a')));
+    auto q = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(q, nullptr);
     EXPECT_EQ(q->value(), 'a');
 }
 
 TEST_F(RegexTests, Union)
 {
-    std::unique_ptr<ASTNode> re(
-            make_union(new EmptyNode, new CharNode('a')));
-    auto p = dynamic_cast<CharNode*>(re.get());
+    std::unique_ptr<Regex> re(
+            make_union(new Empty, new Symbol('a')));
+    auto p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_EQ(p->value(), 'a');
-    re.reset(make_union(new CharNode('a'), new CharNode('a')));
-    p = dynamic_cast<CharNode*>(re.get());
+    re.reset(make_union(new Symbol('a'), new Symbol('a')));
+    p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_EQ(p->value(), 'a');
 }
 
 TEST_F(RegexTests, Star)
 {
-    std::unique_ptr<ASTNode> re(
-            make_star(new StarNode(new StarNode(new CharNode('a')))));
-    auto p = dynamic_cast<StarNode*>(re.get());
+    std::unique_ptr<Regex> re(
+            make_star(new Closure(new Closure(new Symbol('a')))));
+    auto p = dynamic_cast<Closure*>(re.get());
     ASSERT_NE(p, nullptr);
-    auto q = dynamic_cast<const CharNode*>(p->expr());
+    auto q = dynamic_cast<const Symbol*>(p->expr());
     ASSERT_NE(q, nullptr);
 }
 
 TEST_F(RegexTests, Intersection)
 {
-    std::unique_ptr<ASTNode> re(
-            make_intersection(new EmptyNode, new CharNode('a')));
-    auto p = dynamic_cast<EmptyNode*>(re.get());
+    std::unique_ptr<Regex> re(
+            make_intersection(new Empty, new Symbol('a')));
+    auto p = dynamic_cast<Empty*>(re.get());
     ASSERT_NE(p, nullptr);
-    re.reset(make_intersection(new CharNode('a'), new CharNode('a')));
-    auto p2 = dynamic_cast<CharNode*>(re.get());
+    re.reset(make_intersection(new Symbol('a'), new Symbol('a')));
+    auto p2 = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p2, nullptr);
     EXPECT_EQ(p2->value(), 'a');
 }
 
 TEST_F(RegexTests, Complement)
 {
-    std::unique_ptr<ASTNode> re(
-            make_complement(new ComplementNode(new CharNode('a'))));
-    auto p = dynamic_cast<CharNode*>(re.get());
+    std::unique_ptr<Regex> re(
+            make_complement(new Complement(new Symbol('a'))));
+    auto p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_EQ(p->value(), 'a');
 }
@@ -81,3 +81,20 @@ TEST_F(RegexTests, Test)
     EXPECT_TRUE(*re4 == *re6);
 }
 
+TEST_F(RegexTests, ToString)
+{
+    auto re = parser.parse("[A-Z_a-z][0-9A-Z_a-z]*");
+    EXPECT_EQ(re->to_string(),
+              "((((((((((((((((((((((((((((((((((((("
+                      "((((((((((((((((A|B)|C)|D)|E)|F"
+                      ")|G)|H)|I)|J)|K)|L)|M)|N)|O)|P)|Q)|R)|S)|T)|U"
+                      ")|V)|W)|X)|Y)|Z)|_)|a)|b)|c)|d)|e)|f)|g)|"
+                      "h)|i)|j)|k)|l)|m)|n)|o)|p)|q)|r)|s)|t)|u)|v)|w)|x)|y)|z)"
+                      ".((((((((((((((((((((((((((((((((((((((((((((((((("
+                      "((((((((((((((0|1)|2)|3)|4)|5)|6)|7)|8)|"
+                      "9)|A)|B)|C)|D)|E)|F)|G)|H)|I)|J)|K)|L)|M)"
+                      "|N)|O)|P)|Q)|R)|S)|T)|U)|V)|W)|X)|Y)|Z)|_)|"
+                      "a)|b)|c)|d)|e)|f)|g)|h)|i)|j)|k)|l)|m)|n)|o)|p)|"
+                      "q)|r)|s)|t)|u)|v)|w)|x)|y)|z)*))");
+
+}

@@ -1,7 +1,4 @@
-//
-// Created by devan on 3/16/18.
-//
-
+/*
 #include <Lexer.h>
 #include <TransitionTable.h>
 #include <iostream>
@@ -76,3 +73,4 @@ int Lexer::advance()
     }
     return c;
 }
+*/

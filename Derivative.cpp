@@ -1,11 +1,12 @@
-#include "Derivative.h"
+#include <Derivative.h>
+#include <Nullable.h>
 
-void Derivative::visit(const ASTNode* node)
+void Derivative::visit(const Regex* node)
 {
     node->accept(this);
 }
 
-void Derivative::visit(const StarNode* node)
+void Derivative::visit(const Closure* node)
 {
     stack.push_back(
             make_cat(
@@ -15,7 +16,7 @@ void Derivative::visit(const StarNode* node)
                             node->expr()->clone())));
 }
 
-void Derivative::visit(const CatNode* node)
+void Derivative::visit(const Concat* node)
 {
     stack.push_back(
             make_union(
@@ -27,7 +28,7 @@ void Derivative::visit(const CatNode* node)
                             evaluate(node->right()->clone()))));
 }
 
-void Derivative::visit(const UnionNode* node)
+void Derivative::visit(const Union* node)
 {
     stack.push_back(
             make_union(
@@ -35,7 +36,7 @@ void Derivative::visit(const UnionNode* node)
                     evaluate(node->right()->clone())));
 }
 
-void Derivative::visit(const IntersectionNode* node)
+void Derivative::visit(const Intersection* node)
 {
     stack.push_back(
             make_intersection(
@@ -43,116 +44,55 @@ void Derivative::visit(const IntersectionNode* node)
                     evaluate(node->right()->clone())));
 }
 
-void Derivative::visit(const ComplementNode* node)
+void Derivative::visit(const Complement* node)
 {
     stack.push_back(
             make_complement(
                     evaluate(node->expr()->clone())));
 }
 
-void Derivative::visit(const CharNode* node)
+void Derivative::visit(const Symbol* node)
 {
     if (node->value() == dA)
-        stack.push_back(new EpsilonNode);
+        stack.push_back(new Epsilon);
     else
-        stack.push_back(new EmptyNode);
+        stack.push_back(new Empty);
 }
 
-void Derivative::visit(const EpsilonNode* node)
+void Derivative::visit(const Epsilon* node)
 {
-    stack.push_back(new EmptyNode);
+    stack.push_back(new Empty);
 }
 
-void Derivative::visit(const EmptyNode* node)
+void Derivative::visit(const Empty* node)
 {
-    stack.push_back(new EmptyNode);
+    stack.push_back(new Empty);
 }
 
-ASTNode* Derivative::derive_impl(const ASTNode* tree)
+Regex* Derivative::derive_impl(const Regex* tree)
 {
     return evaluate(tree);
 }
 
-std::unique_ptr<ASTNode> Derivative::derive(const ASTNode* tree, char da)
+std::unique_ptr<Regex> Derivative::derive(const Regex* tree, char da)
 {
     stack.clear();
     dA = da;
-    return std::unique_ptr<ASTNode>(derive_impl(tree));
+    return std::unique_ptr<Regex>(derive_impl(tree));
 }
 
-ASTNode* Derivative::evaluate(const ASTNode* node)
+Regex* Derivative::evaluate(const Regex* node)
 {
     visit(node);
-    ASTNode* res = stack.back();
+    Regex* res = stack.back();
     stack.pop_back();
     return res;
 }
 
 // Overload is derivative w.r.t empty string
-std::unique_ptr<ASTNode> Derivative::derive(const ASTNode* tree)
+std::unique_ptr<Regex> Derivative::derive(const Regex* tree)
 {
     stack.clear();
     dA = 0;
-    return std::unique_ptr<ASTNode>(tree->clone());
-}
-
-void Nullable::visit(const ASTNode* node)
-{
-    node->accept(this);
-}
-
-void Nullable::visit(const StarNode* node)
-{
-    stack.push_back(true);
-}
-
-void Nullable::visit(const CatNode* node)
-{
-    stack.push_back(evaluate(node->left()) && evaluate(node->right()));
-}
-
-void Nullable::visit(const UnionNode* node)
-{
-    stack.push_back(evaluate(node->left()) || evaluate(node->right()));
-}
-
-void Nullable::visit(const CharNode* node)
-{
-    stack.push_back(false);
-}
-
-void Nullable::visit(const EpsilonNode* node)
-{
-    stack.push_back(true);
-}
-
-void Nullable::visit(const EmptyNode* node)
-{
-    stack.push_back(false);
-}
-
-bool Nullable::evaluate(const ASTNode* node)
-{
-    visit(node);
-    bool res = stack.back();
-    stack.pop_back();
-    return res;
-}
-
-void Nullable::visit(const IntersectionNode* node)
-{
-    stack.push_back(evaluate(node->left()) && evaluate(node->right()));
-}
-
-void Nullable::visit(const ComplementNode* node)
-{
-    stack.push_back(!evaluate(node->expr()));
-}
-
-ASTNode* helper(const ASTNode* node)
-{
-    if (Nullable{}.evaluate(node))
-        return new EpsilonNode;
-    else
-        return new EmptyNode;
+    return std::unique_ptr<Regex>(tree->clone());
 }

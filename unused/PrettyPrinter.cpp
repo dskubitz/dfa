@@ -1,5 +1,6 @@
 #include "PrettyPrinter.h"
 
+/*
 PrettyPrinter::PrettyPrinter(std::ostream& os)
         :os_(os)
 {
@@ -71,3 +72,4 @@ void PrettyPrinter::visit(const ComplementNode* node)
     visit(node->expr());
     os_ << ")";
 }
+ */

@@ -1,6 +1,7 @@
 #ifndef LEXER_DFAFUNCTIONCALCULATOR_H
 #define LEXER_DFAFUNCTIONCALCULATOR_H
 
+/*
 #include <vector>
 #include <unordered_map>
 #include <set>
@@ -66,4 +67,5 @@ private:
 };
 
 void followpos_graphviz(const TreeFunctions& functions);
+*/
 #endif //LEXER_DFAFUNCTIONCALCULATOR_H

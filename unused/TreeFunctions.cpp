@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include "TreeFunctions.h"
 void TreeFunctions::visit(const ASTNode* node)
@@ -103,17 +104,6 @@ void TreeFunctions::visit(const ComplementNode* node)
 
 }
 
-/*
-void TreeFunctions::visit(const EndmarkerNode* node)
-{
-    nullable_[node] = false;
-    firstpos_[node] = make_bitset(node->id());
-    lastpos_[node] = make_bitset(node->id());
-    symbols_[node->id()] = node->value();
-    acceptpos_[node->id()] = node->name();
-}
-*/
-
 void followpos_graphviz(const TreeFunctions& functions)
 {
     std::cout << "digraph {\n";
@@ -131,3 +121,4 @@ void followpos_graphviz(const TreeFunctions& functions)
     }
     std::cout << "}\n";
 }
+*/

@@ -1,12 +1,13 @@
 #ifndef LEXER_PRETTYPRINTER_H
 #define LEXER_PRETTYPRINTER_H
 
+/*
 #include <ostream>
 #include <deque>
 #include <cassert>
 #include <stack>
 
-#include "ASTNode.h"
+#include "Node.h"
 
 class PrettyPrinter : public ASTVisitor {
 public:
@@ -27,5 +28,6 @@ public:
 private:
     std::ostream& os_;
 };
+*/
 
 #endif //LEXER_PRETTYPRINTER_H

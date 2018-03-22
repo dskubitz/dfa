@@ -23,14 +23,14 @@ bool is_char(char ch)
 }
 }
 
-ASTNode* Parser::parse_impl(const std::string& regexp)
+Regex* Parser::parse_impl(const std::string& regexp)
 {
     expr = regexp;
     pos = 0;
     paren_count = 0;
     try {
         if (expr.empty())
-            return new EpsilonNode;
+            return new Epsilon;
          return expression();
     }
     catch (std::out_of_range& e) {
@@ -41,19 +41,19 @@ ASTNode* Parser::parse_impl(const std::string& regexp)
     }
 }
 
-ASTNode* Parser::expression()
+Regex* Parser::expression()
 {
     auto left = term();
 
     while (match('|')) {
         auto right = term();
-        left = new UnionNode(left, right);
+        left = new Union(left, right);
     }
 
     return left;
 }
 
-ASTNode* Parser::term()
+Regex* Parser::term()
 {
     auto left = factor();
 
@@ -69,42 +69,42 @@ ASTNode* Parser::term()
             break;
         } else {
             auto right = factor();
-            left = new CatNode(left, right);
+            left = new Concat(left, right);
         }
     }
 
     return left;
 }
 
-ASTNode* Parser::factor()
+Regex* Parser::factor()
 {
     auto left = primary();
 
     if (match('*'))
-        left = new StarNode(left);
+        left = new Closure(left);
     else if (match('+'))
-        left = new CatNode(left, new StarNode(left->clone()));
+        left = new Concat(left, new Closure(left->clone()));
     else if (match('?'))
-        left = new UnionNode(left, new EpsilonNode);
+        left = new Union(left, new Epsilon);
 
     return left;
 }
 
-ASTNode* Parser::primary()
+Regex* Parser::primary()
 {
     if (is_char(peek())) {
-        return new CharNode(advance());
+        return new Symbol(advance());
     } else if (match('\\')) {
-        return new CharNode(advance());
+        return new Symbol(advance());
     } else if (match('.')) {
-        ASTNode* left = new CharNode(9);
+        Regex* left = new Symbol(9);
         auto it = alphabet.begin() + 1, end = alphabet.end();
         for (; it != end; ++it) {
             char ch = *it;
             if (ch == '\n' || ch == '\r')
                 continue;
-            auto right = new CharNode(ch);
-            left = new UnionNode(left, right);
+            auto right = new Symbol(ch);
+            left = new Union(left, right);
         }
         return left;
     } else if (match('(')) {
@@ -113,7 +113,7 @@ ASTNode* Parser::primary()
         consume(')', "unmatched parenthesis");
         return expr;
     } else if (match('[')) {
-        ASTNode* class_expr = nullptr;
+        Regex* class_expr = nullptr;
         if (match('^'))
             class_expr = make_negated_character_class(character_class());
         else
@@ -125,18 +125,18 @@ ASTNode* Parser::primary()
     }
 }
 
-ASTNode* Parser::make_character_class(std::string&& str)
+Regex* Parser::make_character_class(std::string&& str)
 {
     auto it = str.begin();
-    ASTNode* expr = new CharNode(*it++);
+    Regex* expr = new Symbol(*it++);
     while (it != str.end()) {
         char ch = *it++;
-        expr = new UnionNode(expr, new CharNode(ch));
+        expr = new Union(expr, new Symbol(ch));
     }
     return expr;
 }
 
-ASTNode* Parser::make_negated_character_class(std::string&& str)
+Regex* Parser::make_negated_character_class(std::string&& str)
 {
     std::vector<char> chars(128);
 
@@ -144,7 +144,7 @@ ASTNode* Parser::make_negated_character_class(std::string&& str)
         chars[static_cast<int>(c)] = 1;
     }
 
-    ASTNode* expr = nullptr;
+    Regex* expr = nullptr;
 
     // Can't meaningfully match ascii nul, so start at ws chars
     size_t it = 9;
@@ -153,13 +153,13 @@ ASTNode* Parser::make_negated_character_class(std::string&& str)
     // Find the first unset value in chars
     while (it != end)
         if (chars[it] == 0) {
-            expr = new CharNode(static_cast<char>(it++));
+            expr = new Symbol(static_cast<char>(it++));
             break;
         }
 
     for (; it != end; ++it)
         if (chars[it] == 0 && (isgraph(it) || isspace(it)))
-            expr = new UnionNode(expr, new CharNode(static_cast<char>(it)));
+            expr = new Union(expr, new Symbol(static_cast<char>(it)));
 
     return expr;
 }

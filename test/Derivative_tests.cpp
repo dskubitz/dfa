@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <Derivative.h>
 #include <Parser.h>
-#include <PrettyPrinter.h>
+#include <Nullable.h>
 
 class DerivativeTests : public ::testing::Test {
 protected:
@@ -51,6 +51,6 @@ TEST_F(DerivativeTests, Nullable)
     EXPECT_FALSE(Nullable{}.evaluate(re.get()));
     re = parser.parse("");
     EXPECT_TRUE(Nullable{}.evaluate(re.get()));
-    re = std::make_unique<EmptyNode>();
+    re = std::make_unique<Empty>();
     EXPECT_FALSE(Nullable{}.evaluate(re.get()));
 }

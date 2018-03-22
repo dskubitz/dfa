@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <Parser.h>
-#include <PrettyPrinter.h>
+#include <unused/PrettyPrinter.h>
 
 class ParserTests : public ::testing::Test {
 protected:

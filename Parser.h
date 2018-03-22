@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "ASTNode.h"
+#include "Regex.h"
 
 struct ParserError : std::runtime_error {
     using std::runtime_error::runtime_error;
@@ -12,13 +12,13 @@ struct ParserError : std::runtime_error {
 
 class Parser {
 public:
-    std::unique_ptr<ASTNode> parse(const std::string& regexp)
+    std::unique_ptr<Regex> parse(const std::string& regexp)
     {
-        return std::unique_ptr<ASTNode>(parse_impl(regexp));
+        return std::unique_ptr<Regex>(parse_impl(regexp));
     }
 
 private:
-    ASTNode* parse_impl(const std::string& regexp);
+    Regex* parse_impl(const std::string& regexp);
 
     bool match(char ch);
     bool check(char ch);
@@ -28,12 +28,12 @@ private:
     char previous();
     char consume(char ch, const std::string& msg);
 
-    ASTNode* expression();
-    ASTNode* term();
-    ASTNode* factor();
-    ASTNode* primary();
-    ASTNode* make_character_class(std::string&& str);
-    ASTNode* make_negated_character_class(std::string&& str);
+    Regex* expression();
+    Regex* term();
+    Regex* factor();
+    Regex* primary();
+    Regex* make_character_class(std::string&& str);
+    Regex* make_negated_character_class(std::string&& str);
 
     std::string character_class();
     std::string range();

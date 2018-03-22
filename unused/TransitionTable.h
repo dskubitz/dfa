@@ -1,6 +1,7 @@
 #ifndef DFA_H
 #define DFA_H
 
+/*
 #include <vector>
 #include <array>
 #include <map>
@@ -24,9 +25,6 @@ public:
 
     explicit TransitionTable(const TreeFunctions& calc);
 
-    /**
-     * Add a new state to the table and return its index.
-     */
     void add_state() { this->emplace_back(); }
 
     std::map<size_type, std::string>&
@@ -38,4 +36,5 @@ public:
 
 void make_transition_table(const TreeFunctions& calc, TransitionTable& table);
 TransitionTable make_transition_table(const ASTNode* ast);
+*/
 #endif //DFA_H

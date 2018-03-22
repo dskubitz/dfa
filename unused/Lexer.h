@@ -1,6 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
-
+/*
 #include <tuple>
 #include <istream>
 #include <stdexcept>
@@ -63,5 +63,5 @@ private:
     int backup_{0};
     int advance();
 };
-
+*/
 #endif //LEXER_H

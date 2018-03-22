@@ -1,3 +1,5 @@
+#include <TransitionTable.h>
+
 /*
 #include <vector>
 #include <iostream>
@@ -56,3 +58,7 @@ TransitionTable make_transition_table(const ASTNode* ast)
     return TransitionTable(TreeFunctions(ast));
 }
  */
+void make_transition_table(const Regex& regex)
+{
+
+}

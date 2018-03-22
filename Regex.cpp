@@ -1,7 +1,7 @@
 #include "Regex.h"
 #include <sstream>
 
-Closure::Closure(Regex* node)
+Closure::Closure(RegexNode* node)
         :expr_(node)
 {
 }
@@ -11,7 +11,7 @@ void Closure::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-const Regex* Closure::expr() const { return expr_; }
+const RegexNode* Closure::expr() const { return expr_; }
 
 Closure::~Closure()
 {
@@ -24,7 +24,7 @@ Closure* Closure::clone() const
 }
 
 //@formatter:off
-bool Closure::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Closure::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Closure::equiv(const Concat& node) const { return false; }
 bool Closure::equiv(const Union& node) const { return false; }
 bool Closure::equiv(const Symbol& node) const { return false; }
@@ -44,7 +44,7 @@ std::string Closure::to_string() const
     return "(" + expr_->to_string() + "*)";
 }
 
-Concat::Concat(Regex* left, Regex* right)
+Concat::Concat(RegexNode* left, RegexNode* right)
         :left_(left), right_(right)
 {
 }
@@ -54,9 +54,9 @@ void Concat::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-const Regex* Concat::left() const { return left_; }
+const RegexNode* Concat::left() const { return left_; }
 
-const Regex* Concat::right() const { return right_; }
+const RegexNode* Concat::right() const { return right_; }
 
 Concat::~Concat()
 {
@@ -70,7 +70,7 @@ Concat* Concat::clone() const
 }
 
 //@formatter:off
-bool Concat::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Concat::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Concat::equiv(const Closure& node) const { return false; }
 bool Concat::equiv(const Union& node) const { return false; }
 bool Concat::equiv(const Symbol& node) const { return false; }
@@ -95,7 +95,7 @@ Symbol::Symbol(char value)
 {
 }
 
-Union::Union(Regex* left, Regex* right)
+Union::Union(RegexNode* left, RegexNode* right)
         :left_(left), right_(right)
 {
 }
@@ -105,9 +105,9 @@ void Union::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-const Regex* Union::left() const { return left_; }
+const RegexNode* Union::left() const { return left_; }
 
-const Regex* Union::right() const { return right_; }
+const RegexNode* Union::right() const { return right_; }
 
 Union::~Union()
 {
@@ -121,7 +121,7 @@ Union* Union::clone() const
 }
 
 //@formatter:off
-bool Union::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Union::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Union::equiv(const Closure& node) const { return false; }
 bool Union::equiv(const Concat& node) const { return false; }
 bool Union::equiv(const Symbol& node) const { return false; }
@@ -149,7 +149,7 @@ Intersection* Intersection::clone() const
 }
 
 //@formatter:off
-bool Intersection::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Intersection::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Intersection::equiv(const Closure& node) const { return false; }
 bool Intersection::equiv(const Concat& node) const { return false; }
 bool Intersection::equiv(const Union& node) const { return false; }
@@ -170,14 +170,14 @@ Intersection::~Intersection()
     delete right_;
 }
 
-Intersection::Intersection(Regex* left, Regex* right)
+Intersection::Intersection(RegexNode* left, RegexNode* right)
         :left_(left), right_(right)
 {
 }
 
-const Regex* Intersection::left() const { return left_; }
+const RegexNode* Intersection::left() const { return left_; }
 
-const Regex* Intersection::right() const { return right_; }
+const RegexNode* Intersection::right() const { return right_; }
 
 std::string Intersection::to_string() const
 {
@@ -197,7 +197,7 @@ Symbol* Symbol::clone() const
 }
 
 //@formatter:off
-bool Symbol::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Symbol::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Symbol::equiv(const Closure& node) const { return false; }
 bool Symbol::equiv(const Concat& node) const { return false; }
 bool Symbol::equiv(const Union& node) const { return false; }
@@ -227,7 +227,7 @@ Complement* Complement::clone() const
 }
 
 //@formatter:off
-bool Complement::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Complement::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Complement::equiv(const Closure& node) const { return false; }
 bool Complement::equiv(const Concat& node) const { return false; }
 bool Complement::equiv(const Union& node) const { return false; }
@@ -244,10 +244,10 @@ bool Complement::equiv(const Complement& node) const
 
 Complement::~Complement() { delete expr_; }
 
-Complement::Complement(Regex* expr)
+Complement::Complement(RegexNode* expr)
         :expr_(expr) { }
 
-const Regex* Complement::expr() const { return expr_; }
+const RegexNode* Complement::expr() const { return expr_; }
 
 std::string Complement::to_string() const
 {
@@ -265,7 +265,7 @@ Epsilon* Epsilon::clone() const
 }
 
 //@formatter:off
-bool Epsilon::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Epsilon::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Epsilon::equiv(const Closure& node) const { return false; }
 bool Epsilon::equiv(const Concat& node) const { return false; }
 bool Epsilon::equiv(const Union& node) const { return false; }
@@ -287,13 +287,13 @@ void Empty::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-Regex* Empty::clone() const
+RegexNode* Empty::clone() const
 {
     return new Empty;
 }
 
 //@formatter:off
-bool Empty::equiv(const Regex* node) const { return node->equiv(*this); }
+bool Empty::equiv(const RegexNode* node) const { return node->equiv(*this); }
 bool Empty::equiv(const Closure& node) const { return false; }
 bool Empty::equiv(const Concat& node) const { return false; }
 bool Empty::equiv(const Union& node) const { return false; }
@@ -310,7 +310,7 @@ std::string Empty::to_string() const
     return "\u2205";
 }
 
-Regex* make_union(Regex* left, Regex* right)
+RegexNode* make_union(RegexNode* left, RegexNode* right)
 {
     if (dynamic_cast<Empty*>(left)) {
         delete left;
@@ -318,7 +318,7 @@ Regex* make_union(Regex* left, Regex* right)
     } else if (dynamic_cast<Empty*>(right)) {
         delete right;
         return left;
-    } else if (*left == *right) {
+    } else if (left->equiv(right)) {
         delete right;
         return left;
     } else {
@@ -326,7 +326,7 @@ Regex* make_union(Regex* left, Regex* right)
     }
 }
 
-Regex* make_cat(Regex* left, Regex* right)
+RegexNode* make_cat(RegexNode* left, RegexNode* right)
 {
     if (dynamic_cast<Empty*>(left) || dynamic_cast<Empty*>(right)) {
         delete right;
@@ -342,7 +342,7 @@ Regex* make_cat(Regex* left, Regex* right)
     }
 }
 
-Regex* make_star(Regex* expr)
+RegexNode* make_star(RegexNode* expr)
 {
     if (dynamic_cast<Empty*>(expr)) {
         delete expr;
@@ -350,7 +350,7 @@ Regex* make_star(Regex* expr)
     } else if (dynamic_cast<Epsilon*>(expr)) {
         return expr;
     } else if (auto p = dynamic_cast<Closure*>(expr)) {
-        Regex* q = p->expr()->clone();
+        RegexNode* q = p->expr()->clone();
         delete p;
         return make_star(q);
     } else {
@@ -358,7 +358,7 @@ Regex* make_star(Regex* expr)
     }
 }
 
-Regex* make_intersection(Regex* left, Regex* right)
+RegexNode* make_intersection(RegexNode* left, RegexNode* right)
 {
     if (dynamic_cast<Empty*>(left)) {
         delete right;
@@ -366,7 +366,7 @@ Regex* make_intersection(Regex* left, Regex* right)
     } else if (dynamic_cast<Empty*>(right)) {
         delete left;
         return right;
-    } else if (*left == *right) {
+    } else if (left->equiv(right)) {
         delete right;
         return left;
     } else {
@@ -374,10 +374,10 @@ Regex* make_intersection(Regex* left, Regex* right)
     }
 }
 
-Regex* make_complement(Regex* expr)
+RegexNode* make_complement(RegexNode* expr)
 {
     if (auto p = dynamic_cast<Complement*>(expr)) {
-        Regex* q = p->expr()->clone();
+        RegexNode* q = p->expr()->clone();
         delete p;
         return q;
     } else {

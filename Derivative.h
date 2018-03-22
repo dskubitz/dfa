@@ -2,13 +2,14 @@
 #define LEXER_DERIVATIVE_H
 
 #include <vector>
-#include "Regex.h"
+#include <memory>
+#include <Regex.h>
 
 class Derivative : public RegexVisitor {
 public:
-    std::unique_ptr<Regex> derive(const Regex* tree, char da);
-    std::unique_ptr<Regex> derive(const Regex* tree);
-    void visit(const Regex* node) override;
+    Regex derive(const Regex& regex, char da);
+    Regex derive(const Regex& regex);
+    void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;
     void visit(const Concat* node) override;
     void visit(const Union* node) override;
@@ -18,9 +19,9 @@ public:
     void visit(const Empty* node) override;
     void visit(const Epsilon* node) override;
 private:
-    Regex* derive_impl(const Regex* tree);
-    std::vector<Regex*> stack;
-    Regex* evaluate(const Regex* node);
+    RegexNode* derive_impl(const RegexNode* tree);
+    std::vector<RegexNode*> stack;
+    RegexNode* evaluate(const RegexNode* node);
     char dA;
 };
 

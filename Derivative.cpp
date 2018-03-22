@@ -1,7 +1,7 @@
 #include <Derivative.h>
 #include <Nullable.h>
 
-void Derivative::visit(const Regex* node)
+void Derivative::visit(const RegexNode* node)
 {
     node->accept(this);
 }
@@ -69,30 +69,30 @@ void Derivative::visit(const Empty* node)
     stack.push_back(new Empty);
 }
 
-Regex* Derivative::derive_impl(const Regex* tree)
+RegexNode* Derivative::derive_impl(const RegexNode* tree)
 {
     return evaluate(tree);
 }
 
-std::unique_ptr<Regex> Derivative::derive(const Regex* tree, char da)
+Regex Derivative::derive(const Regex& regex, char da)
 {
     stack.clear();
     dA = da;
-    return std::unique_ptr<Regex>(derive_impl(tree));
+    return Regex(derive_impl(regex.get()));
 }
 
-Regex* Derivative::evaluate(const Regex* node)
+RegexNode* Derivative::evaluate(const RegexNode* node)
 {
     visit(node);
-    Regex* res = stack.back();
+    RegexNode* res = stack.back();
     stack.pop_back();
     return res;
 }
 
 // Overload is derivative w.r.t empty string
-std::unique_ptr<Regex> Derivative::derive(const Regex* tree)
+Regex Derivative::derive(const Regex& regex)
 {
     stack.clear();
     dA = 0;
-    return std::unique_ptr<Regex>(tree->clone());
+    return regex;
 }

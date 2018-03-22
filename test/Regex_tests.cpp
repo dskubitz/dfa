@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <Regex.h>
 #include <Parser.h>
-#include <unused/PrettyPrinter.h>
+#include <unordered_set>
 
 class RegexTests : public ::testing::Test {
 protected:
@@ -10,7 +10,7 @@ protected:
 };
 TEST_F(RegexTests, Cat)
 {
-    std::unique_ptr<Regex> re(
+    std::unique_ptr<RegexNode> re(
             make_cat(new Empty, new Symbol('a')));
     auto p = dynamic_cast<Empty*>(re.get());
     ASSERT_NE(p, nullptr);
@@ -22,7 +22,7 @@ TEST_F(RegexTests, Cat)
 
 TEST_F(RegexTests, Union)
 {
-    std::unique_ptr<Regex> re(
+    std::unique_ptr<RegexNode> re(
             make_union(new Empty, new Symbol('a')));
     auto p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
@@ -35,7 +35,7 @@ TEST_F(RegexTests, Union)
 
 TEST_F(RegexTests, Star)
 {
-    std::unique_ptr<Regex> re(
+    std::unique_ptr<RegexNode> re(
             make_star(new Closure(new Closure(new Symbol('a')))));
     auto p = dynamic_cast<Closure*>(re.get());
     ASSERT_NE(p, nullptr);
@@ -45,7 +45,7 @@ TEST_F(RegexTests, Star)
 
 TEST_F(RegexTests, Intersection)
 {
-    std::unique_ptr<Regex> re(
+    std::unique_ptr<RegexNode> re(
             make_intersection(new Empty, new Symbol('a')));
     auto p = dynamic_cast<Empty*>(re.get());
     ASSERT_NE(p, nullptr);
@@ -57,7 +57,7 @@ TEST_F(RegexTests, Intersection)
 
 TEST_F(RegexTests, Complement)
 {
-    std::unique_ptr<Regex> re(
+    std::unique_ptr<RegexNode> re(
             make_complement(new Complement(new Symbol('a'))));
     auto p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
@@ -69,32 +69,36 @@ TEST_F(RegexTests, Test)
     auto re1 = parser.parse("");
     auto re2 = parser.parse("a");
     auto re3 = parser.parse("");
-    EXPECT_FALSE(*re1 == *re2);
+    EXPECT_FALSE(re1 == re2);
 
-    EXPECT_EQ(*re1, *re3);
+    EXPECT_EQ(re1, re3);
 
     auto re4 = parser.parse("(a|b)*abb");
     auto re5 = parser.parse("(ab*|cd*)");
-    EXPECT_NE(*re4, *re5);
+    EXPECT_NE(re4, re5);
 
     auto re6 = parser.parse("(a|b)*abb");
-    EXPECT_TRUE(*re4 == *re6);
+    EXPECT_TRUE(re4 == re6);
 }
 
-TEST_F(RegexTests, ToString)
+TEST_F(RegexTests, WrapperClass)
 {
-    auto re = parser.parse("[A-Z_a-z][0-9A-Z_a-z]*");
-    EXPECT_EQ(re->to_string(),
-              "((((((((((((((((((((((((((((((((((((("
-                      "((((((((((((((((A|B)|C)|D)|E)|F"
-                      ")|G)|H)|I)|J)|K)|L)|M)|N)|O)|P)|Q)|R)|S)|T)|U"
-                      ")|V)|W)|X)|Y)|Z)|_)|a)|b)|c)|d)|e)|f)|g)|"
-                      "h)|i)|j)|k)|l)|m)|n)|o)|p)|q)|r)|s)|t)|u)|v)|w)|x)|y)|z)"
-                      ".((((((((((((((((((((((((((((((((((((((((((((((((("
-                      "((((((((((((((0|1)|2)|3)|4)|5)|6)|7)|8)|"
-                      "9)|A)|B)|C)|D)|E)|F)|G)|H)|I)|J)|K)|L)|M)"
-                      "|N)|O)|P)|Q)|R)|S)|T)|U)|V)|W)|X)|Y)|Z)|_)|"
-                      "a)|b)|c)|d)|e)|f)|g)|h)|i)|j)|k)|l)|m)|n)|o)|p)|"
-                      "q)|r)|s)|t)|u)|v)|w)|x)|y)|z)*))");
+    Regex regex(parser.parse("(a|b)*abb"));
+    Regex re2 = regex;
+    EXPECT_EQ(regex, re2);
+    Regex re3 = std::move(re2);
+    re2 = Regex(parser.parse("(ab*|cd*)"));
+    EXPECT_NE(regex, re2);
+    EXPECT_EQ(regex, re3);
+}
 
+TEST_F(RegexTests, Hash)
+{
+    std::unordered_set<Regex> regexes;
+    auto&&[it, inserted] = regexes.insert(parser.parse("(a|b)*abb"));
+    EXPECT_TRUE(inserted);
+    std::tie(it, inserted) = regexes.insert(parser.parse("(a|b)*abb"));
+    EXPECT_FALSE(inserted);
+    auto iter = regexes.find(*it);
+    EXPECT_NE(iter, regexes.end());
 }

@@ -1,6 +1,10 @@
 #ifndef DFA_H
 #define DFA_H
 
+#include <Regex.h>
+
+void make_transition_table(const Regex& regex);
+
 /*
 #include <vector>
 #include <array>

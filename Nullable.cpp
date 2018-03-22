@@ -1,6 +1,6 @@
 #include "Nullable.h"
 
-void Nullable::visit(const Regex* node)
+void Nullable::visit(const RegexNode* node)
 {
     node->accept(this);
 }
@@ -35,9 +35,9 @@ void Nullable::visit(const Empty* node)
     stack.push_back(false);
 }
 
-bool Nullable::evaluate(const Regex* node)
+bool Nullable::evaluate(const RegexNode* regex)
 {
-    visit(node);
+    visit(regex);
     bool res = stack.back();
     stack.pop_back();
     return res;
@@ -53,7 +53,7 @@ void Nullable::visit(const Complement* node)
     stack.push_back(!evaluate(node->expr()));
 }
 
-Regex* helper(const Regex* node)
+RegexNode* helper(const RegexNode* node)
 {
     if (Nullable{}.evaluate(node))
         return new Epsilon;

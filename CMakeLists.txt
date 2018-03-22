@@ -9,7 +9,7 @@ add_subdirectory(test)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCES Regex.cpp Parser.cpp Derivative.cpp Derivative.h Nullable.cpp Nullable.h unused/print.cpp)
+set(SOURCES Regex.cpp Parser.cpp Derivative.cpp Derivative.h Nullable.cpp Nullable.h TransitionTable.cpp)
 add_library(core STATIC ${SOURCES})
 target_include_directories(core PRIVATE ${Boost_INCLUDE_DIR})
 target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR})

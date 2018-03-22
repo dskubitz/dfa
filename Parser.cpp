@@ -23,7 +23,7 @@ bool is_char(char ch)
 }
 }
 
-Regex* Parser::parse_impl(const std::string& regexp)
+RegexNode* Parser::parse_impl(const std::string& regexp)
 {
     expr = regexp;
     pos = 0;
@@ -41,7 +41,7 @@ Regex* Parser::parse_impl(const std::string& regexp)
     }
 }
 
-Regex* Parser::expression()
+RegexNode* Parser::expression()
 {
     auto left = term();
 
@@ -53,7 +53,7 @@ Regex* Parser::expression()
     return left;
 }
 
-Regex* Parser::term()
+RegexNode* Parser::term()
 {
     auto left = factor();
 
@@ -76,7 +76,7 @@ Regex* Parser::term()
     return left;
 }
 
-Regex* Parser::factor()
+RegexNode* Parser::factor()
 {
     auto left = primary();
 
@@ -90,14 +90,14 @@ Regex* Parser::factor()
     return left;
 }
 
-Regex* Parser::primary()
+RegexNode* Parser::primary()
 {
     if (is_char(peek())) {
         return new Symbol(advance());
     } else if (match('\\')) {
         return new Symbol(advance());
     } else if (match('.')) {
-        Regex* left = new Symbol(9);
+        RegexNode* left = new Symbol(9);
         auto it = alphabet.begin() + 1, end = alphabet.end();
         for (; it != end; ++it) {
             char ch = *it;
@@ -113,7 +113,7 @@ Regex* Parser::primary()
         consume(')', "unmatched parenthesis");
         return expr;
     } else if (match('[')) {
-        Regex* class_expr = nullptr;
+        RegexNode* class_expr = nullptr;
         if (match('^'))
             class_expr = make_negated_character_class(character_class());
         else
@@ -125,10 +125,10 @@ Regex* Parser::primary()
     }
 }
 
-Regex* Parser::make_character_class(std::string&& str)
+RegexNode* Parser::make_character_class(std::string&& str)
 {
     auto it = str.begin();
-    Regex* expr = new Symbol(*it++);
+    RegexNode* expr = new Symbol(*it++);
     while (it != str.end()) {
         char ch = *it++;
         expr = new Union(expr, new Symbol(ch));
@@ -136,7 +136,7 @@ Regex* Parser::make_character_class(std::string&& str)
     return expr;
 }
 
-Regex* Parser::make_negated_character_class(std::string&& str)
+RegexNode* Parser::make_negated_character_class(std::string&& str)
 {
     std::vector<char> chars(128);
 
@@ -144,7 +144,7 @@ Regex* Parser::make_negated_character_class(std::string&& str)
         chars[static_cast<int>(c)] = 1;
     }
 
-    Regex* expr = nullptr;
+    RegexNode* expr = nullptr;
 
     // Can't meaningfully match ascii nul, so start at ws chars
     size_t it = 9;

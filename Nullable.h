@@ -2,11 +2,11 @@
 #define LEXER_NULLABLE_H
 
 #include <vector>
-#include "Regex.h"
+#include <Regex.h>
 
 class Nullable : public RegexVisitor {
 public:
-    void visit(const Regex* node) override;
+    void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;
     void visit(const Concat* node) override;
     void visit(const Union* node) override;
@@ -15,11 +15,11 @@ public:
     void visit(const Intersection* node) override;
     void visit(const Complement* node) override;
     void visit(const Epsilon* node) override;
-    bool evaluate(const Regex* node);
+    bool evaluate(const RegexNode* regex);
 private:
     std::vector<bool> stack;
 };
 
-Regex* helper(const Regex* node);
+RegexNode* helper(const RegexNode* node);
 
 #endif //LEXER_NULLABLE_H

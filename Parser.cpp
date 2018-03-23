@@ -96,25 +96,11 @@ RegexNode* Parser::primary()
     if (is_char(peek())) {
         return new Symbol(advance());
     } else if (match('\\')) {
-        Bitset set;
-        set.flip(advance());
-        return new Symbol(set);
+        return new Symbol(advance());
     } else if (match('.')) {
         Bitset set;
         set.flip();
         return new Symbol(set);
-        /*
-        RegexNode* left = new Symbol(9);
-        auto it = alphabet.begin() + 1, end = alphabet.end();
-        for (; it != end; ++it) {
-            char ch = *it;
-            if (ch == '\n' || ch == '\r')
-                continue;
-            auto right = new Symbol(ch);
-            left = new Union(left, right);
-        }
-        return left;
-        */
     } else if (match('(')) {
         ++paren_count;
         auto expr = expression();

@@ -2,10 +2,13 @@
 #define LEXER_DERIVATIVECLASS_H
 
 #include <vector>
+#include <unordered_set>
 #include "Regex.h"
+#include "Nullable.h"
 
 class DerivativeClass : RegexVisitor {
 public:
+    std::unordered_set<Bitset> evaluate(const Regex& regex);
 private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* closure) override;
@@ -16,9 +19,9 @@ private:
     void visit(const Symbol* symbol) override;
     void visit(const Epsilon* epsilon) override;
     void visit(const Empty* empty) override;
-private:
-    std::vector<RegexNode*> stack;
-    RegexNode* evaluate(const RegexNode* node);
+    std::unordered_set<Bitset> evaluate(const RegexNode* node);
+    Nullable nullable;
+    std::vector<std::unordered_set<Bitset>> stack;
 };
 
 #endif //LEXER_DERIVATIVECLASS_H

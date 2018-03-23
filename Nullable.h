@@ -6,6 +6,8 @@
 
 class Nullable : public RegexVisitor {
 public:
+    bool evaluate(const RegexNode* regex);
+private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;
     void visit(const Concat* node) override;
@@ -15,8 +17,6 @@ public:
     void visit(const Intersection* node) override;
     void visit(const Complement* node) override;
     void visit(const Epsilon* node) override;
-    bool evaluate(const RegexNode* regex);
-private:
     std::vector<bool> stack;
 };
 

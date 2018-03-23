@@ -9,6 +9,7 @@ class Derivative : public RegexVisitor {
 public:
     Regex derive(const Regex& regex, char da);
     Regex derive(const Regex& regex);
+private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;
     void visit(const Concat* node) override;
@@ -18,7 +19,6 @@ public:
     void visit(const Complement* node) override;
     void visit(const Empty* node) override;
     void visit(const Epsilon* node) override;
-private:
     RegexNode* derive_impl(const RegexNode* tree);
     std::vector<RegexNode*> stack;
     RegexNode* evaluate(const RegexNode* node);

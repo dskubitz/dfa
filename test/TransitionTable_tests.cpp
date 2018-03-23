@@ -3,6 +3,7 @@
 #include <Regex.h>
 #include <TransitionTable.h>
 #include <Derivative.h>
+#include <DerivativeClass.h>
 
 TEST(TransitionTableTests, TransitionTableTest)
 {
@@ -25,6 +26,11 @@ TEST(TransitionTableTests, TransitionTableTest)
         n++;
     }
     Derivative D;
+    DerivativeClass derivativeClass;
+    auto cl = derivativeClass.evaluate(re);
+    for (auto& set : cl) {
+        std::cout << set.to_string() << '\n';
+    }
     auto r1 = D.derive(re, 'K');
     auto r2 = D.derive(re, 'b');
     auto r3 = D.derive(re, 'd');

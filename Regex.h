@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <bitset>
+#include <vector>
 
 constexpr static const std::array<int, 100>
         alphabet = {9, 10, 11, 12, 13, 32, 33, 34,
@@ -22,6 +23,15 @@ constexpr static const std::array<int, 100>
                     120, 121, 122, 123, 124, 125, 126,
 };
 using Bitset = std::bitset<128>;
+
+inline int first(const Bitset& set)
+{
+    if (set.none())
+        return 0;
+    for (int i = 0; i < set.size(); ++i)
+        if (set.test(static_cast<unsigned>(i)))
+            return i;
+}
 
 //@formatter:off
 class RegexNode;
@@ -184,73 +194,27 @@ public:
 class Regex {
 public:
     Regex() noexcept = default;
+    Regex(const Regex& regex);
+    explicit Regex(RegexNode* ptr);
+    Regex(Regex&& regex) noexcept;
+    explicit Regex(std::unique_ptr<RegexNode> ptr);
+    Regex& operator=(const Regex& regex);
+    Regex& operator=(Regex&& regex) noexcept;
 
-    Regex(const Regex& regex)
-            : ptr_(regex.ptr_->clone()) { }
+    void swap(Regex& other) noexcept;
 
-    explicit Regex(RegexNode* ptr)
-            : ptr_(ptr) { }
+    friend bool operator==(const Regex& lhs, const Regex& rhs);
+    friend bool operator!=(const Regex& lhs, const Regex& rhs);
+    friend bool operator<(const Regex& lhs, const Regex& rhs);
+    friend bool operator>(const Regex& lhs, const Regex& rhs);
+    friend bool operator<=(const Regex& lhs, const Regex& rhs);
+    friend bool operator>=(const Regex& lhs, const Regex& rhs);
 
-    Regex(Regex&& regex) noexcept
-            : ptr_(std::move(regex.ptr_)) { }
+    RegexNode* get() noexcept;
+    RegexNode* operator->() noexcept;
 
-    explicit Regex(std::unique_ptr<RegexNode> ptr)
-            : ptr_(std::move(ptr)) { }
-
-    Regex& operator=(const Regex& regex)
-    {
-        if (this != &regex) {
-            Regex tmp(regex);
-            swap(tmp);
-        }
-        return *this;
-    }
-
-    Regex& operator=(Regex&& regex) noexcept
-    {
-        swap(regex);
-        return *this;
-    }
-
-    void swap(Regex& other) noexcept { ptr_.swap(other.ptr_); }
-
-    friend bool operator==(const Regex& lhs, const Regex& rhs)
-    {
-        return lhs.ptr_->equiv(rhs.ptr_.get());
-    }
-
-    friend bool operator!=(const Regex& lhs, const Regex& rhs)
-    {
-        return !(rhs == lhs);
-    }
-
-    friend bool operator<(const Regex& lhs, const Regex& rhs)
-    {
-        return lhs.ptr_->comp(rhs.get());
-    }
-
-    friend bool operator>(const Regex& lhs, const Regex& rhs)
-    {
-        return rhs < lhs;
-    }
-
-    friend bool operator<=(const Regex& lhs, const Regex& rhs)
-    {
-        return !(rhs < lhs);
-    }
-
-    friend bool operator>=(const Regex& lhs, const Regex& rhs)
-    {
-        return !(lhs < rhs);
-    }
-
-    RegexNode* get() noexcept { return ptr_.get(); }
-
-    RegexNode* operator->() noexcept { return ptr_.get(); }
-
-    const RegexNode* get() const noexcept { return ptr_.get(); }
-
-    const RegexNode* operator->() const noexcept { return ptr_.get(); }
+    const RegexNode* get() const noexcept;
+    const RegexNode* operator->() const noexcept;
 
 private:
     std::unique_ptr<RegexNode> ptr_;
@@ -270,6 +234,8 @@ inline void swap(Regex& lhs, Regex& rhs) noexcept
 {
     lhs.swap(rhs);
 }
+
+void print(const std::vector<Regex>& rvec);
 
 RegexNode* make_union(RegexNode* left, RegexNode* right);
 RegexNode* make_cat(RegexNode* left, RegexNode* right);

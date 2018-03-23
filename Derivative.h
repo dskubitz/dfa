@@ -25,4 +25,6 @@ private:
     char dA;
 };
 
+std::vector<Regex> make_derivative(const std::vector<Regex>& rvector, char da);
+
 #endif //LEXER_DERIVATIVE_H

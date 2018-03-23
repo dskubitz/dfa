@@ -28,4 +28,5 @@ public:
 };
 
 TransitionTable make_transition_table(const Regex& regex);
+TransitionTable make_transition_table(const std::vector<Regex>& regex);
 #endif //DFA_H

@@ -1,14 +1,16 @@
 #include <gtest/gtest.h>
 #include <Parser.h>
-#include <Regex.h>
 #include <TransitionTable.h>
-#include <Derivative.h>
 #include <DerivativeClass.h>
 
 TEST(TransitionTableTests, TransitionTableTest)
 {
-    auto re = Parser{}.parse("def|[abc][abc_01]*");
-    auto table = make_transition_table(re);
+    auto re = Parser{}.parse("[A-Za-z_][A-Za-z_0-9]*");
+    auto re2 = Parser{}.parse("[0-9]+(\\.[0-9]+)?");
+
+    std::vector<Regex> regular_vector{re, re2};
+    auto table = make_transition_table(regular_vector);
+    /*
     int n = 0;
     for (auto& state : table) {
         std::cout << "state " << n << '\n';
@@ -25,16 +27,10 @@ TEST(TransitionTableTests, TransitionTableTest)
         std::cout << '\n';
         n++;
     }
-    Derivative D;
-    DerivativeClass derivativeClass;
-    auto cl = derivativeClass.evaluate(re);
-    for (auto& set : cl) {
-        std::cout << set.to_string() << '\n';
+    */
+    int state = 0;
+    for (auto c : "123.01234 abcd") {
+        state = table[state][c];
+        std::cout << state << ' ' << c << '\n';
     }
-    auto r1 = D.derive(re, 'K');
-    auto r2 = D.derive(re, 'b');
-    auto r3 = D.derive(re, 'd');
-    std::cout << r1.get()->to_string() << '\n';
-    std::cout << r2.get()->to_string() << '\n';
-    std::cout << r3.get()->to_string() << '\n';
 }

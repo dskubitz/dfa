@@ -484,3 +484,77 @@ RegexNode* make_complement(RegexNode* expr)
         return new Complement(expr);
     }
 }
+
+Regex::Regex(const Regex& regex)
+        : ptr_(regex.ptr_->clone()) { }
+
+Regex::Regex(RegexNode* ptr)
+        : ptr_(ptr) { }
+
+Regex::Regex(Regex&& regex) noexcept
+        : ptr_(std::move(regex.ptr_)) { }
+
+Regex::Regex(std::unique_ptr<RegexNode> ptr)
+        : ptr_(std::move(ptr)) { }
+
+Regex& Regex::operator=(const Regex& regex)
+{
+    if (this != &regex) {
+        Regex tmp(regex);
+        swap(tmp);
+    }
+    return *this;
+}
+
+Regex& Regex::operator=(Regex&& regex) noexcept
+{
+    swap(regex);
+    return *this;
+}
+
+void Regex::swap(Regex& other) noexcept { ptr_.swap(other.ptr_); }
+
+bool operator==(const Regex& lhs, const Regex& rhs)
+{
+    return lhs.ptr_->equiv(rhs.ptr_.get());
+}
+
+bool operator!=(const Regex& lhs, const Regex& rhs)
+{
+    return !(rhs == lhs);
+}
+
+bool operator<(const Regex& lhs, const Regex& rhs)
+{
+    return lhs.ptr_->comp(rhs.get());
+}
+
+bool operator>(const Regex& lhs, const Regex& rhs)
+{
+    return rhs < lhs;
+}
+
+bool operator<=(const Regex& lhs, const Regex& rhs)
+{
+    return !(rhs < lhs);
+}
+
+bool operator>=(const Regex& lhs, const Regex& rhs)
+{
+    return !(lhs < rhs);
+}
+
+void print(const std::vector<Regex>& rvec)
+{
+    std::cout << "[|";
+    for (auto& i : rvec) { std::cout << '\t' << i->to_string() << ";\n"; }
+    std::cout << "|]\n";
+}
+
+RegexNode* Regex::get() noexcept { return ptr_.get(); }
+
+RegexNode* Regex::operator->() noexcept { return ptr_.get(); }
+
+const RegexNode* Regex::get() const noexcept { return ptr_.get(); }
+
+const RegexNode* Regex::operator->() const noexcept { return ptr_.get(); }

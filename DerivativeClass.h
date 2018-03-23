@@ -24,4 +24,9 @@ private:
     std::vector<std::unordered_set<Bitset>> stack;
 };
 
+std::unordered_set<Bitset>
+make_derivative_class(const std::vector<Regex>& rvector);
+
+std::unordered_set<Bitset>
+cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r);
 #endif //LEXER_DERIVATIVECLASS_H

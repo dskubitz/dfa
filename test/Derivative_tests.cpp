@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <Derivative.h>
+#include <DerivativeClass.h>
 #include <Parser.h>
 #include <Nullable.h>
 
@@ -17,12 +18,6 @@ TEST_F(DerivativeTests, BasicFunctionality)
     EXPECT_EQ(re1, re2);
     re2 = derivative.derive(re1, 'a');
     EXPECT_EQ(re2, re3);
-    auto re4 = parser.parse("(a|b)*b");
-    auto r = derivative.derive(re4);
-    std::cout << r.get()->to_string() << '\n';
-    r = derivative.derive(re4, 'a');
-    std::cout << r.get()->to_string() << '\n';
-
 }
 
 TEST_F(DerivativeTests, MatchSimple)
@@ -57,4 +52,43 @@ TEST_F(DerivativeTests, Nullable)
     EXPECT_FALSE(Nullable{}.evaluate(re.get()));
     re = parser.parse("");
     EXPECT_TRUE(Nullable{}.evaluate(re.get()));
+}
+
+TEST_F(DerivativeTests, DerivativeClassTest)
+{
+    auto re = Parser{}.parse("def|[abc][abc_01]*");
+    Derivative D;
+    DerivativeClass derivativeClass;
+
+    auto cl = derivativeClass.evaluate(re);
+
+    std::unordered_set<Regex> set1;
+    for (int i = 0; i < 128; ++i) {
+        set1.insert(D.derive(re, i));
+    }
+    std::unordered_set<Regex> set2;
+    for (auto& set : cl) {
+        int first_of = first(set);
+        set2.insert(D.derive(re, first_of));
+    }
+    EXPECT_EQ(set1.size(), set2.size());
+}
+
+TEST_F(DerivativeTests, RVectorTests)
+{
+    DerivativeClass derivativeClass;
+    auto re = Parser{}.parse("[A-Za-z_][A-Za-z_0-9]*");
+    auto re2 = Parser{}.parse("[0-9]+(\\.[0-9]+)?");
+    auto set1 = derivativeClass.evaluate(re);
+    auto set2 = derivativeClass.evaluate(re);
+    std::vector<Regex> regular_vector{re, re2};
+    auto set = make_derivative_class(regular_vector);
+    print(regular_vector);
+    for (auto& s : set) {
+        auto c = static_cast<char>(first(s));
+        auto rev = make_derivative(regular_vector, c);
+        print(rev);
+        std::cout << std::boolalpha << is_nullable(rev) << std::noboolalpha
+                  << '\n';
+    }
 }

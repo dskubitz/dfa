@@ -1,14 +1,19 @@
+#include <numeric>
+#include <algorithm>
 #include "DerivativeClass.h"
 
 std::unordered_set<Bitset>
 cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r)
 {
+    if (l.empty()) return {r};
+    if (r.empty()) return {l};
+
     std::unordered_set<Bitset> res;
-    for (auto& setl : l) {
-        for (auto& setr : r) {
+
+    for (auto& setl : l)
+        for (auto& setr : r)
             res.emplace(setl & setr);
-        }
-    }
+
     return res;
 }
 
@@ -82,6 +87,7 @@ void DerivativeClass::visit(const Empty* empty)
 
 std::unordered_set<Bitset> DerivativeClass::evaluate(const RegexNode* node)
 {
+    stack.clear();
     visit(node);
     std::unordered_set<Bitset> res = stack.back();
     stack.pop_back();
@@ -91,4 +97,15 @@ std::unordered_set<Bitset> DerivativeClass::evaluate(const RegexNode* node)
 std::unordered_set<Bitset> DerivativeClass::evaluate(const Regex& regex)
 {
     return evaluate(regex.get());
+}
+
+std::unordered_set<Bitset>
+make_derivative_class(const std::vector<Regex>& rvector)
+{
+    DerivativeClass derivativeClass;
+    std::unordered_set<Bitset> res;
+    for (auto& i : rvector) {
+        res = cross(res, derivativeClass.evaluate(i));
+    }
+    return res;
 }

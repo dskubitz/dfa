@@ -35,14 +35,6 @@ void Nullable::visit(const Empty* node)
     stack.push_back(false);
 }
 
-bool Nullable::evaluate(const RegexNode* regex)
-{
-    visit(regex);
-    bool res = stack.back();
-    stack.pop_back();
-    return res;
-}
-
 void Nullable::visit(const Intersection* node)
 {
     stack.push_back(evaluate(node->left()) && evaluate(node->right()));
@@ -53,10 +45,35 @@ void Nullable::visit(const Complement* node)
     stack.push_back(!evaluate(node->expr()));
 }
 
+bool Nullable::evaluate(const RegexNode* regex)
+{
+    stack.clear();
+    visit(regex);
+    bool res = stack.back();
+    stack.pop_back();
+    return res;
+}
+
+bool Nullable::evaluate(const Regex& regex)
+{
+    return evaluate(regex.get());
+}
+
 RegexNode* helper(const RegexNode* node)
 {
     if (Nullable{}.evaluate(node))
         return new Epsilon;
     else
         return new Empty;
+}
+
+bool is_nullable(const std::vector<Regex>& rvec)
+{
+    Nullable N;
+
+    for (auto& i : rvec)
+        if (N.evaluate(i))
+            return true;
+
+    return false;
 }

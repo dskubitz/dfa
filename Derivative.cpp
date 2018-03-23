@@ -1,5 +1,6 @@
 #include <Derivative.h>
 #include <Nullable.h>
+#include <algorithm>
 
 void Derivative::visit(const RegexNode* node)
 {
@@ -74,13 +75,6 @@ RegexNode* Derivative::derive_impl(const RegexNode* tree)
     return evaluate(tree);
 }
 
-Regex Derivative::derive(const Regex& regex, char da)
-{
-    stack.clear();
-    dA = da;
-    return Regex(derive_impl(regex.get()));
-}
-
 RegexNode* Derivative::evaluate(const RegexNode* node)
 {
     visit(node);
@@ -89,10 +83,27 @@ RegexNode* Derivative::evaluate(const RegexNode* node)
     return res;
 }
 
+Regex Derivative::derive(const Regex& regex, char da)
+{
+    stack.clear();
+    dA = da;
+    return Regex(derive_impl(regex.get()));
+}
+
 // Overload is derivative w.r.t empty string
 Regex Derivative::derive(const Regex& regex)
 {
     stack.clear();
     dA = 0;
     return regex;
+}
+
+std::vector<Regex> make_derivative(const std::vector<Regex>& rvector, char da)
+{
+    Derivative D;
+    std::vector<Regex> res;
+    for (auto& re : rvector) {
+        res.push_back(D.derive(re, da));
+    }
+    return res;
 }

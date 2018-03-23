@@ -1,6 +1,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 #include "Parser.h"
 
@@ -95,8 +96,14 @@ RegexNode* Parser::primary()
     if (is_char(peek())) {
         return new Symbol(advance());
     } else if (match('\\')) {
-        return new Symbol(advance());
+        Bitset set;
+        set.flip(advance());
+        return new Symbol(set);
     } else if (match('.')) {
+        Bitset set;
+        set.flip();
+        return new Symbol(set);
+        /*
         RegexNode* left = new Symbol(9);
         auto it = alphabet.begin() + 1, end = alphabet.end();
         for (; it != end; ++it) {
@@ -107,6 +114,7 @@ RegexNode* Parser::primary()
             left = new Union(left, right);
         }
         return left;
+        */
     } else if (match('(')) {
         ++paren_count;
         auto expr = expression();
@@ -127,6 +135,15 @@ RegexNode* Parser::primary()
 
 RegexNode* Parser::make_character_class(std::string&& str)
 {
+    Bitset set;
+    std::sort(str.begin(), str.end());
+    auto last = std::unique(str.begin(), str.end());
+    for (auto it = str.begin(); it != last; ++it) {
+        set.flip(*it);
+    }
+    return new Symbol(set);
+
+    /*
     auto it = str.begin();
     RegexNode* expr = new Symbol(*it++);
     while (it != str.end()) {
@@ -134,10 +151,21 @@ RegexNode* Parser::make_character_class(std::string&& str)
         expr = new Union(expr, new Symbol(ch));
     }
     return expr;
+    */
 }
 
 RegexNode* Parser::make_negated_character_class(std::string&& str)
 {
+    Bitset set;
+    set.flip();
+    std::sort(str.begin(), str.end());
+    auto last = std::unique(str.begin(), str.end());
+    for (auto it = str.begin(); it != last; ++it) {
+        set.flip(*it);
+    }
+    return new Symbol(set);
+
+    /*
     std::vector<char> chars(128);
 
     for (auto c : str) {
@@ -162,6 +190,7 @@ RegexNode* Parser::make_negated_character_class(std::string&& str)
             expr = new Union(expr, new Symbol(static_cast<char>(it)));
 
     return expr;
+    */
 }
 
 std::string Parser::character_class()

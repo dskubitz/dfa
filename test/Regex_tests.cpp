@@ -18,7 +18,7 @@ TEST_F(RegexTests, Cat)
     re.reset(make_cat(new Epsilon, new Symbol('a')));
     auto q = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(q, nullptr);
-    EXPECT_EQ(q->value(), 'a');
+    EXPECT_TRUE(q->values().test('a'));
 }
 
 TEST_F(RegexTests, Union)
@@ -27,11 +27,11 @@ TEST_F(RegexTests, Union)
             make_union(new Empty, new Symbol('a')));
     auto p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
-    EXPECT_EQ(p->value(), 'a');
+    EXPECT_TRUE(p->values().test('a'));
     re.reset(make_union(new Symbol('a'), new Symbol('a')));
     p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
-    EXPECT_EQ(p->value(), 'a');
+    EXPECT_TRUE(p->values().test('a'));
 }
 
 TEST_F(RegexTests, Star)
@@ -53,7 +53,7 @@ TEST_F(RegexTests, Intersection)
     re.reset(make_intersection(new Symbol('a'), new Symbol('a')));
     auto p2 = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p2, nullptr);
-    EXPECT_EQ(p2->value(), 'a');
+    EXPECT_TRUE(p2->values().test('a'));
 }
 
 TEST_F(RegexTests, Complement)
@@ -62,7 +62,7 @@ TEST_F(RegexTests, Complement)
             make_complement(new Complement(new Symbol('a'))));
     auto p = dynamic_cast<Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
-    EXPECT_EQ(p->value(), 'a');
+    EXPECT_TRUE(p->values().test('a'));
 }
 
 TEST_F(RegexTests, Test)

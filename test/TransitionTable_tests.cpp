@@ -6,16 +6,29 @@
 
 TEST(TransitionTableTests, TransitionTableTest)
 {
-    auto re = Parser{}.parse("a+b*");
+    auto re = Parser{}.parse("def|[abc][abc_01]*");
     auto table = make_transition_table(re);
-    int i = 0;
-    for (auto& st : table) {
-        for (auto& trs : st) {
-            std::cout << trs << ' ';
-            if (++i % 64 == 0)
+    int n = 0;
+    for (auto& state : table) {
+        std::cout << "state " << n << '\n';
+        for (int i = 0; i < 128; ++i) {
+            if (!(isgraph(i) || isspace(i)))
+                continue;
+            if (isgraph(i))
+                std::cout << "q(" << char(i) << ") = " << state[i] << ' ';
+            else
+                std::cout << "q(" << i << ") = " << state[i] << ' ';
+            if (i % 8 == 0)
                 std::cout << '\n';
-
         }
         std::cout << '\n';
+        n++;
     }
+    Derivative D;
+    auto r1 = D.derive(re, 'K');
+    auto r2 = D.derive(re, 'b');
+    auto r3 = D.derive(re, 'd');
+    std::cout << r1.get()->to_string() << '\n';
+    std::cout << r2.get()->to_string() << '\n';
+    std::cout << r3.get()->to_string() << '\n';
 }

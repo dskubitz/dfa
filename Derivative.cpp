@@ -53,7 +53,7 @@ void Derivative::visit(const Complement* node)
 
 void Derivative::visit(const Symbol* node)
 {
-    if (node->value() == dA)
+    if (node->values().test(dA))
         stack.push_back(new Epsilon);
     else
         stack.push_back(new Empty);

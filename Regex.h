@@ -4,6 +4,7 @@
 #include <array>
 #include <string>
 #include <memory>
+#include <bitset>
 
 constexpr static const std::array<int, 100>
         alphabet = {9, 10, 11, 12, 13, 32, 33, 34,
@@ -20,6 +21,7 @@ constexpr static const std::array<int, 100>
                     113, 114, 115, 116, 117, 118, 119,
                     120, 121, 122, 123, 124, 125, 126,
 };
+using Bitset = std::bitset<128>;
 
 //@formatter:off
 class RegexNode;
@@ -146,16 +148,17 @@ private:
 class Symbol : public RegexNode {
 public:
     explicit Symbol(char value);
+    explicit Symbol(Bitset values);
     void accept(RegexVisitor* v) const override;
     Symbol* clone() const override;
     bool equiv(const RegexNode* node) const override;
     bool comp(const RegexNode* node) const override;
     size_t hash_code() const override;
-    char value() const;
+    const Bitset& values() const;
     std::string to_string() const override;
 
 private:
-    const char value_;
+    Bitset set_;
 };
 
 class Epsilon : public RegexNode {
@@ -243,7 +246,11 @@ public:
 
     RegexNode* get() noexcept { return ptr_.get(); }
 
+    RegexNode* operator->() noexcept { return ptr_.get(); }
+
     const RegexNode* get() const noexcept { return ptr_.get(); }
+
+    const RegexNode* operator->() const noexcept { return ptr_.get(); }
 
 private:
     std::unique_ptr<RegexNode> ptr_;

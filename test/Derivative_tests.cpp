@@ -17,6 +17,12 @@ TEST_F(DerivativeTests, BasicFunctionality)
     EXPECT_EQ(re1, re2);
     re2 = derivative.derive(re1, 'a');
     EXPECT_EQ(re2, re3);
+    auto re4 = parser.parse("(a|b)*b");
+    auto r = derivative.derive(re4);
+    std::cout << r.get()->to_string() << '\n';
+    r = derivative.derive(re4, 'a');
+    std::cout << r.get()->to_string() << '\n';
+
 }
 
 TEST_F(DerivativeTests, MatchSimple)

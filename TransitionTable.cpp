@@ -73,19 +73,23 @@ TransitionTable make_transition_table(const Regex& regex)
     while (!unmarked.empty()) {
         Regex from = unmarked.back();
         unmarked.pop_back();
-        std::cout << from.get()->to_string() << '\n';
 
-        for (int c = 0; c < 128; ++c) {
-//            if (!isgraph(c)) continue;
+        for (auto c : alphabet) {
             Regex to = deriv.derive(from, c);
 
             if (dstates.emplace(to, num).second) {
+                if (isprint(c))
+                    std::cout << char(c) << '\n';
+                else std::cout << c << '\n';
                 ++num;
                 unmarked.push_back(to);
                 table.add_state();
             }
             table[dstates.at(from)][c] = dstates.at(to);
         }
+    }
+    for (auto& i : dstates) {
+        std::cout << i.first.get()->to_string() << ' ' << i.second << '\n';
     }
 
     return table;

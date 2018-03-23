@@ -2,6 +2,8 @@
 #include <Nullable.h>
 #include <sstream>
 #include <boost/functional/hash.hpp>
+#include <experimental/iterator>
+#include <iostream>
 
 Closure::Closure(RegexNode* node)
         : expr_(node)
@@ -108,11 +110,6 @@ bool Concat::comp(const RegexNode* node) const
     return typeid(Concat).before(typeid(*node));
 }
 
-Symbol::Symbol(char value)
-        : value_(value)
-{
-}
-
 Union::Union(RegexNode* left, RegexNode* right)
         : left_(left), right_(right)
 {
@@ -148,7 +145,7 @@ bool Union::equiv(const RegexNode* node) const
 
 std::string Union::to_string() const
 {
-    return "(" + left_->to_string() + "|" + right_->to_string() + ")";
+    return "(" + left_->to_string() + "+" + right_->to_string() + ")";
 }
 
 size_t Union::hash_code() const
@@ -220,45 +217,93 @@ bool Intersection::comp(const RegexNode* node) const
     return typeid(Intersection).before(typeid(*node));
 }
 
+Symbol::Symbol(char value)
+{
+    set_.flip(value);
+}
+
+Symbol::Symbol(Bitset values)
+        : set_(values)
+{
+}
+
 void Symbol::accept(RegexVisitor* v) const
 {
     v->visit(this);
 }
 
-char Symbol::value() const { return value_; }
-
 Symbol* Symbol::clone() const
 {
-    return new Symbol(value_);
+    return new Symbol(*this);
 }
 
-//@formatter:off
 bool Symbol::equiv(const RegexNode* node) const
 {
     if (auto p = dynamic_cast<const Symbol*>(node))
-        return value_ == p->value_;
+        return set_ == p->set_;
 
     return false;
 }
 
 std::string Symbol::to_string() const
 {
+    bool write_comma{false};
     std::ostringstream oss;
-    oss << value_;
+    oss << "{";
+    for (auto it = alphabet.begin(), end = alphabet.end(); it != end;) {
+        char c = *it++;
+        if (set_.test(c)) {
+            if (write_comma) {
+                oss << ", ";
+                write_comma = false;
+            }
+
+            switch (c) {
+            case '\t':
+                oss << "\\t";
+                break;
+            case '\n':
+                oss << "\\n";
+                break;
+            case '\r':
+                oss << "\\r";
+                break;
+            case '\v':
+                oss << "\\v";
+                break;
+            case '\f':
+                oss << "\\f";
+                break;
+            default:
+                oss << c;
+                break;
+            }
+        } else {
+            continue;
+        }
+
+        if (it != end) write_comma = true;
+    }
+    oss << "}";
     return oss.str();
 }
 
 size_t Symbol::hash_code() const
 {
-    return std::hash<char>{}(value_);
+    return std::hash<Bitset>{}(set_);
 }
 
 bool Symbol::comp(const RegexNode* node) const
 {
     if (auto p = dynamic_cast<const Symbol*>(node))
-        return value_ < p->value_;
+        return set_.to_string() < p->set_.to_string();
 
     return typeid(Symbol).before(typeid(*node));
+}
+
+const Bitset& Symbol::values() const
+{
+    return set_;
 }
 
 void Complement::accept(RegexVisitor* v) const { v->visit(this); }
@@ -275,10 +320,11 @@ bool Complement::equiv(const RegexNode* node) const
 
     return false;
 }
+
 Complement::~Complement() { delete expr_; }
 
 Complement::Complement(RegexNode* expr)
-        :expr_(expr) { }
+        : expr_(expr) { }
 
 const RegexNode* Complement::expr() const { return expr_; }
 
@@ -317,6 +363,7 @@ bool Epsilon::equiv(const RegexNode* node) const
 {
     return bool(dynamic_cast<const Epsilon*>(node));
 }
+
 std::string Epsilon::to_string() const
 {
     return "\u03b5";
@@ -381,8 +428,9 @@ RegexNode* make_union(RegexNode* left, RegexNode* right)
 RegexNode* make_cat(RegexNode* left, RegexNode* right)
 {
     if (dynamic_cast<Empty*>(left) || dynamic_cast<Empty*>(right)) {
+        delete left;
         delete right;
-        return left;
+        return new Empty;
     } else if (dynamic_cast<Epsilon*>(left)) {
         delete left;
         return right;

@@ -83,25 +83,25 @@ RegexNode* Derivative::evaluate(const RegexNode* node)
     return res;
 }
 
-Regex Derivative::derive(const Regex& regex, char da)
+Regexp Derivative::derive(const Regexp& regex, char da)
 {
     stack.clear();
     dA = da;
-    return Regex(derive_impl(regex.get()));
+    return Regexp(derive_impl(regex.get()));
 }
 
 // Overload is derivative w.r.t empty string
-Regex Derivative::derive(const Regex& regex)
+Regexp Derivative::derive(const Regexp& regex)
 {
     stack.clear();
     dA = 0;
     return regex;
 }
 
-std::vector<Regex> make_derivative(const std::vector<Regex>& rvector, char da)
+std::vector<Regexp> make_derivative(const std::vector<Regexp>& rvector, char da)
 {
     Derivative D;
-    std::vector<Regex> res;
+    std::vector<Regexp> res;
     for (auto& re : rvector) {
         res.push_back(D.derive(re, da));
     }

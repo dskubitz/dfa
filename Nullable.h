@@ -2,12 +2,12 @@
 #define LEXER_NULLABLE_H
 
 #include <vector>
-#include <Regex.h>
+#include <Regexp.h>
 
 class Nullable : public RegexVisitor {
 public:
     bool evaluate(const RegexNode* regex);
-    bool evaluate(const Regex& regex);
+    bool evaluate(const Regexp& regex);
 private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;
@@ -21,7 +21,7 @@ private:
     std::vector<bool> stack;
 };
 
-bool is_nullable(const std::vector<Regex>& rvec);
+bool is_nullable(const std::vector<Regexp>& rvec);
 
 RegexNode* helper(const RegexNode* node);
 

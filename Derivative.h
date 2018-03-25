@@ -3,12 +3,12 @@
 
 #include <vector>
 #include <memory>
-#include <Regex.h>
+#include <Regexp.h>
 
 class Derivative : public RegexVisitor {
 public:
-    Regex derive(const Regex& regex, char da);
-    Regex derive(const Regex& regex);
+    Regexp derive(const Regexp& regex, char da);
+    Regexp derive(const Regexp& regex);
 private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;
@@ -25,6 +25,6 @@ private:
     char dA;
 };
 
-std::vector<Regex> make_derivative(const std::vector<Regex>& rvector, char da);
+std::vector<Regexp> make_derivative(const std::vector<Regexp>& rvector, char da);
 
 #endif //LEXER_DERIVATIVE_H

@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-#include <Regex.h>
+#include <Regexp.h>
 
 struct ParserError : std::runtime_error {
     using std::runtime_error::runtime_error;
@@ -13,9 +13,9 @@ struct ParserError : std::runtime_error {
 
 class Parser {
 public:
-    Regex parse(const std::string& regexp)
+    Regexp parse(const std::string& regexp)
     {
-        return Regex(parse_impl(regexp));
+        return Regexp(parse_impl(regexp));
     }
 
 private:

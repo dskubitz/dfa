@@ -62,11 +62,11 @@ TEST_F(DerivativeTests, DerivativeClassTest)
 
     auto cl = derivativeClass.evaluate(re);
 
-    std::unordered_set<Regex> set1;
+    std::unordered_set<Regexp> set1;
     for (int i = 0; i < 128; ++i) {
         set1.insert(D.derive(re, i));
     }
-    std::unordered_set<Regex> set2;
+    std::unordered_set<Regexp> set2;
     for (auto& set : cl) {
         int first_of = first(set);
         set2.insert(D.derive(re, first_of));
@@ -81,7 +81,7 @@ TEST_F(DerivativeTests, RVectorTests)
     auto re2 = Parser{}.parse("[0-9]+(\\.[0-9]+)?");
     auto set1 = derivativeClass.evaluate(re);
     auto set2 = derivativeClass.evaluate(re);
-    std::vector<Regex> regular_vector{re, re2};
+    std::vector<Regexp> regular_vector{re, re2};
     auto set = make_derivative_class(regular_vector);
     print(regular_vector);
     for (auto& s : set) {

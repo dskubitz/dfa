@@ -1,7 +1,7 @@
 #ifndef DFA_H
 #define DFA_H
 
-#include <Regex.h>
+#include <Regexp.h>
 
 
 #include <vector>
@@ -27,6 +27,6 @@ public:
     void add_state() { this->emplace_back(); }
 };
 
-TransitionTable make_transition_table(const Regex& regex);
-TransitionTable make_transition_table(const std::vector<Regex>& regex);
+TransitionTable make_transition_table(const Regexp& regex);
+TransitionTable make_transition_table(const std::vector<Regexp>& regex);
 #endif //DFA_H

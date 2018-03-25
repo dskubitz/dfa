@@ -4,9 +4,9 @@
 #include <iostream>
 #include "DerivativeClass.h"
 
-TransitionTable make_transition_table(const std::vector<Regex>& regex)
+TransitionTable make_transition_table(const std::vector<Regexp>& regex)
 {
-    using State = std::vector<Regex>;
+    using State = std::vector<Regexp>;
 
     Derivative deriv;
     DerivativeClass derivativeClass;
@@ -47,25 +47,25 @@ TransitionTable make_transition_table(const std::vector<Regex>& regex)
     return table;
 }
 
-TransitionTable make_transition_table(const Regex& regex)
+TransitionTable make_transition_table(const Regexp& regex)
 {
     Derivative deriv;
     DerivativeClass derivativeClass;
 
-    std::vector<Regex> unmarked{regex};
-    std::map<Regex, size_t> dstates{{regex, 0}};
+    std::vector<Regexp> unmarked{regex};
+    std::map<Regexp, size_t> dstates{{regex, 0}};
     size_t num = 1;
     TransitionTable table;
     table.add_state();
 
     while (!unmarked.empty()) {
-        Regex from = unmarked.back();
+        Regexp from = unmarked.back();
         unmarked.pop_back();
         std::unordered_set<Bitset> dclass = derivativeClass.evaluate(from);
 
         for (auto& set : dclass) {
             auto c = static_cast<char>(first(set));
-            Regex to = deriv.derive(from, c);
+            Regexp to = deriv.derive(from, c);
 
             for (int i = 0; i < set.size(); ++i) {
                 if (!set.test(static_cast<unsigned>(i)))

@@ -54,7 +54,7 @@ bool Nullable::evaluate(const RegexNode* regex)
     return res;
 }
 
-bool Nullable::evaluate(const Regex& regex)
+bool Nullable::evaluate(const Regexp& regex)
 {
     return evaluate(regex.get());
 }
@@ -67,7 +67,7 @@ RegexNode* helper(const RegexNode* node)
         return new Empty;
 }
 
-bool is_nullable(const std::vector<Regex>& rvec)
+bool is_nullable(const std::vector<Regexp>& rvec)
 {
     Nullable N;
 

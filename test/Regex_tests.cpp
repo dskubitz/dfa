@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <Regex.h>
+
+#include <Regexp.h>
 #include <Parser.h>
 #include <unordered_set>
 
@@ -84,18 +85,18 @@ TEST_F(RegexTests, Test)
 
 TEST_F(RegexTests, WrapperClass)
 {
-    Regex regex(parser.parse("(a|b)*abb"));
-    Regex re2 = regex;
+    Regexp regex(parser.parse("(a|b)*abb"));
+    Regexp re2 = regex;
     EXPECT_EQ(regex, re2);
-    Regex re3 = std::move(re2);
-    re2 = Regex(parser.parse("(ab*|cd*)"));
+    Regexp re3 = std::move(re2);
+    re2 = Regexp(parser.parse("(ab*|cd*)"));
     EXPECT_NE(regex, re2);
     EXPECT_EQ(regex, re3);
 }
 
 TEST_F(RegexTests, Hash)
 {
-    std::unordered_set<Regex> regexes;
+    std::unordered_set<Regexp> regexes;
     auto && [it, inserted] = regexes.insert(parser.parse("(a|b)*abb"));
     EXPECT_TRUE(inserted);
     std::tie(it, inserted) = regexes.insert(parser.parse("(a|b)*abb"));
@@ -106,11 +107,11 @@ TEST_F(RegexTests, Hash)
 
 TEST_F(RegexTests, StrictWeakOrder)
 {
-    Regex re0 = parser.parse(".");
-    Regex re1 = parser.parse("[aeiou]");
-    Regex re2 = parser.parse("[0-9]");
-    Regex re3 = parser.parse("[aeiou]");
-    Regex re4 = parser.parse("[A-Z_a-z_0-9]");
+    Regexp re0 = parser.parse(".");
+    Regexp re1 = parser.parse("[aeiou]");
+    Regexp re2 = parser.parse("[0-9]");
+    Regexp re3 = parser.parse("[aeiou]");
+    Regexp re4 = parser.parse("[A-Z_a-z_0-9]");
     // for all a, comp(a,a)==false
     EXPECT_FALSE(re0 < re0);
     EXPECT_FALSE(re1 < re1);

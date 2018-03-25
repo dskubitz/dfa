@@ -94,13 +94,13 @@ std::unordered_set<Bitset> DerivativeClass::evaluate(const RegexNode* node)
     return res;
 }
 
-std::unordered_set<Bitset> DerivativeClass::evaluate(const Regex& regex)
+std::unordered_set<Bitset> DerivativeClass::evaluate(const Regexp& regex)
 {
     return evaluate(regex.get());
 }
 
 std::unordered_set<Bitset>
-make_derivative_class(const std::vector<Regex>& rvector)
+make_derivative_class(const std::vector<Regexp>& rvector)
 {
     DerivativeClass derivativeClass;
     std::unordered_set<Bitset> res;

@@ -3,12 +3,12 @@
 
 #include <vector>
 #include <unordered_set>
-#include "Regex.h"
+#include "Regexp.h"
 #include "Nullable.h"
 
 class DerivativeClass : RegexVisitor {
 public:
-    std::unordered_set<Bitset> evaluate(const Regex& regex);
+    std::unordered_set<Bitset> evaluate(const Regexp& regex);
 private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* closure) override;
@@ -25,7 +25,7 @@ private:
 };
 
 std::unordered_set<Bitset>
-make_derivative_class(const std::vector<Regex>& rvector);
+make_derivative_class(const std::vector<Regexp>& rvector);
 
 std::unordered_set<Bitset>
 cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r);

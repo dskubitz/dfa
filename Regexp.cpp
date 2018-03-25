@@ -1,12 +1,26 @@
-#include <Regex.h>
-#include <Nullable.h>
+#include <Regexp.h>
 #include <sstream>
 #include <boost/functional/hash.hpp>
 #include <experimental/iterator>
 #include <iostream>
 
+const std::array<int, 100>
+        alphabet {9, 10, 11, 12, 13, 32, 33, 34,
+                  35, 36, 37, 38, 39, 40, 41, 42,
+                  43, 44, 45, 46, 47, 48, 49, 50,
+                  51, 52, 53, 54, 55, 56, 57, 58,
+                  59, 60, 61, 62, 63, 64, 65, 66,
+                  67, 68, 69, 70, 71, 72, 73, 74,
+                  75, 76, 77, 78, 79, 80, 81, 82,
+                  83, 84, 85, 86, 87, 88, 89, 90,
+                  91, 92, 93, 94, 95, 96, 97, 98,
+                  99, 100, 101, 102, 103, 104, 105,
+                  106, 107, 108, 109, 110, 111, 112,
+                  113, 114, 115, 116, 117, 118, 119,
+                  120, 121, 122, 123, 124, 125, 126,};
+
 Closure::Closure(RegexNode* node)
-        : expr_(node)
+        :expr_(node)
 {
 }
 
@@ -56,7 +70,7 @@ bool Closure::comp(const RegexNode* node) const
 }
 
 Concat::Concat(RegexNode* left, RegexNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -111,7 +125,7 @@ bool Concat::comp(const RegexNode* node) const
 }
 
 Union::Union(RegexNode* left, RegexNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -187,7 +201,7 @@ Intersection::~Intersection()
 }
 
 Intersection::Intersection(RegexNode* left, RegexNode* right)
-        : left_(left), right_(right)
+        :left_(left), right_(right)
 {
 }
 
@@ -223,7 +237,7 @@ Symbol::Symbol(char value)
 }
 
 Symbol::Symbol(Bitset values)
-        : set_(values)
+        :set_(values)
 {
 }
 
@@ -247,7 +261,7 @@ bool Symbol::equiv(const RegexNode* node) const
 
 std::string Symbol::to_string() const
 {
-    bool write_comma{false};
+    bool write_comma {false};
     std::ostringstream oss;
     oss << "{";
     for (auto it = alphabet.begin(), end = alphabet.end(); it != end;) {
@@ -324,7 +338,7 @@ bool Complement::equiv(const RegexNode* node) const
 Complement::~Complement() { delete expr_; }
 
 Complement::Complement(RegexNode* expr)
-        : expr_(expr) { }
+        :expr_(expr) { }
 
 const RegexNode* Complement::expr() const { return expr_; }
 
@@ -485,76 +499,76 @@ RegexNode* make_complement(RegexNode* expr)
     }
 }
 
-Regex::Regex(const Regex& regex)
+Regexp::Regexp(const Regexp& regex)
         : ptr_(regex.ptr_->clone()) { }
 
-Regex::Regex(RegexNode* ptr)
+Regexp::Regexp(RegexNode* ptr)
         : ptr_(ptr) { }
 
-Regex::Regex(Regex&& regex) noexcept
+Regexp::Regexp(Regexp&& regex) noexcept
         : ptr_(std::move(regex.ptr_)) { }
 
-Regex::Regex(std::unique_ptr<RegexNode> ptr)
+Regexp::Regexp(std::unique_ptr<RegexNode> ptr)
         : ptr_(std::move(ptr)) { }
 
-Regex& Regex::operator=(const Regex& regex)
+Regexp& Regexp::operator=(const Regexp& regex)
 {
     if (this != &regex) {
-        Regex tmp(regex);
+        Regexp tmp(regex);
         swap(tmp);
     }
     return *this;
 }
 
-Regex& Regex::operator=(Regex&& regex) noexcept
+Regexp& Regexp::operator=(Regexp&& regex) noexcept
 {
     swap(regex);
     return *this;
 }
 
-void Regex::swap(Regex& other) noexcept { ptr_.swap(other.ptr_); }
+void Regexp::swap(Regexp& other) noexcept { ptr_.swap(other.ptr_); }
 
-bool operator==(const Regex& lhs, const Regex& rhs)
+bool operator==(const Regexp& lhs, const Regexp& rhs)
 {
     return lhs.ptr_->equiv(rhs.ptr_.get());
 }
 
-bool operator!=(const Regex& lhs, const Regex& rhs)
+bool operator!=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(rhs == lhs);
 }
 
-bool operator<(const Regex& lhs, const Regex& rhs)
+bool operator<(const Regexp& lhs, const Regexp& rhs)
 {
     return lhs.ptr_->comp(rhs.get());
 }
 
-bool operator>(const Regex& lhs, const Regex& rhs)
+bool operator>(const Regexp& lhs, const Regexp& rhs)
 {
     return rhs < lhs;
 }
 
-bool operator<=(const Regex& lhs, const Regex& rhs)
+bool operator<=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(rhs < lhs);
 }
 
-bool operator>=(const Regex& lhs, const Regex& rhs)
+bool operator>=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(lhs < rhs);
 }
 
-void print(const std::vector<Regex>& rvec)
+void print(const std::vector<Regexp>& rvec)
 {
     std::cout << "[|";
     for (auto& i : rvec) { std::cout << '\t' << i->to_string() << ";\n"; }
     std::cout << "|]\n";
 }
 
-RegexNode* Regex::get() noexcept { return ptr_.get(); }
+RegexNode* Regexp::get() noexcept { return ptr_.get(); }
 
-RegexNode* Regex::operator->() noexcept { return ptr_.get(); }
+RegexNode* Regexp::operator->() noexcept { return ptr_.get(); }
 
-const RegexNode* Regex::get() const noexcept { return ptr_.get(); }
+const RegexNode* Regexp::get() const noexcept { return ptr_.get(); }
 
-const RegexNode* Regex::operator->() const noexcept { return ptr_.get(); }
+const RegexNode* Regexp::operator->() const noexcept { return ptr_.get(); }

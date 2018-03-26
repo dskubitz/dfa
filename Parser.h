@@ -30,7 +30,6 @@ private:
     char consume(char ch, const std::string& msg);
 
     RegexNode* union_or_intersection();
-    RegexNode* complement();
     RegexNode* concatenation();
     RegexNode* postfix();
     RegexNode* factor();

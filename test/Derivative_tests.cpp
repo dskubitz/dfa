@@ -13,7 +13,7 @@ protected:
 TEST_F(DerivativeTests, BasicFunctionality)
 {
     auto re1 = parser.parse("ab*");
-    auto re2 = derivative.derive(re1);
+    auto re2 = re1;
     auto re3 = parser.parse("b*");
     EXPECT_EQ(re1, re2);
     re2 = derivative.derive(re1, 'a');
@@ -24,7 +24,7 @@ TEST_F(DerivativeTests, MatchSimple)
 {
     Nullable nullable;
     auto re = parser.parse("abc+");
-    auto r = derivative.derive(re);
+    auto r = re;
     EXPECT_FALSE(nullable.evaluate(r.get()));
     r = derivative.derive(r, 'a');
     EXPECT_FALSE(nullable.evaluate(r.get()));

@@ -1,8 +1,8 @@
 #include <TransitionTable.h>
-#include <unordered_map>
 #include <Derivative.h>
-#include <iostream>
-#include "DerivativeClass.h"
+#include <DerivativeClass.h>
+
+#include <unordered_map>
 
 TransitionTable make_transition_table(const std::vector<Regexp>& regex)
 {
@@ -39,47 +39,12 @@ TransitionTable make_transition_table(const std::vector<Regexp>& regex)
             }
         }
     }
-    for (auto& i : dstates) {
-        std::cout << i.second << ' ';
-        print(i.first);
-    }
 
     return table;
 }
 
 TransitionTable make_transition_table(const Regexp& regex)
 {
-    Derivative deriv;
-    DerivativeClass derivativeClass;
-
-    std::vector<Regexp> unmarked{regex};
-    std::map<Regexp, size_t> dstates{{regex, 0}};
-    size_t num = 1;
-    TransitionTable table;
-    table.add_state();
-
-    while (!unmarked.empty()) {
-        Regexp from = unmarked.back();
-        unmarked.pop_back();
-        std::unordered_set<Bitset> dclass = derivativeClass.evaluate(from);
-
-        for (auto& set : dclass) {
-            auto c = static_cast<char>(first(set));
-            Regexp to = deriv.derive(from, c);
-
-            for (int i = 0; i < set.size(); ++i) {
-                if (!set.test(static_cast<unsigned>(i)))
-                    continue;
-
-                if (dstates.emplace(to, num).second) {
-                    ++num;
-                    unmarked.push_back(to);
-                    table.add_state();
-                }
-                table[dstates.at(from)][i] = static_cast<int>(dstates.at(to));
-            }
-        }
-    }
-
-    return table;
+    std::vector<Regexp> rvec{regex};
+    return make_transition_table(rvec);
 }

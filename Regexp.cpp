@@ -504,33 +504,6 @@ RegexNode* make_complement(RegexNode* expr)
     }
 }
 
-Regexp::Regexp(const Regexp& regex)
-        : ptr_(regex.ptr_->clone()) { }
-
-Regexp::Regexp(RegexNode* ptr)
-        : ptr_(ptr) { }
-
-Regexp::Regexp(Regexp&& regex) noexcept
-        : ptr_(std::move(regex.ptr_)) { }
-
-Regexp::Regexp(std::unique_ptr<RegexNode> ptr)
-        : ptr_(std::move(ptr)) { }
-
-Regexp& Regexp::operator=(const Regexp& regex)
-{
-    if (this != &regex) {
-        Regexp tmp(regex);
-        swap(tmp);
-    }
-    return *this;
-}
-
-Regexp& Regexp::operator=(Regexp&& regex) noexcept
-{
-    swap(regex);
-    return *this;
-}
-
 void Regexp::swap(Regexp& other) noexcept { ptr_.swap(other.ptr_); }
 
 bool operator==(const Regexp& lhs, const Regexp& rhs)
@@ -561,13 +534,6 @@ bool operator<=(const Regexp& lhs, const Regexp& rhs)
 bool operator>=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(lhs < rhs);
-}
-
-void print(const std::vector<Regexp>& rvec)
-{
-    std::cout << "[\n";
-    for (auto& i : rvec) { std::cout << '\t' << i->to_string() << ",\n"; }
-    std::cout << "]\n";
 }
 
 RegexNode* Regexp::get() noexcept { return ptr_.get(); }

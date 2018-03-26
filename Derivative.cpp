@@ -90,14 +90,6 @@ Regexp Derivative::derive(const Regexp& regex, char da)
     return Regexp(derive_impl(regex.get()));
 }
 
-// Overload is derivative w.r.t empty string
-Regexp Derivative::derive(const Regexp& regex)
-{
-    stack.clear();
-    dA = 0;
-    return regex;
-}
-
 std::vector<Regexp> make_derivative(const std::vector<Regexp>& rvector, char da)
 {
     Derivative D;

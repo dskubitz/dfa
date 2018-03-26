@@ -8,7 +8,6 @@
 class Derivative : public RegexVisitor {
 public:
     Regexp derive(const Regexp& regex, char da);
-    Regexp derive(const Regexp& regex);
 private:
     void visit(const RegexNode* node) override;
     void visit(const Closure* node) override;

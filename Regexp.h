@@ -178,15 +178,16 @@ public:
     std::string to_string() const override;
 };
 
+RegexNode* make_union(RegexNode* left, RegexNode* right);
+RegexNode* make_cat(RegexNode* left, RegexNode* right);
+RegexNode* make_star(RegexNode* expr);
+RegexNode* make_intersection(RegexNode* left, RegexNode* right);
+RegexNode* make_complement(RegexNode* expr);
+
 class Regexp {
 public:
     Regexp() noexcept = default;
-    Regexp(const Regexp& regex);
-    explicit Regexp(RegexNode* ptr);
-    Regexp(Regexp&& regex) noexcept;
-    explicit Regexp(std::unique_ptr<RegexNode> ptr);
-    Regexp& operator=(const Regexp& regex);
-    Regexp& operator=(Regexp&& regex) noexcept;
+    explicit Regexp(RegexNode* ptr) :ptr_(ptr) { }
 
     void swap(Regexp& other) noexcept;
 
@@ -204,7 +205,7 @@ public:
     const RegexNode* operator->() const noexcept;
 
 private:
-    std::unique_ptr<RegexNode> ptr_;
+    std::shared_ptr<RegexNode> ptr_;
 };
 
 namespace std {
@@ -222,11 +223,5 @@ inline void swap(Regexp& lhs, Regexp& rhs) noexcept
     lhs.swap(rhs);
 }
 
-void print(const std::vector<Regexp>& rvec);
 
-RegexNode* make_union(RegexNode* left, RegexNode* right);
-RegexNode* make_cat(RegexNode* left, RegexNode* right);
-RegexNode* make_star(RegexNode* expr);
-RegexNode* make_intersection(RegexNode* left, RegexNode* right);
-RegexNode* make_complement(RegexNode* expr);
 #endif //RE_H

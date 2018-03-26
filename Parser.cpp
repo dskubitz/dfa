@@ -1,8 +1,3 @@
-#include <vector>
-#include <sstream>
-#include <iostream>
-#include <algorithm>
-
 #include "Parser.h"
 
 namespace {
@@ -107,117 +102,57 @@ RegexNode* Parser::primary()
         consume(')', "unmatched parenthesis");
         return expr;
     } else if (match('[')) {
-        RegexNode* class_expr = nullptr;
-        if (match('^'))
-            class_expr = make_negated_character_class(character_class());
-        else
-            class_expr = make_character_class(character_class());
+        Bitset set;
+        if (match('^')) {
+            set = character_class();
+            set.flip();
+        } else {
+            set = character_class();
+        }
         consume(']', "unmatched bracket");
-        return class_expr;
+        return new Symbol(set);
     } else {
         error("unrecognized");
     }
 }
 
-RegexNode* Parser::make_character_class(std::string&& str)
+Bitset Parser::character_class()
+{
+    Bitset set = range();
+
+    while (is_char(peek()))
+        set |= range();
+
+    return set;
+}
+
+Bitset Parser::range()
 {
     Bitset set;
-    std::sort(str.begin(), str.end());
-    auto last = std::unique(str.begin(), str.end());
-    for (auto it = str.begin(); it != last; ++it) {
-        set.flip(*it);
-    }
-    return new Symbol(set);
 
-    /*
-    auto it = str.begin();
-    RegexNode* expr = new Symbol(*it++);
-    while (it != str.end()) {
-        char ch = *it++;
-        expr = new Union(expr, new Symbol(ch));
-    }
-    return expr;
-    */
-}
-
-RegexNode* Parser::make_negated_character_class(std::string&& str)
-{
-    Bitset set;
-    set.flip();
-    std::sort(str.begin(), str.end());
-    auto last = std::unique(str.begin(), str.end());
-    for (auto it = str.begin(); it != last; ++it) {
-        set.flip(*it);
-    }
-    return new Symbol(set);
-
-    /*
-    std::vector<char> chars(128);
-
-    for (auto c : str) {
-        chars[static_cast<int>(c)] = 1;
-    }
-
-    RegexNode* expr = nullptr;
-
-    // Can't meaningfully match ascii nul, so start at ws chars
-    size_t it = 9;
-    size_t end = chars.size();
-
-    // Find the first unset value in chars
-    while (it != end)
-        if (chars[it] == 0) {
-            expr = new Symbol(static_cast<char>(it++));
-            break;
-        }
-
-    for (; it != end; ++it)
-        if (chars[it] == 0 && (isgraph(it) || isspace(it)))
-            expr = new Union(expr, new Symbol(static_cast<char>(it)));
-
-    return expr;
-    */
-}
-
-std::string Parser::character_class()
-{
-    std::string res;
-    res += range();
-
-    while (is_char(peek())) {
-        auto right = range();
-        res += right;
-    }
-
-    return res;
-}
-
-std::string Parser::range()
-{
-    std::stringstream ss;
-
-    auto left = advance();
-    ss << left;
+    char left = advance();
+    set.set(static_cast<unsigned char>(left), true);
 
     if (!match('-'))
-        return ss.str();
+        return set;
 
     // If '-' is at the end of the character class it is not a range.
     if (peek() == ']') {
-        ss << previous();
-        return ss.str();
+        set.set(static_cast<unsigned char>(left), true);
+        return set;
     }
 
-    auto right = advance();
+    char right = advance();
 
     if (left > right)
         error("start character greater than end character");
 
     while (left < right) {
         left++;
-        ss << left;
+        set.set(static_cast<unsigned char>(left), true);
     }
-    return ss.str();
+
+    return set;
 }
 
 bool Parser::match(char ch)
@@ -261,5 +196,3 @@ char Parser::consume(char ch, const std::string& msg)
         return advance();
     error(msg);
 }
-
-

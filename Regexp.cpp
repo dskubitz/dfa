@@ -259,39 +259,46 @@ bool Symbol::equiv(const RegexNode* node) const
     return false;
 }
 
+std::string escaped_char(int c)
+{
+    switch (c) {
+    case '\t':
+        return "\\t";
+    case '\n':
+        return "\\n";
+    case '\r':
+        return "\\r";
+    case '\v':
+        return "\\v";
+    case '\f':
+        return "\\f";
+    default:
+        std::stringstream oss;
+        oss << static_cast<char>(c);
+        return oss.str();
+    }
+}
+
 std::string Symbol::to_string() const
 {
     bool write_comma {false};
+
+    std::string sym;
+
     std::ostringstream oss;
     oss << "{";
     for (auto it = alphabet.begin(), end = alphabet.end(); it != end;) {
-        char c = *it++;
+        auto c = static_cast<char>(*it++);
+
         if (set_.test(c)) {
+
             if (write_comma) {
-                oss << ", ";
+                oss << ",";
                 write_comma = false;
             }
+            sym = escaped_char(c);
+            oss << sym;
 
-            switch (c) {
-            case '\t':
-                oss << "\\t";
-                break;
-            case '\n':
-                oss << "\\n";
-                break;
-            case '\r':
-                oss << "\\r";
-                break;
-            case '\v':
-                oss << "\\v";
-                break;
-            case '\f':
-                oss << "\\f";
-                break;
-            default:
-                oss << c;
-                break;
-            }
         } else {
             continue;
         }
@@ -560,9 +567,9 @@ bool operator>=(const Regexp& lhs, const Regexp& rhs)
 
 void print(const std::vector<Regexp>& rvec)
 {
-    std::cout << "[|";
-    for (auto& i : rvec) { std::cout << '\t' << i->to_string() << ";\n"; }
-    std::cout << "|]\n";
+    std::cout << "[\n";
+    for (auto& i : rvec) { std::cout << '\t' << i->to_string() << ",\n"; }
+    std::cout << "]\n";
 }
 
 RegexNode* Regexp::get() noexcept { return ptr_.get(); }

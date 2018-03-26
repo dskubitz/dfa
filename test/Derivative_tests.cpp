@@ -83,6 +83,7 @@ TEST_F(DerivativeTests, RVectorTests)
     auto set2 = derivativeClass.evaluate(re);
     std::vector<Regexp> regular_vector{re, re2};
     auto set = make_derivative_class(regular_vector);
+    /*
     print(regular_vector);
     for (auto& s : set) {
         auto c = static_cast<char>(first(s));
@@ -91,4 +92,5 @@ TEST_F(DerivativeTests, RVectorTests)
         std::cout << std::boolalpha << is_nullable(rev) << std::noboolalpha
                   << '\n';
     }
+    */
 }

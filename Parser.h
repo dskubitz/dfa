@@ -33,11 +33,9 @@ private:
     RegexNode* term();
     RegexNode* factor();
     RegexNode* primary();
-    RegexNode* make_character_class(std::string&& str);
-    RegexNode* make_negated_character_class(std::string&& str);
 
-    std::string character_class();
-    std::string range();
+    Bitset character_class();
+    Bitset range();
 
     std::string expr {};
     std::string::size_type pos {0};

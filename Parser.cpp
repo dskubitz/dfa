@@ -5,7 +5,7 @@ bool is_meta(char ch)
 {
     return ch == '*' || ch == '+' || ch == '-' || ch == '|' || ch == '.'
            || ch == '(' || ch == ')' || ch == '[' || ch == ']'
-           || ch == '?' || ch == '\\';
+           || ch == '?' || ch == '\\' || ch == '&';
 }
 
 bool is_char(char ch)
@@ -27,7 +27,7 @@ RegexNode* Parser::parse_impl(const std::string& regexp)
     try {
         if (expr.empty())
             return new Epsilon;
-        return expression();
+        return union_or_intersection();
     }
     catch (std::out_of_range& e) {
         throw ParserError(e.what());
@@ -37,26 +37,34 @@ RegexNode* Parser::parse_impl(const std::string& regexp)
     }
 }
 
-RegexNode* Parser::expression()
+RegexNode* Parser::union_or_intersection()
 {
-    auto left = term();
+    auto left = concatenation();
 
-    while (match('|')) {
-        auto right = term();
-        left = new Union(left, right);
+    while (true) {
+        if (match('|')) {
+            auto right = concatenation();
+            left = new Union(left, right);
+            continue;
+        } else if (match('&')) {
+            auto right = concatenation();
+            left = new Intersection(left, right);
+            continue;
+        }
+        break;
     }
 
     return left;
 }
 
-RegexNode* Parser::term()
+RegexNode* Parser::concatenation()
 {
-    auto left = factor();
+    auto left = postfix();
 
     while (!at_end()) {
         char c = peek();
 
-        if (c == '|') {
+        if (c == '|' || c == '&') {
             break;
         } else if (c == ')') {
             if (paren_count == 0)
@@ -64,7 +72,7 @@ RegexNode* Parser::term()
             --paren_count;
             break;
         } else {
-            auto right = factor();
+            auto right = postfix();
             left = new Concat(left, right);
         }
     }
@@ -72,9 +80,9 @@ RegexNode* Parser::term()
     return left;
 }
 
-RegexNode* Parser::factor()
+RegexNode* Parser::postfix()
 {
-    auto left = primary();
+    auto left = factor();
 
     if (match('*'))
         left = new Closure(left);
@@ -86,7 +94,7 @@ RegexNode* Parser::factor()
     return left;
 }
 
-RegexNode* Parser::primary()
+RegexNode* Parser::factor()
 {
     if (is_char(peek())) {
         return new Symbol(advance());
@@ -98,25 +106,39 @@ RegexNode* Parser::primary()
         return new Symbol(set);
     } else if (match('(')) {
         ++paren_count;
-        auto expr = expression();
+        auto expr = union_or_intersection();
         consume(')', "unmatched parenthesis");
         return expr;
     } else if (match('[')) {
-        Bitset set;
-        if (match('^')) {
-            set = character_class();
-            set.flip();
-        } else {
-            set = character_class();
-        }
-        consume(']', "unmatched bracket");
-        return new Symbol(set);
+        return character_class();
     } else {
         error("unrecognized");
     }
 }
 
-Bitset Parser::character_class()
+RegexNode* Parser::character_class()
+{
+    Bitset set;
+    if (match('^')) {
+        set = parse_character_class();
+        set.flip();
+    } else if (match('-')) {
+        set = parse_character_class();
+        set.set('-', true);
+    } else {
+        set = parse_character_class();
+    }
+
+    if (peek() == '-') {
+        advance();
+        set.set('-', true);
+    }
+
+    consume(']', "unmatched bracket");
+    return new Symbol(set);
+}
+
+Bitset Parser::parse_character_class()
 {
     Bitset set = range();
 

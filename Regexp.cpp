@@ -281,12 +281,9 @@ std::string escaped_char(int c)
 
 std::string Symbol::to_string() const
 {
-    bool write_comma {false};
-
-    std::string sym;
-
+    int written = 0;
+    bool write_comma = false;
     std::ostringstream oss;
-    oss << "{";
     for (auto it = alphabet.begin(), end = alphabet.end(); it != end;) {
         auto c = static_cast<char>(*it++);
 
@@ -296,8 +293,8 @@ std::string Symbol::to_string() const
                 oss << ",";
                 write_comma = false;
             }
-            sym = escaped_char(c);
-            oss << sym;
+            oss << escaped_char(c);
+            written++;
 
         } else {
             continue;
@@ -305,7 +302,8 @@ std::string Symbol::to_string() const
 
         if (it != end) write_comma = true;
     }
-    oss << "}";
+    if (written > 1)
+        return "{" + oss.str() + "}";
     return oss.str();
 }
 

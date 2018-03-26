@@ -29,12 +29,14 @@ private:
     char previous();
     char consume(char ch, const std::string& msg);
 
-    RegexNode* expression();
-    RegexNode* term();
+    RegexNode* union_or_intersection();
+    RegexNode* complement();
+    RegexNode* concatenation();
+    RegexNode* postfix();
     RegexNode* factor();
-    RegexNode* primary();
+    RegexNode* character_class();
 
-    Bitset character_class();
+    Bitset parse_character_class();
     Bitset range();
 
     std::string expr {};

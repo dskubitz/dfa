@@ -2,7 +2,6 @@
 #include <Derivative.h>
 #include <DerivativeClass.h>
 #include <Parser.h>
-#include <Nullable.h>
 
 class DerivativeTests : public ::testing::Test {
 protected:
@@ -68,7 +67,7 @@ TEST_F(DerivativeTests, DerivativeClassTest)
     }
     std::unordered_set<Regexp> set2;
     for (auto& set : cl) {
-        int first_of = first(set);
+        int first_of = first_occurring(set);
         set2.insert(D.derive(re, first_of));
     }
     EXPECT_EQ(set1.size(), set2.size());

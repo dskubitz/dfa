@@ -3,6 +3,7 @@
 #include <DerivativeClass.h>
 
 #include <unordered_map>
+#include <iostream>
 
 DFA make_DFA(const std::vector<Regexp>& regex)
 {
@@ -23,9 +24,13 @@ DFA make_DFA(const std::vector<Regexp>& regex)
         DFAState from = unmarked.back();
         unmarked.pop_back();
         std::unordered_set<Bitset> dclass = make_derivative_class(from);
+        std::cout << dstates.at(from) << '\n';
+        for (auto& i : dclass) {
+            std::cout << i.to_string() << '\n';
+        }
 
         for (auto& set : dclass) {
-            auto c = static_cast<char>(first(set));
+            auto c = static_cast<char>(first_occurring(set));
             DFAState to = make_derivative(from, c);
 
             for (int i = 0; i < set.size(); ++i) {
@@ -40,6 +45,7 @@ DFA make_DFA(const std::vector<Regexp>& regex)
                 table[dstates.at(from)][i] = static_cast<int>(dstates.at(to));
             }
         }
+        std::cout << '\n';
     }
 
     return res;

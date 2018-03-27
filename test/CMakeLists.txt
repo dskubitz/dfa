@@ -18,6 +18,6 @@ download_project(PROJ                googletest
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
 # Trivial example using gtest and gmock
-add_executable(unittests Parser_tests.cpp Derivative_tests.cpp Regex_tests.cpp TransitionTable_tests.cpp)
+add_executable(unittests Parser_tests.cpp Derivative_tests.cpp Regex_tests.cpp TransitionTable_tests.cpp Bitset_tests.cpp)
 target_include_directories(unittests PRIVATE SYSTEM ${gtest_INCLUDE_DIR} ${gtest_SOURCE_DIR} ${lexer_SOURCE_DIR})
 target_link_libraries(unittests gtest gtest_main core)

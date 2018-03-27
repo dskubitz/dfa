@@ -11,14 +11,7 @@ extern const std::array<int, 100> alphabet;
 
 using Bitset = std::bitset<128>;
 
-inline int first(const Bitset& set)
-{
-    if (set.none()) return 0;
-    for (int i = 0; i < set.size(); ++i)
-        if (set.test(static_cast<unsigned>(i)))
-            return i;
-    return 0;
-}
+int first_occurring(const Bitset& set);
 
 //@formatter:off
 class RegexNode;
@@ -31,6 +24,8 @@ class Complement;
 class Epsilon;
 class Empty;
 //@formatter:on
+
+
 
 class RegexVisitor {
 public:
@@ -48,6 +43,16 @@ public:
 
 class RegexNode {
 public:
+    enum class Type : uint8_t {
+        Closure,
+        Concat,
+        Union,
+        Intersection,
+        Symbol,
+        Complement,
+        Epsilon,
+        Empty,
+    };
     virtual ~RegexNode() = default;
     virtual void accept(RegexVisitor* v) const =0;
     virtual RegexNode* clone() const = 0;
@@ -55,6 +60,15 @@ public:
     virtual bool comp(const RegexNode* node) const =0;
     virtual size_t hash_code() const =0;
     virtual std::string to_string() const =0;
+
+    Type type() const noexcept { return type_; }
+
+protected:
+    RegexNode(Type type)
+            : type_(type) { }
+
+private:
+    const Type type_;
 };
 
 class Closure : public RegexNode {
@@ -160,6 +174,7 @@ private:
 
 class Epsilon : public RegexNode {
 public:
+    Epsilon();
     void accept(RegexVisitor* v) const override;
     Epsilon* clone() const override;
     bool equiv(const RegexNode* node) const override;
@@ -170,6 +185,7 @@ public:
 
 class Empty : public RegexNode {
 public:
+    Empty();
     void accept(RegexVisitor* v) const override;
     RegexNode* clone() const override;
     bool comp(const RegexNode* node) const override;
@@ -187,7 +203,9 @@ RegexNode* make_complement(RegexNode* expr);
 class Regexp {
 public:
     Regexp() noexcept = default;
-    explicit Regexp(RegexNode* ptr) :ptr_(ptr) { }
+
+    explicit Regexp(RegexNode* ptr)
+            : ptr_(ptr) { }
 
     void swap(Regexp& other) noexcept;
 
@@ -213,7 +231,7 @@ template<>
 struct hash<Regexp> {
     size_t operator()(const Regexp& regex) const noexcept
     {
-        return regex.get()->hash_code();
+        return regex->hash_code();
     }
 };
 }
@@ -222,6 +240,5 @@ inline void swap(Regexp& lhs, Regexp& rhs) noexcept
 {
     lhs.swap(rhs);
 }
-
 
 #endif //RE_H

@@ -20,7 +20,7 @@ const std::array<int, 100>
                   120, 121, 122, 123, 124, 125, 126,};
 
 Closure::Closure(RegexNode* node)
-        :expr_(node)
+        : RegexNode(Type::Closure), expr_(node)
 {
 }
 
@@ -70,7 +70,7 @@ bool Closure::comp(const RegexNode* node) const
 }
 
 Concat::Concat(RegexNode* left, RegexNode* right)
-        :left_(left), right_(right)
+        : RegexNode(Type::Concat), left_(left), right_(right)
 {
 }
 
@@ -125,7 +125,7 @@ bool Concat::comp(const RegexNode* node) const
 }
 
 Union::Union(RegexNode* left, RegexNode* right)
-        :left_(left), right_(right)
+        : RegexNode(Type::Union), left_(left), right_(right)
 {
 }
 
@@ -201,7 +201,7 @@ Intersection::~Intersection()
 }
 
 Intersection::Intersection(RegexNode* left, RegexNode* right)
-        :left_(left), right_(right)
+        : RegexNode(Type::Intersection), left_(left), right_(right)
 {
 }
 
@@ -232,12 +232,13 @@ bool Intersection::comp(const RegexNode* node) const
 }
 
 Symbol::Symbol(char value)
+        : RegexNode(Type::Symbol)
 {
     set_.flip(value);
 }
 
 Symbol::Symbol(Bitset values)
-        :set_(values)
+        : RegexNode(Type::Symbol), set_(values)
 {
 }
 
@@ -343,7 +344,7 @@ bool Complement::equiv(const RegexNode* node) const
 Complement::~Complement() { delete expr_; }
 
 Complement::Complement(RegexNode* expr)
-        :expr_(expr) { }
+        : RegexNode(Type::Complement), expr_(expr) { }
 
 const RegexNode* Complement::expr() const { return expr_; }
 
@@ -398,6 +399,11 @@ bool Epsilon::comp(const RegexNode* node) const
     return typeid(Epsilon).before(typeid(*node));
 }
 
+Epsilon::Epsilon()
+        : RegexNode(Type::Epsilon)
+{
+}
+
 void Empty::accept(RegexVisitor* v) const
 {
     v->visit(this);
@@ -426,6 +432,11 @@ size_t Empty::hash_code() const
 bool Empty::comp(const RegexNode* node) const
 {
     return typeid(Empty).before(typeid(*node));
+}
+
+Empty::Empty()
+    :RegexNode(Type::Empty)
+{
 }
 
 RegexNode* make_union(RegexNode* left, RegexNode* right)
@@ -534,6 +545,14 @@ bool operator<=(const Regexp& lhs, const Regexp& rhs)
 bool operator>=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(lhs < rhs);
+}
+
+int first_occurring(const Bitset& set)
+{
+    for (unsigned i = 0; i < set.size(); ++i)
+        if (set.test(i))
+            return i;
+    return 0;
 }
 
 RegexNode* Regexp::get() noexcept { return ptr_.get(); }

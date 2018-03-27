@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.9)
 project(lexer)
-add_definitions(-std=c++1z -Wall -Wno-missing-braces)
+add_definitions(-std=c++1z -Wall -Wno-missing-braces -O3)
 
 # see https://cmake.org/cmake/help/latest/module/FindBoost.html
 find_package(Boost REQUIRED)
 add_subdirectory(cmake)
 add_subdirectory(test)
 
-set(SOURCES Regexp.cpp Parser.cpp Derivative.cpp Derivative.h Nullable.cpp Nullable.h TransitionFunction.cpp DerivativeClass.cpp DerivativeClass.h)
+set(SOURCES Regexp.cpp Parser.cpp Derivative.cpp Derivative.h Nullable.cpp Nullable.h TransitionFunction.cpp DerivativeClass.cpp DerivativeClass.h Bitset.cpp Bitset.h)
 add_library(core STATIC ${SOURCES})
 
 target_include_directories(core PRIVATE ${Boost_INCLUDE_DIR})

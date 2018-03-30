@@ -7,6 +7,7 @@
 #include <string>
 
 #include <Regexp.h>
+#include <unordered_map>
 
 class TransitionTable : private std::vector<std::array<int, 128>> {
     using base = std::vector<std::array<int, 128>>;
@@ -21,10 +22,9 @@ public:
     void add_state() { this->emplace_back(); }
 };
 
-
 using DFAState = std::vector<Regexp>;
 using StateMap = std::map<DFAState, int>;
-using AcceptMap = std::map<int, int>;
+using AcceptMap = std::unordered_map<int, int>;
 
 struct DFA {
     TransitionTable table;

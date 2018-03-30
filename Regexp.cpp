@@ -5,19 +5,23 @@
 #include <iostream>
 
 const std::array<int, 100>
-        alphabet {9, 10, 11, 12, 13, 32, 33, 34,
-                  35, 36, 37, 38, 39, 40, 41, 42,
-                  43, 44, 45, 46, 47, 48, 49, 50,
-                  51, 52, 53, 54, 55, 56, 57, 58,
-                  59, 60, 61, 62, 63, 64, 65, 66,
-                  67, 68, 69, 70, 71, 72, 73, 74,
-                  75, 76, 77, 78, 79, 80, 81, 82,
-                  83, 84, 85, 86, 87, 88, 89, 90,
-                  91, 92, 93, 94, 95, 96, 97, 98,
-                  99, 100, 101, 102, 103, 104, 105,
-                  106, 107, 108, 109, 110, 111, 112,
-                  113, 114, 115, 116, 117, 118, 119,
-                  120, 121, 122, 123, 124, 125, 126,};
+        alphabet{9, 10, 11, 12, 13, 32, 33, 34,
+                 35, 36, 37, 38, 39, 40, 41, 42,
+                 43, 44, 45, 46, 47, 48, 49, 50,
+                 51, 52, 53, 54, 55, 56, 57, 58,
+                 59, 60, 61, 62, 63, 64, 65, 66,
+                 67, 68, 69, 70, 71, 72, 73, 74,
+                 75, 76, 77, 78, 79, 80, 81, 82,
+                 83, 84, 85, 86, 87, 88, 89, 90,
+                 91, 92, 93, 94, 95, 96, 97, 98,
+                 99, 100, 101, 102, 103, 104, 105,
+                 106, 107, 108, 109, 110, 111, 112,
+                 113, 114, 115, 116, 117, 118, 119,
+                 120, 121, 122, 123, 124, 125, 126,
+};
+
+Empty Empty::instance;
+Epsilon Epsilon::instance;
 
 Closure::Closure(RegexNode* node)
         : RegexNode(Type::Closure), expr_(node)
@@ -43,8 +47,8 @@ Closure* Closure::clone() const
 
 bool Closure::equiv(const RegexNode* node) const
 {
-    if (auto p = dynamic_cast<const Closure*>(node))
-        return expr_->equiv(p->expr_);
+    if (node->type() == RegexNode::Type::Closure)
+        return expr_->equiv(static_cast<const Closure*>(node)->expr_);
 
     return false;
 }
@@ -54,19 +58,12 @@ std::string Closure::to_string() const
     return "(" + expr_->to_string() + "*)";
 }
 
-size_t Closure::hash_code() const
+bool Closure::compare(const RegexNode* node) const
 {
-    std::size_t seed = 0;
-    boost::hash_combine(seed, typeid(Closure).hash_code());
-    boost::hash_combine(seed, expr_->hash_code());
-    return seed;
-}
+    if (node->type() == RegexNode::Type::Closure)
+        return expr_->compare(static_cast<const Closure*>(node)->expr_);
 
-bool Closure::comp(const RegexNode* node) const
-{
-    if (auto p = dynamic_cast<const Closure*>(node))
-        return expr_->comp(p->expr_);
-    return typeid(Closure).before(typeid(*node));
+    return type() < node->type();
 }
 
 Concat::Concat(RegexNode* left, RegexNode* right)
@@ -96,8 +93,10 @@ Concat* Concat::clone() const
 
 bool Concat::equiv(const RegexNode* node) const
 {
-    if (auto p = dynamic_cast<const Concat*>(node))
+    if (node->type() == RegexNode::Type::Concat) {
+        auto p = static_cast<const Concat*>(node);
         return left_->equiv(p->left_) && right_->equiv(p->right_);
+    }
 
     return false;
 }
@@ -107,21 +106,12 @@ std::string Concat::to_string() const
     return "(" + left_->to_string() + "." + right_->to_string() + ")";
 }
 
-size_t Concat::hash_code() const
+bool Concat::compare(const RegexNode* node) const
 {
-    std::size_t seed = 0;
-    boost::hash_combine(seed, typeid(Concat).hash_code());
-    boost::hash_combine(seed, left_->hash_code());
-    boost::hash_combine(seed, right_->hash_code());
-    return seed;
-}
+    if (node->type() == RegexNode::Type::Concat)
+        return left_->compare(static_cast<const Concat*>(node)->left_);
 
-bool Concat::comp(const RegexNode* node) const
-{
-    if (auto p = dynamic_cast<const Concat*>(node))
-        return left_->comp(p->left_);
-
-    return typeid(Concat).before(typeid(*node));
+    return type() < node->type();
 }
 
 Union::Union(RegexNode* left, RegexNode* right)
@@ -151,8 +141,10 @@ Union* Union::clone() const
 
 bool Union::equiv(const RegexNode* node) const
 {
-    if (auto p = dynamic_cast<const Union*>(node))
-        return left_->equiv(p->left_) && right_->equiv(p->right_);
+    if (node->type() == RegexNode::Type::Union) {
+        auto p = static_cast<const Union*>(node);
+        return left_->equiv(p->left_) /*&& right_->equiv(p->right_)*/;
+    }
 
     return false;
 }
@@ -162,21 +154,12 @@ std::string Union::to_string() const
     return "(" + left_->to_string() + "+" + right_->to_string() + ")";
 }
 
-size_t Union::hash_code() const
+bool Union::compare(const RegexNode* node) const
 {
-    std::size_t seed = 0;
-    boost::hash_combine(seed, typeid(Union).hash_code());
-    boost::hash_combine(seed, left_->hash_code());
-    boost::hash_combine(seed, right_->hash_code());
-    return seed;
-}
+    if (node->type() == RegexNode::Type::Union)
+        return left_->compare(static_cast<const Union*>(node)->left_);
 
-bool Union::comp(const RegexNode* node) const
-{
-    if (auto p = dynamic_cast<const Union*>(node))
-        return left_->comp(p->left_);
-
-    return typeid(Union).before(typeid(*node));
+    return type() < node->type();
 }
 
 void Intersection::accept(RegexVisitor* v) const { v->visit(this); }
@@ -188,8 +171,10 @@ Intersection* Intersection::clone() const
 
 bool Intersection::equiv(const RegexNode* node) const
 {
-    if (auto p = dynamic_cast<const Intersection*>(node))
+    if (node->type() == RegexNode::Type::Intersection) {
+        auto p = static_cast<const Intersection*>(node);
         return left_->equiv(p->left_) && right_->equiv(p->right_);
+    }
 
     return false;
 }
@@ -214,21 +199,14 @@ std::string Intersection::to_string() const
     return "(" + left_->to_string() + "&" + right_->to_string() + ")";
 }
 
-size_t Intersection::hash_code() const
+bool Intersection::compare(const RegexNode* node) const
 {
-    std::size_t seed = 0;
-    boost::hash_combine(seed, typeid(Intersection).hash_code());
-    boost::hash_combine(seed, left_->hash_code());
-    boost::hash_combine(seed, right_->hash_code());
-    return seed;
-}
+    if (node->type() == RegexNode::Type::Intersection) {
+        auto p = static_cast<const Intersection*>(node);
+        return left_->compare(p->left_) /*&& right_->comp(p->right_)*/;
+    }
 
-bool Intersection::comp(const RegexNode* node) const
-{
-    if (auto p = dynamic_cast<const Intersection*>(node))
-        return left_->comp(p->left_) && right_->comp(p->right_);
-
-    return typeid(Intersection).before(typeid(*node));
+    return type() < node->type();
 }
 
 Symbol::Symbol(char value)
@@ -254,8 +232,8 @@ Symbol* Symbol::clone() const
 
 bool Symbol::equiv(const RegexNode* node) const
 {
-    if (auto p = dynamic_cast<const Symbol*>(node))
-        return set_ == p->set_;
+    if (node->type() == RegexNode::Type::Symbol)
+        return set_ == static_cast<const Symbol*>(node)->set_;
 
     return false;
 }
@@ -308,17 +286,13 @@ std::string Symbol::to_string() const
     return oss.str();
 }
 
-size_t Symbol::hash_code() const
+bool Symbol::compare(const RegexNode* node) const
 {
-    return std::hash<Bitset>{}(set_);
-}
+    if (node->type() == RegexNode::Type::Symbol)
+        return set_.to_string()
+               < static_cast<const Symbol*>(node)->set_.to_string();
 
-bool Symbol::comp(const RegexNode* node) const
-{
-    if (auto p = dynamic_cast<const Symbol*>(node))
-        return set_.to_string() < p->set_.to_string();
-
-    return typeid(Symbol).before(typeid(*node));
+    return type() < node->type();
 }
 
 const Bitset& Symbol::values() const
@@ -335,8 +309,8 @@ Complement* Complement::clone() const
 
 bool Complement::equiv(const RegexNode* node) const
 {
-    if (auto p = dynamic_cast<const Complement*>(node))
-        return expr_->equiv(p->expr_);
+    if (node->type() == RegexNode::Type::Complement)
+        return expr_->equiv(static_cast<const Complement*>(node)->expr_);
 
     return false;
 }
@@ -353,20 +327,12 @@ std::string Complement::to_string() const
     return "~(" + expr_->to_string() + ")";
 }
 
-size_t Complement::hash_code() const
+bool Complement::compare(const RegexNode* node) const
 {
-    std::size_t seed = 0;
-    boost::hash_combine(seed, typeid(Complement).hash_code());
-    boost::hash_combine(seed, expr_->hash_code());
-    return seed;
-}
+    if (node->type() == RegexNode::Type::Complement)
+        return expr_->compare(static_cast<const Complement*>(node)->expr_);
 
-bool Complement::comp(const RegexNode* node) const
-{
-    if (auto p = dynamic_cast<const Complement*>(node))
-        return expr_->comp(p->expr_);
-
-    return typeid(Complement).before(typeid(*node));
+    return type() < node->type();
 }
 
 void Epsilon::accept(RegexVisitor* v) const
@@ -376,12 +342,12 @@ void Epsilon::accept(RegexVisitor* v) const
 
 Epsilon* Epsilon::clone() const
 {
-    return new Epsilon;
+    return &instance;
 }
 
 bool Epsilon::equiv(const RegexNode* node) const
 {
-    return bool(dynamic_cast<const Epsilon*>(node));
+    return node->type() == RegexNode::Type::Epsilon;
 }
 
 std::string Epsilon::to_string() const
@@ -389,14 +355,9 @@ std::string Epsilon::to_string() const
     return "\u03b5";
 }
 
-size_t Epsilon::hash_code() const
+bool Epsilon::compare(const RegexNode* node) const
 {
-    return typeid(Epsilon).hash_code();
-}
-
-bool Epsilon::comp(const RegexNode* node) const
-{
-    return typeid(Epsilon).before(typeid(*node));
+    return type() < node->type();
 }
 
 Epsilon::Epsilon()
@@ -411,40 +372,35 @@ void Empty::accept(RegexVisitor* v) const
 
 RegexNode* Empty::clone() const
 {
-    return new Empty;
+    return &instance;
 }
 
-//@formatter:off
 bool Empty::equiv(const RegexNode* node) const
 {
-    return bool(dynamic_cast<const Empty*>(node));
+    return node->type() == RegexNode::Type::Empty;
 }
+
 std::string Empty::to_string() const
 {
     return "\u2205";
 }
 
-size_t Empty::hash_code() const
+bool Empty::compare(const RegexNode* node) const
 {
-    return typeid(Empty).hash_code();
-}
-
-bool Empty::comp(const RegexNode* node) const
-{
-    return typeid(Empty).before(typeid(*node));
+    return type() < node->type();
 }
 
 Empty::Empty()
-    :RegexNode(Type::Empty)
+        : RegexNode(Type::Empty)
 {
 }
 
 RegexNode* make_union(RegexNode* left, RegexNode* right)
 {
-    if (/*dynamic_cast<Empty*>(left)*/left->type()==RegexNode::Type::Empty) {
+    if (left->type() == RegexNode::Type::Empty) {
         delete left;
         return right;
-    } else if (/*dynamic_cast<Empty*>(right)*/right->type()==RegexNode::Type::Empty) {
+    } else if (right->type() == RegexNode::Type::Empty) {
         delete right;
         return left;
     } else if (left->equiv(right)) {
@@ -459,15 +415,14 @@ RegexNode* make_cat(RegexNode* left, RegexNode* right)
 {
     RegexNode::Type ltype = left->type();
     RegexNode::Type rtype = right->type();
-    if (/*dynamic_cast<Empty*>(left)*/ltype==RegexNode::Type::Empty
-                                      || /*dynamic_cast<Empty*>(right)*/rtype==RegexNode::Type::Empty) {
+    if (ltype == RegexNode::Type::Empty || rtype == RegexNode::Type::Empty) {
         delete left;
         delete right;
         return new Empty;
-    } else if (/*dynamic_cast<Epsilon*>(left)*/ltype==RegexNode::Type::Epsilon) {
+    } else if (ltype == RegexNode::Type::Epsilon) {
         delete left;
         return right;
-    } else if (/*dynamic_cast<Epsilon*>(right)*/rtype==RegexNode::Type::Epsilon) {
+    } else if (rtype == RegexNode::Type::Epsilon) {
         delete right;
         return left;
     } else {
@@ -478,14 +433,13 @@ RegexNode* make_cat(RegexNode* left, RegexNode* right)
 RegexNode* make_star(RegexNode* expr)
 {
     RegexNode::Type type = expr->type();
-    if (/*dynamic_cast<Empty*>(expr)*/type==RegexNode::Type::Empty) {
+    if (type == RegexNode::Type::Empty) {
         delete expr;
         return new Epsilon;
-    } else if (/*dynamic_cast<Epsilon*>(expr)*/type==RegexNode::Type::Epsilon) {
+    } else if (type == RegexNode::Type::Epsilon) {
         return expr;
-    } else if (/*auto p = dynamic_cast<Closure*>(expr)*/type==RegexNode::Type::Closure) {
+    } else if (type == RegexNode::Type::Closure) {
         RegexNode* q = static_cast<Closure*>(expr)->expr()->clone();
-//        delete p;
         delete expr;
         return make_star(q);
     } else {
@@ -495,10 +449,10 @@ RegexNode* make_star(RegexNode* expr)
 
 RegexNode* make_intersection(RegexNode* left, RegexNode* right)
 {
-    if (/*dynamic_cast<Empty*>(left)*/left->type()==RegexNode::Type::Empty) {
+    if (left->type() == RegexNode::Type::Empty) {
         delete right;
         return left;
-    } else if (/*dynamic_cast<Empty*>(right)*/right->type()==RegexNode::Type::Empty) {
+    } else if (right->type() == RegexNode::Type::Empty) {
         delete left;
         return right;
     } else if (left->equiv(right)) {
@@ -511,7 +465,7 @@ RegexNode* make_intersection(RegexNode* left, RegexNode* right)
 
 RegexNode* make_complement(RegexNode* expr)
 {
-    if (/*auto p = dynamic_cast<Complement*>(expr)*/expr->type()==RegexNode::Type::Complement) {
+    if (expr->type() == RegexNode::Type::Complement) {
         RegexNode* q = static_cast<Complement*>(expr)->expr()->clone();
         delete expr;
         return q;
@@ -534,7 +488,7 @@ bool operator!=(const Regexp& lhs, const Regexp& rhs)
 
 bool operator<(const Regexp& lhs, const Regexp& rhs)
 {
-    return lhs.ptr_->comp(rhs.get());
+    return lhs.ptr_->compare(rhs.get());
 }
 
 bool operator>(const Regexp& lhs, const Regexp& rhs)
@@ -552,12 +506,67 @@ bool operator>=(const Regexp& lhs, const Regexp& rhs)
     return !(lhs < rhs);
 }
 
+inline int test(unsigned first, unsigned last, const Bitset& set)
+{
+    for (; first < last; ++first)
+        if (set.test(first))
+            return first;
+}
+
+static Bitset lowerq{
+        "00000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111"
+};
+static Bitset upperq{
+        "11111111111111111111111111111111111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000000"
+};
+static Bitset firstw{
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111"
+};
+static Bitset firsth{
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111"
+};
+static Bitset thirdh{
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000111111111111111100000000000000000000000000000000"
+};
+static Bitset thirdw{
+        "00000000000000000000000000000000111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000000"
+};
+static Bitset fifthh{
+        "00000000000000000000000000000000000000000000000011111111111111110000000000000000000000000000000000000000000000000000000000000000"
+};
+static Bitset svnthh{
+        "00000000000000001111111111111111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+};
+
 int first_occurring(const Bitset& set)
 {
-    // TODO: Optimize
-    for (unsigned i = 0; i < set.size(); ++i)
-        if (set.test(i))
-            return i;
+    if ((set & lowerq).any()) {
+        if ((set & firstw).any()) {
+            if ((set & firsth).any())
+                return test(0, 16, set);
+            else
+                return test(16, 32, set);
+
+        } else {
+            if ((set & thirdh).any())
+                return test(32, 48, set);
+            else
+                return test(48, 64, set);
+        }
+    } else if ((set & upperq).any()) {
+        if ((set & thirdw).any()) {
+            if ((set & fifthh).any())
+                return test(64, 80, set);
+            else
+                return test(80, 96, set);
+
+        } else {
+            if ((set & svnthh).any())
+                return test(96, 112, set);
+            else
+                return test(112, 128, set);
+        }
+    }
     return 0;
 }
 

@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
-#include <Derivative.h>
-#include <DerivativeClass.h>
+#include <DerivativeEvaluator.h>
+#include <DerivativeClassEvaluator.h>
 #include <Parser.h>
-
 class DerivativeTests : public ::testing::Test {
 protected:
-    Derivative derivative;
+    DerivativeEvaluator derivative;
     Parser parser;
 };
 
@@ -21,7 +20,7 @@ TEST_F(DerivativeTests, BasicFunctionality)
 
 TEST_F(DerivativeTests, MatchSimple)
 {
-    Nullable nullable;
+    NullableEvaluator nullable;
     auto re = parser.parse("abc+");
     auto r = re;
     EXPECT_FALSE(nullable.evaluate(r.get()));
@@ -40,42 +39,22 @@ TEST_F(DerivativeTests, MatchSimple)
 TEST_F(DerivativeTests, Nullable)
 {
     auto re = parser.parse("a*");
-    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
+    EXPECT_TRUE(NullableEvaluator{}.evaluate(re.get()));
     re = parser.parse("(a*|b)");
-    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
+    EXPECT_TRUE(NullableEvaluator{}.evaluate(re.get()));
     re = parser.parse("a|b");
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
+    EXPECT_FALSE(NullableEvaluator{}.evaluate(re.get()));
     re = parser.parse("(a*b)");
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
+    EXPECT_FALSE(NullableEvaluator{}.evaluate(re.get()));
     re = parser.parse("ab");
-    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
+    EXPECT_FALSE(NullableEvaluator{}.evaluate(re.get()));
     re = parser.parse("");
-    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
-}
-
-TEST_F(DerivativeTests, DerivativeClassTest)
-{
-    auto re = Parser{}.parse("def|[abc][abc_01]*");
-    Derivative D;
-    DerivativeClass derivativeClass;
-
-    auto cl = derivativeClass.evaluate(re);
-
-    std::unordered_set<Regexp> set1;
-    for (int i = 0; i < 128; ++i) {
-        set1.insert(D.derive(re, i));
-    }
-    std::unordered_set<Regexp> set2;
-    for (auto& set : cl) {
-        int first_of = first_occurring(set);
-        set2.insert(D.derive(re, first_of));
-    }
-    EXPECT_EQ(set1.size(), set2.size());
+    EXPECT_TRUE(NullableEvaluator{}.evaluate(re.get()));
 }
 
 TEST_F(DerivativeTests, RVectorTests)
 {
-    DerivativeClass derivativeClass;
+    DerivativeClassEvaluator derivativeClass;
     auto re = Parser{}.parse("[A-Za-z_][A-Za-z_0-9]*");
     auto re2 = Parser{}.parse("[0-9]+(\\.[0-9]+)?");
     auto set1 = derivativeClass.evaluate(re);

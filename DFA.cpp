@@ -1,12 +1,12 @@
-#include <TransitionTable.h>
-#include <Derivative.h>
-#include <DerivativeClass.h>
+#include <DFA.h>
+#include <DerivativeEvaluator.h>
+#include <DerivativeClassEvaluator.h>
 #include <iostream>
 
 namespace {
 std::tuple<bool, bool, int> accepting(const DFAState& state)
 {
-    Nullable N;
+    NullableEvaluator N;
 
     int index = 0;
     int nempty = 0;
@@ -33,8 +33,8 @@ DFA make_DFA(const std::vector<Regexp>& regex)
 
     dstates.insert({regex, 0});
 
-    Derivative deriv;
-    DerivativeClass derivativeClass;
+    DerivativeEvaluator deriv;
+    DerivativeClassEvaluator derivativeClass;
 
     std::vector<DFAState> unmarked{regex};
     size_t num = 1;
@@ -71,7 +71,6 @@ DFA make_DFA(const std::vector<Regexp>& regex)
             }
         }
     }
-
 
     return res;
 }

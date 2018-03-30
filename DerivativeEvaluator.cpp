@@ -1,23 +1,23 @@
-#include <Derivative.h>
-#include <Nullable.h>
+#include <DerivativeEvaluator.h>
+#include <NullableEvaluator.h>
 #include <algorithm>
 
-void Derivative::visit(const RegexNode* node)
+void DerivativeEvaluator::visit(const RegexNode* node)
 {
     node->accept(this);
 }
 
-void Derivative::visit(const Closure* node)
+void DerivativeEvaluator::visit(const Closure* node)
 {
     stack.push_back(
             make_cat(
                     evaluate(
-                            node->expr()->clone()),
+                            node->expr()),
                     make_star(
                             node->expr()->clone())));
 }
 
-void Derivative::visit(const Concat* node)
+void DerivativeEvaluator::visit(const Concat* node)
 {
     stack.push_back(
             make_union(
@@ -26,33 +26,33 @@ void Derivative::visit(const Concat* node)
                             node->right()->clone()),
                     make_cat(
                             helper(node->left()),
-                            evaluate(node->right()->clone()))));
+                            evaluate(node->right()))));
 }
 
-void Derivative::visit(const Union* node)
+void DerivativeEvaluator::visit(const Union* node)
 {
     stack.push_back(
             make_union(
-                    evaluate(node->left()->clone()),
-                    evaluate(node->right()->clone())));
+                    evaluate(node->left()),
+                    evaluate(node->right())));
 }
 
-void Derivative::visit(const Intersection* node)
+void DerivativeEvaluator::visit(const Intersection* node)
 {
     stack.push_back(
             make_intersection(
-                    evaluate(node->left()->clone()),
-                    evaluate(node->right()->clone())));
+                    evaluate(node->left()),
+                    evaluate(node->right())));
 }
 
-void Derivative::visit(const Complement* node)
+void DerivativeEvaluator::visit(const Complement* node)
 {
     stack.push_back(
             make_complement(
                     evaluate(node->expr()->clone())));
 }
 
-void Derivative::visit(const Symbol* node)
+void DerivativeEvaluator::visit(const Symbol* node)
 {
     if (node->values().test(dA))
         stack.push_back(new Epsilon);
@@ -60,22 +60,22 @@ void Derivative::visit(const Symbol* node)
         stack.push_back(new Empty);
 }
 
-void Derivative::visit(const Epsilon* node)
+void DerivativeEvaluator::visit(const Epsilon* node)
 {
     stack.push_back(new Empty);
 }
 
-void Derivative::visit(const Empty* node)
+void DerivativeEvaluator::visit(const Empty* node)
 {
     stack.push_back(new Empty);
 }
 
-RegexNode* Derivative::derive_impl(const RegexNode* tree)
+RegexNode* DerivativeEvaluator::derive_impl(const RegexNode* tree)
 {
     return evaluate(tree);
 }
 
-RegexNode* Derivative::evaluate(const RegexNode* node)
+RegexNode* DerivativeEvaluator::evaluate(const RegexNode* node)
 {
     visit(node);
     RegexNode* res = stack.back();
@@ -83,7 +83,7 @@ RegexNode* Derivative::evaluate(const RegexNode* node)
     return res;
 }
 
-Regexp Derivative::derive(const Regexp& regex, char da)
+Regexp DerivativeEvaluator::derive(const Regexp& regex, char da)
 {
     stack.clear();
     dA = da;
@@ -92,7 +92,7 @@ Regexp Derivative::derive(const Regexp& regex, char da)
 
 std::vector<Regexp> make_derivative(const std::vector<Regexp>& rvector, char da)
 {
-    Derivative D;
+    DerivativeEvaluator D;
     std::vector<Regexp> res;
     for (auto& re : rvector) {
         res.push_back(D.derive(re, da));

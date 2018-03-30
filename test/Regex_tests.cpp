@@ -7,7 +7,6 @@
 class RegexTests : public ::testing::Test {
 protected:
     Parser parser;
-
 };
 
 TEST_F(RegexTests, Cat)
@@ -96,7 +95,7 @@ TEST_F(RegexTests, WrapperClass)
 
 TEST_F(RegexTests, Hash)
 {
-    std::unordered_set<Regexp> regexes;
+    std::set<Regexp> regexes;
     auto && [it, inserted] = regexes.insert(parser.parse("(a|b)*abb"));
     EXPECT_TRUE(inserted);
     std::tie(it, inserted) = regexes.insert(parser.parse("(a|b)*abb"));
@@ -123,4 +122,23 @@ TEST_F(RegexTests, StrictWeakOrder)
     EXPECT_TRUE((re2 < re3) == !(re3 < re2));
     // if comp(a,b) and comp(b,c) then comp(a,c)
     EXPECT_TRUE(((re0 < re1) && (re2 < re3)) == (re0 < re3));
+}
+
+TEST_F(RegexTests, SingletonEmpty)
+{
+    auto empty1 = new Empty;
+    auto empty2 = new Empty;
+    EXPECT_EQ(empty1, empty2);
+}
+
+TEST_F(RegexTests, Swap)
+{
+    Regexp re1 = parser.parse("[aeiou]");
+    Regexp re2 = parser.parse("[A-Z_a-z_0-9]");
+    Regexp re3 = parser.parse("[aeiou]");
+    Regexp re4 = parser.parse("[A-Z_a-z_0-9]");
+    using std::swap;
+    swap(re1, re2);
+    EXPECT_EQ(re2, re3);
+    EXPECT_EQ(re1, re4);
 }

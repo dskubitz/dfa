@@ -4,9 +4,9 @@
 #include <vector>
 #include <unordered_set>
 #include "Regexp.h"
-#include "Nullable.h"
+#include "NullableEvaluator.h"
 
-class DerivativeClass : RegexVisitor {
+class DerivativeClassEvaluator : RegexVisitor {
 public:
     std::unordered_set<Bitset> evaluate(const Regexp& regex);
 private:
@@ -20,7 +20,7 @@ private:
     void visit(const Epsilon* epsilon) override;
     void visit(const Empty* empty) override;
     std::unordered_set<Bitset> evaluate(const RegexNode* node);
-    Nullable nullable;
+    NullableEvaluator nullable;
     std::vector<std::unordered_set<Bitset>> stack;
 };
 

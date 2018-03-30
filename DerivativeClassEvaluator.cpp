@@ -1,6 +1,6 @@
 #include <numeric>
 #include <algorithm>
-#include "DerivativeClass.h"
+#include "DerivativeClassEvaluator.h"
 
 std::unordered_set<Bitset>
 cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r)
@@ -17,17 +17,17 @@ cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r)
     return res;
 }
 
-void DerivativeClass::visit(const RegexNode* node)
+void DerivativeClassEvaluator::visit(const RegexNode* node)
 {
     node->accept(this);
 }
 
-void DerivativeClass::visit(const Closure* closure)
+void DerivativeClassEvaluator::visit(const Closure* closure)
 {
     stack.push_back(evaluate(closure->expr()));
 }
 
-void DerivativeClass::visit(const Concat* concat)
+void DerivativeClassEvaluator::visit(const Concat* concat)
 {
     if (nullable.evaluate(concat->left())) {
         stack.push_back(
@@ -39,7 +39,7 @@ void DerivativeClass::visit(const Concat* concat)
     }
 }
 
-void DerivativeClass::visit(const Union* anUnion)
+void DerivativeClassEvaluator::visit(const Union* anUnion)
 {
     stack.push_back(
             cross(
@@ -47,7 +47,7 @@ void DerivativeClass::visit(const Union* anUnion)
                     evaluate(anUnion->right())));
 }
 
-void DerivativeClass::visit(const Intersection* intersection)
+void DerivativeClassEvaluator::visit(const Intersection* intersection)
 {
     stack.push_back(
             cross(
@@ -55,12 +55,12 @@ void DerivativeClass::visit(const Intersection* intersection)
                     evaluate(intersection->right())));
 }
 
-void DerivativeClass::visit(const Complement* complement)
+void DerivativeClassEvaluator::visit(const Complement* complement)
 {
     stack.push_back(evaluate(complement->expr()));
 }
 
-void DerivativeClass::visit(const Symbol* symbol)
+void DerivativeClassEvaluator::visit(const Symbol* symbol)
 {
     Bitset set;
     set.flip();
@@ -68,7 +68,7 @@ void DerivativeClass::visit(const Symbol* symbol)
     stack.emplace_back(std::unordered_set<Bitset>{S, set & ~S});
 }
 
-void DerivativeClass::visit(const Epsilon* epsilon)
+void DerivativeClassEvaluator::visit(const Epsilon* epsilon)
 {
     (void) epsilon;
     Bitset set;
@@ -76,7 +76,7 @@ void DerivativeClass::visit(const Epsilon* epsilon)
     stack.emplace_back(std::unordered_set<Bitset>{set});
 }
 
-void DerivativeClass::visit(const Empty* empty)
+void DerivativeClassEvaluator::visit(const Empty* empty)
 {
     (void) empty;
     Bitset set;
@@ -85,7 +85,8 @@ void DerivativeClass::visit(const Empty* empty)
     stack.emplace_back(std::unordered_set<Bitset>{S, set & ~S});
 }
 
-std::unordered_set<Bitset> DerivativeClass::evaluate(const RegexNode* node)
+std::unordered_set<Bitset>
+DerivativeClassEvaluator::evaluate(const RegexNode* node)
 {
     stack.clear();
     visit(node);
@@ -94,7 +95,8 @@ std::unordered_set<Bitset> DerivativeClass::evaluate(const RegexNode* node)
     return res;
 }
 
-std::unordered_set<Bitset> DerivativeClass::evaluate(const Regexp& regex)
+std::unordered_set<Bitset>
+DerivativeClassEvaluator::evaluate(const Regexp& regex)
 {
     return evaluate(regex.get());
 }
@@ -102,7 +104,7 @@ std::unordered_set<Bitset> DerivativeClass::evaluate(const Regexp& regex)
 std::unordered_set<Bitset>
 make_derivative_class(const std::vector<Regexp>& rvector)
 {
-    DerivativeClass derivativeClass;
+    DerivativeClassEvaluator derivativeClass;
     std::unordered_set<Bitset> res;
     for (auto& i : rvector) {
         res = cross(res, derivativeClass.evaluate(i));

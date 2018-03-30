@@ -6,7 +6,6 @@ protected:
     Parser parser;
     std::ostringstream out;
 };
-
 TEST_F(ParserTests, SingleCharactersBad)
 {
     EXPECT_THROW(parser.parse("*"), ParserError);

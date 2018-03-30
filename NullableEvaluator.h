@@ -4,7 +4,7 @@
 #include <vector>
 #include <Regexp.h>
 
-class Nullable : public RegexVisitor {
+class NullableEvaluator : public RegexVisitor {
 public:
     bool evaluate(const RegexNode* regex);
     bool evaluate(const Regexp& regex);

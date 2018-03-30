@@ -1,51 +1,51 @@
-#include "Nullable.h"
+#include "NullableEvaluator.h"
 
-void Nullable::visit(const RegexNode* node)
+void NullableEvaluator::visit(const RegexNode* node)
 {
     node->accept(this);
 }
 
-void Nullable::visit(const Closure* node)
+void NullableEvaluator::visit(const Closure* node)
 {
     stack.push_back(true);
 }
 
-void Nullable::visit(const Concat* node)
+void NullableEvaluator::visit(const Concat* node)
 {
     stack.push_back(evaluate(node->left()) && evaluate(node->right()));
 }
 
-void Nullable::visit(const Union* node)
+void NullableEvaluator::visit(const Union* node)
 {
     stack.push_back(evaluate(node->left()) || evaluate(node->right()));
 }
 
-void Nullable::visit(const Symbol* node)
+void NullableEvaluator::visit(const Symbol* node)
 {
     stack.push_back(false);
 }
 
-void Nullable::visit(const Epsilon* node)
+void NullableEvaluator::visit(const Epsilon* node)
 {
     stack.push_back(true);
 }
 
-void Nullable::visit(const Empty* node)
+void NullableEvaluator::visit(const Empty* node)
 {
     stack.push_back(false);
 }
 
-void Nullable::visit(const Intersection* node)
+void NullableEvaluator::visit(const Intersection* node)
 {
     stack.push_back(evaluate(node->left()) && evaluate(node->right()));
 }
 
-void Nullable::visit(const Complement* node)
+void NullableEvaluator::visit(const Complement* node)
 {
     stack.push_back(!evaluate(node->expr()));
 }
 
-bool Nullable::evaluate(const RegexNode* regex)
+bool NullableEvaluator::evaluate(const RegexNode* regex)
 {
     stack.clear();
     visit(regex);
@@ -54,14 +54,14 @@ bool Nullable::evaluate(const RegexNode* regex)
     return res;
 }
 
-bool Nullable::evaluate(const Regexp& regex)
+bool NullableEvaluator::evaluate(const Regexp& regex)
 {
     return evaluate(regex.get());
 }
 
 RegexNode* helper(const RegexNode* node)
 {
-    if (Nullable{}.evaluate(node))
+    if (NullableEvaluator{}.evaluate(node))
         return new Epsilon;
     else
         return new Empty;

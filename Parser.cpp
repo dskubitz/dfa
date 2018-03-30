@@ -39,27 +39,27 @@ RegexNode* Parser::parse_impl(const std::string& regexp)
 
 RegexNode* Parser::union_or_intersection()
 {
-    auto left = concatenation();
+    std::unique_ptr<RegexNode> left(concatenation());
 
     while (true) {
         if (match('|')) {
-            auto right = concatenation();
-            left = new Union(left, right);
+            std::unique_ptr<RegexNode> right(concatenation());
+            left.reset(new Union(left.release(), right.release()));
             continue;
         } else if (match('&')) {
-            auto right = concatenation();
-            left = new Intersection(left, right);
+            std::unique_ptr<RegexNode> right(concatenation());
+            left.reset(new Intersection(left.release(), right.release()));
             continue;
         }
         break;
     }
 
-    return left;
+    return left.release();
 }
 
 RegexNode* Parser::concatenation()
 {
-    auto left = postfix();
+    std::unique_ptr<RegexNode> left(postfix());
 
     while (!at_end()) {
         char c = peek();
@@ -72,26 +72,28 @@ RegexNode* Parser::concatenation()
             --paren_count;
             break;
         } else {
-            auto right = postfix();
-            left = new Concat(left, right);
+            std::unique_ptr<RegexNode> right(postfix());
+            left.reset(new Concat(left.release(), right.release()));
         }
     }
 
-    return left;
+    return left.release();
 }
 
 RegexNode* Parser::postfix()
 {
-    auto left = factor();
+    std::unique_ptr<RegexNode> left(factor());
 
     if (match('*'))
-        left = new Closure(left);
-    else if (match('+'))
-        left = new Concat(left, new Closure(left->clone()));
+        left.reset(new Closure(left.release()));
+    else if (match('+')) {
+        auto p = left.release();
+        left.reset(new Concat(p, new Closure(p->clone())));
+    }
     else if (match('?'))
-        left = new Union(left, new Epsilon);
+        left.reset(new Union(left.release(), new Epsilon));
 
-    return left;
+    return left.release();
 }
 
 RegexNode* Parser::factor()
@@ -106,9 +108,9 @@ RegexNode* Parser::factor()
         return new Symbol(set);
     } else if (match('(')) {
         ++paren_count;
-        auto expr = union_or_intersection();
+        std::unique_ptr<RegexNode> expr(union_or_intersection());
         consume(')', "unmatched parenthesis");
-        return expr;
+        return expr.release();
     } else if (match('[')) {
         return character_class();
     } else {

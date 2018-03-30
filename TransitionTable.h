@@ -8,8 +8,7 @@
 
 #include <Regexp.h>
 
-// Transition function δ : Q × Σ → Q
-class TransitionFunction : private std::vector<std::array<int, 128>> {
+class TransitionTable : private std::vector<std::array<int, 128>> {
     using base = std::vector<std::array<int, 128>>;
 public:
     using base::vector;
@@ -23,13 +22,21 @@ public:
 };
 
 
-// States of the DFA are regular vectors
 using DFAState = std::vector<Regexp>;
-// The set of states (Q) and their index in δ
 using StateMap = std::map<DFAState, int>;
-// Alphabet Σ is implied
-// q0 is index 0
-using DFA = std::pair<TransitionFunction, StateMap>;
+using AcceptMap = std::map<int, int>;
+
+struct DFA {
+    TransitionTable table;
+    StateMap state_map;
+    AcceptMap accept_map;
+    int dead_state{-1};
+    DFA() = default;
+    DFA(DFA&&) = default;
+    DFA& operator=(DFA&&) = default;
+    DFA(const DFA&) = delete;
+    DFA& operator=(const DFA&) = delete;
+};
 
 DFA make_DFA(const std::vector<Regexp>& regex);
 #endif //DFA_H

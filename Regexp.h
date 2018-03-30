@@ -202,7 +202,6 @@ RegexNode* make_complement(RegexNode* expr);
 
 class Regexp {
 public:
-    Regexp() noexcept = default;
 
     explicit Regexp(RegexNode* ptr)
             : ptr_(ptr) { }
@@ -225,6 +224,8 @@ public:
 private:
     std::shared_ptr<RegexNode> ptr_;
 };
+
+std::ostream& operator<<(std::ostream& os, const Regexp& regexp);
 
 namespace std {
 template<>

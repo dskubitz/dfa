@@ -441,10 +441,10 @@ Empty::Empty()
 
 RegexNode* make_union(RegexNode* left, RegexNode* right)
 {
-    if (dynamic_cast<Empty*>(left)) {
+    if (/*dynamic_cast<Empty*>(left)*/left->type()==RegexNode::Type::Empty) {
         delete left;
         return right;
-    } else if (dynamic_cast<Empty*>(right)) {
+    } else if (/*dynamic_cast<Empty*>(right)*/right->type()==RegexNode::Type::Empty) {
         delete right;
         return left;
     } else if (left->equiv(right)) {
@@ -457,14 +457,17 @@ RegexNode* make_union(RegexNode* left, RegexNode* right)
 
 RegexNode* make_cat(RegexNode* left, RegexNode* right)
 {
-    if (dynamic_cast<Empty*>(left) || dynamic_cast<Empty*>(right)) {
+    RegexNode::Type ltype = left->type();
+    RegexNode::Type rtype = right->type();
+    if (/*dynamic_cast<Empty*>(left)*/ltype==RegexNode::Type::Empty
+                                      || /*dynamic_cast<Empty*>(right)*/rtype==RegexNode::Type::Empty) {
         delete left;
         delete right;
         return new Empty;
-    } else if (dynamic_cast<Epsilon*>(left)) {
+    } else if (/*dynamic_cast<Epsilon*>(left)*/ltype==RegexNode::Type::Epsilon) {
         delete left;
         return right;
-    } else if (dynamic_cast<Epsilon*>(right)) {
+    } else if (/*dynamic_cast<Epsilon*>(right)*/rtype==RegexNode::Type::Epsilon) {
         delete right;
         return left;
     } else {
@@ -474,14 +477,16 @@ RegexNode* make_cat(RegexNode* left, RegexNode* right)
 
 RegexNode* make_star(RegexNode* expr)
 {
-    if (dynamic_cast<Empty*>(expr)) {
+    RegexNode::Type type = expr->type();
+    if (/*dynamic_cast<Empty*>(expr)*/type==RegexNode::Type::Empty) {
         delete expr;
         return new Epsilon;
-    } else if (dynamic_cast<Epsilon*>(expr)) {
+    } else if (/*dynamic_cast<Epsilon*>(expr)*/type==RegexNode::Type::Epsilon) {
         return expr;
-    } else if (auto p = dynamic_cast<Closure*>(expr)) {
-        RegexNode* q = p->expr()->clone();
-        delete p;
+    } else if (/*auto p = dynamic_cast<Closure*>(expr)*/type==RegexNode::Type::Closure) {
+        RegexNode* q = static_cast<Closure*>(expr)->expr()->clone();
+//        delete p;
+        delete expr;
         return make_star(q);
     } else {
         return new Closure(expr);
@@ -490,10 +495,10 @@ RegexNode* make_star(RegexNode* expr)
 
 RegexNode* make_intersection(RegexNode* left, RegexNode* right)
 {
-    if (dynamic_cast<Empty*>(left)) {
+    if (/*dynamic_cast<Empty*>(left)*/left->type()==RegexNode::Type::Empty) {
         delete right;
         return left;
-    } else if (dynamic_cast<Empty*>(right)) {
+    } else if (/*dynamic_cast<Empty*>(right)*/right->type()==RegexNode::Type::Empty) {
         delete left;
         return right;
     } else if (left->equiv(right)) {
@@ -506,9 +511,9 @@ RegexNode* make_intersection(RegexNode* left, RegexNode* right)
 
 RegexNode* make_complement(RegexNode* expr)
 {
-    if (auto p = dynamic_cast<Complement*>(expr)) {
-        RegexNode* q = p->expr()->clone();
-        delete p;
+    if (/*auto p = dynamic_cast<Complement*>(expr)*/expr->type()==RegexNode::Type::Complement) {
+        RegexNode* q = static_cast<Complement*>(expr)->expr()->clone();
+        delete expr;
         return q;
     } else {
         return new Complement(expr);
@@ -549,10 +554,16 @@ bool operator>=(const Regexp& lhs, const Regexp& rhs)
 
 int first_occurring(const Bitset& set)
 {
+    // TODO: Optimize
     for (unsigned i = 0; i < set.size(); ++i)
         if (set.test(i))
             return i;
     return 0;
+}
+
+std::ostream& operator<<(std::ostream& os, const Regexp& regexp)
+{
+    return os << regexp->to_string();
 }
 
 RegexNode* Regexp::get() noexcept { return ptr_.get(); }

@@ -67,13 +67,3 @@ RegexNode* helper(const RegexNode* node)
         return new Empty;
 }
 
-bool is_nullable(const std::vector<Regexp>& rvec)
-{
-    Nullable N;
-
-    for (auto& i : rvec)
-        if (N.evaluate(i))
-            return true;
-
-    return false;
-}

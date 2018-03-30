@@ -21,8 +21,6 @@ private:
     std::vector<bool> stack;
 };
 
-bool is_nullable(const std::vector<Regexp>& rvec);
-
 RegexNode* helper(const RegexNode* node);
 
 #endif //LEXER_NULLABLE_H

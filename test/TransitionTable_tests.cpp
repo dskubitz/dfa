@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <Parser.h>
-#include <TransitionFunction.h>
+#include <TransitionTable.h>
 #include <Nullable.h>
 #include <cstdint>
 
@@ -29,6 +29,18 @@ TEST(TransitionTableTests, TransitionTableTest)
             "[A-Za-z_][A-Za-z_0-9]*",
             "[0-9]+(\\.[0-9]+)?",
             "\"(\\.|[^\\\"\n])*\"",
+            "\\+",
+            "\\-",
+            "\\*",
+            "\\/",
+            "==",
+            "\\=",
+            "!=",
+            "\\!",
+            "<=",
+            "\\<",
+            ">=",
+            "\\>",
             "[ \t\v\n\f]",
     };
 
@@ -36,31 +48,25 @@ TEST(TransitionTableTests, TransitionTableTest)
     for (auto& i : regexps)
         regular_vector.push_back(parser.parse(i));
 
-    TransitionFunction table;
-    StateMap states;
-    std::tie(table, states) = make_DFA(regular_vector);
-
-    for (int i = 0; i < table.size(); ++i) {
-        std::cout << i << '\n';
-        for (int j = 0; j < 128;) {
-            std::cout << table[i][j++] << ' ';
-            if (j % 16 == 0)
-                std::cout << '\n';
+    DFA dfa = make_DFA(regular_vector);
+    std::cout << typeid(dfa).name() << '\n';
+    for (auto& i : dfa.table) {
+        for (auto& j : i) {
+            std::cout << j << ' ';
         }
+        std::cout << "\n\n";
+    }
+    for (auto& i : dfa.accept_map) {
+        std::cout << i.first << " -> " << i.second << '\n';
+    }
+    std::cout << "dead -> " << dfa.dead_state << '\n';
+    for (auto& i : dfa.state_map) {
+        std::cout << i.second << " -> ";
+        std::copy(i.first.begin(), i.first.end(),
+                  std::ostream_iterator<Regexp>(std::cout));
+        auto it = dfa.accept_map.find(i.second);
+        if (it != dfa.accept_map.end())
+            std::cout << ' ' << regexps.at(dfa.accept_map.at(i.second));
         std::cout << '\n';
     }
-    for (auto& state : states) {
-        std::cout << state.second << ' ';
-        if (std::all_of(state.first.begin(), state.first.end(),
-                        [](const Regexp& a) {
-                            return a->type() == RegexNode::Type::Empty;
-                        })) {
-            std::cout << "dead\n";
-        }
-        for (auto& i : state.first) {
-            std::cout << i->to_string() << ' ';
-        }
-        std::cout << '\n';
-    }
-    std::cout << sizeof(intmax_t) << '\n';
 }

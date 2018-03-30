@@ -7,7 +7,7 @@ find_package(Boost REQUIRED)
 add_subdirectory(cmake)
 add_subdirectory(test)
 
-set(SOURCES Regexp.cpp Parser.cpp Derivative.cpp Derivative.h Nullable.cpp Nullable.h TransitionFunction.cpp DerivativeClass.cpp DerivativeClass.h Bitset.cpp Bitset.h)
+set(SOURCES Regexp.cpp Parser.cpp Derivative.cpp Derivative.h Nullable.cpp Nullable.h TransitionTable.cpp DerivativeClass.cpp DerivativeClass.h)
 add_library(core STATIC ${SOURCES})
 
 target_include_directories(core PRIVATE ${Boost_INCLUDE_DIR})

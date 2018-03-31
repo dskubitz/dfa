@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace {
-std::tuple<bool, bool, int> accepting(const DFAState& state)
+std::tuple<bool, bool, int> accepting(const DFA::State& state)
 {
     NullableEvaluator N;
 
@@ -14,7 +14,7 @@ std::tuple<bool, bool, int> accepting(const DFAState& state)
         if (N.evaluate(i)) {
             return {true, false, index};
         }
-        if (i->type() == RegexNode::Type::Empty)
+        if (i->type() == Regex::Type::Empty)
             ++nempty;
         ++index;
     }
@@ -26,9 +26,9 @@ std::tuple<bool, bool, int> accepting(const DFAState& state)
 DFA make_DFA(const std::vector<Regexp>& regex)
 {
     DFA res;
-    TransitionTable& table = res.table;
-    StateMap& dstates = res.state_map;
-    AcceptMap& accepts = res.accept_map;
+    DFA::TransitionTable& table = res.table;
+    DFA::StateMap& dstates = res.state_map;
+    DFA::AcceptMap& accepts = res.accept_map;
     int& dead_state_index = res.dead_state;
 
     dstates.insert({regex, 0});
@@ -36,12 +36,12 @@ DFA make_DFA(const std::vector<Regexp>& regex)
     DerivativeEvaluator deriv;
     DerivativeClassEvaluator derivativeClass;
 
-    std::vector<DFAState> unmarked{regex};
+    std::vector<DFA::State> unmarked{regex};
     size_t num = 1;
-    table.add_state();
+    table.emplace_back();
 
     while (!unmarked.empty()) {
-        DFAState from = unmarked.back();
+        DFA::State from = unmarked.back();
         unmarked.pop_back();
         std::unordered_set<Bitset> dclass = make_derivative_class(from);
 
@@ -56,7 +56,7 @@ DFA make_DFA(const std::vector<Regexp>& regex)
 
         for (auto& set : dclass) {
             auto c = static_cast<char>(first_occurring(set));
-            DFAState to = make_derivative(from, c);
+            DFA::State to = make_derivative(from, c);
 
             for (unsigned i = 0; i < set.size(); ++i) {
                 if (!set.test(i))
@@ -65,7 +65,7 @@ DFA make_DFA(const std::vector<Regexp>& regex)
                 if (dstates.emplace(to, num).second) {
                     ++num;
                     unmarked.push_back(to);
-                    table.add_state();
+                    table.emplace_back();
                 }
                 table[dstates.at(from)][i] = static_cast<int>(dstates.at(to));
             }

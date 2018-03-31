@@ -1,8 +1,7 @@
 #include <Regexp.h>
 #include <sstream>
-#include <boost/functional/hash.hpp>
-#include <experimental/iterator>
-#include <iostream>
+
+using namespace Regex;
 
 const std::array<int, 100>
         alphabet{9, 10, 11, 12, 13, 32, 33, 34,
@@ -23,8 +22,8 @@ const std::array<int, 100>
 Empty Empty::instance;
 Epsilon Epsilon::instance;
 
-Closure::Closure(RegexNode* node)
-        : RegexNode(Type::Closure), expr_(node)
+Closure::Closure(Node* node)
+        : Node(Type::Closure), expr_(node)
 {
 }
 
@@ -33,7 +32,7 @@ void Closure::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-const RegexNode* Closure::expr() const { return expr_; }
+const Node* Closure::expr() const { return expr_; }
 
 Closure::~Closure()
 {
@@ -45,9 +44,9 @@ Closure* Closure::clone() const
     return new Closure(expr_->clone());
 }
 
-bool Closure::equiv(const RegexNode* node) const
+bool Closure::equiv(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Closure)
+    if (node->type() == Type::Closure)
         return expr_->equiv(static_cast<const Closure*>(node)->expr_);
 
     return false;
@@ -58,16 +57,16 @@ std::string Closure::to_string() const
     return "(" + expr_->to_string() + "*)";
 }
 
-bool Closure::compare(const RegexNode* node) const
+bool Closure::compare(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Closure)
+    if (node->type() == Type::Closure)
         return expr_->compare(static_cast<const Closure*>(node)->expr_);
 
     return type() < node->type();
 }
 
-Concat::Concat(RegexNode* left, RegexNode* right)
-        : RegexNode(Type::Concat), left_(left), right_(right)
+Concat::Concat(Node* left, Node* right)
+        : Node(Type::Concat), left_(left), right_(right)
 {
 }
 
@@ -76,9 +75,9 @@ void Concat::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-const RegexNode* Concat::left() const { return left_; }
+const Node* Concat::left() const { return left_; }
 
-const RegexNode* Concat::right() const { return right_; }
+const Node* Concat::right() const { return right_; }
 
 Concat::~Concat()
 {
@@ -91,9 +90,9 @@ Concat* Concat::clone() const
     return new Concat(left_->clone(), right_->clone());
 }
 
-bool Concat::equiv(const RegexNode* node) const
+bool Concat::equiv(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Concat) {
+    if (node->type() == Type::Concat) {
         auto p = static_cast<const Concat*>(node);
         return left_->equiv(p->left_) && right_->equiv(p->right_);
     }
@@ -106,16 +105,16 @@ std::string Concat::to_string() const
     return "(" + left_->to_string() + "." + right_->to_string() + ")";
 }
 
-bool Concat::compare(const RegexNode* node) const
+bool Concat::compare(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Concat)
+    if (node->type() == Type::Concat)
         return left_->compare(static_cast<const Concat*>(node)->left_);
 
     return type() < node->type();
 }
 
-Union::Union(RegexNode* left, RegexNode* right)
-        : RegexNode(Type::Union), left_(left), right_(right)
+Union::Union(Node* left, Node* right)
+        : Node(Type::Union), left_(left), right_(right)
 {
 }
 
@@ -124,9 +123,9 @@ void Union::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-const RegexNode* Union::left() const { return left_; }
+const Node* Union::left() const { return left_; }
 
-const RegexNode* Union::right() const { return right_; }
+const Node* Union::right() const { return right_; }
 
 Union::~Union()
 {
@@ -139,9 +138,9 @@ Union* Union::clone() const
     return new Union(left_->clone(), right_->clone());
 }
 
-bool Union::equiv(const RegexNode* node) const
+bool Union::equiv(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Union) {
+    if (node->type() == Type::Union) {
         auto p = static_cast<const Union*>(node);
         return left_->equiv(p->left_) /*&& right_->equiv(p->right_)*/;
     }
@@ -154,9 +153,9 @@ std::string Union::to_string() const
     return "(" + left_->to_string() + "+" + right_->to_string() + ")";
 }
 
-bool Union::compare(const RegexNode* node) const
+bool Union::compare(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Union)
+    if (node->type() == Type::Union)
         return left_->compare(static_cast<const Union*>(node)->left_);
 
     return type() < node->type();
@@ -169,9 +168,9 @@ Intersection* Intersection::clone() const
     return new Intersection(left_->clone(), right_->clone());
 }
 
-bool Intersection::equiv(const RegexNode* node) const
+bool Intersection::equiv(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Intersection) {
+    if (node->type() == Type::Intersection) {
         auto p = static_cast<const Intersection*>(node);
         return left_->equiv(p->left_) && right_->equiv(p->right_);
     }
@@ -185,23 +184,23 @@ Intersection::~Intersection()
     delete right_;
 }
 
-Intersection::Intersection(RegexNode* left, RegexNode* right)
-        : RegexNode(Type::Intersection), left_(left), right_(right)
+Intersection::Intersection(Node* left, Node* right)
+        : Node(Type::Intersection), left_(left), right_(right)
 {
 }
 
-const RegexNode* Intersection::left() const { return left_; }
+const Node* Intersection::left() const { return left_; }
 
-const RegexNode* Intersection::right() const { return right_; }
+const Node* Intersection::right() const { return right_; }
 
 std::string Intersection::to_string() const
 {
     return "(" + left_->to_string() + "&" + right_->to_string() + ")";
 }
 
-bool Intersection::compare(const RegexNode* node) const
+bool Intersection::compare(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Intersection) {
+    if (node->type() == Type::Intersection) {
         auto p = static_cast<const Intersection*>(node);
         return left_->compare(p->left_) /*&& right_->comp(p->right_)*/;
     }
@@ -210,13 +209,13 @@ bool Intersection::compare(const RegexNode* node) const
 }
 
 Symbol::Symbol(char value)
-        : RegexNode(Type::Symbol)
+        : Node(Type::Symbol)
 {
     set_.flip(value);
 }
 
 Symbol::Symbol(Bitset values)
-        : RegexNode(Type::Symbol), set_(values)
+        : Node(Type::Symbol), set_(values)
 {
 }
 
@@ -230,9 +229,9 @@ Symbol* Symbol::clone() const
     return new Symbol(*this);
 }
 
-bool Symbol::equiv(const RegexNode* node) const
+bool Symbol::equiv(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Symbol)
+    if (node->type() == Type::Symbol)
         return set_ == static_cast<const Symbol*>(node)->set_;
 
     return false;
@@ -286,9 +285,9 @@ std::string Symbol::to_string() const
     return oss.str();
 }
 
-bool Symbol::compare(const RegexNode* node) const
+bool Symbol::compare(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Symbol)
+    if (node->type() == Type::Symbol)
         return set_.to_string()
                < static_cast<const Symbol*>(node)->set_.to_string();
 
@@ -307,9 +306,9 @@ Complement* Complement::clone() const
     return new Complement(expr_->clone());
 }
 
-bool Complement::equiv(const RegexNode* node) const
+bool Complement::equiv(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Complement)
+    if (node->type() == Type::Complement)
         return expr_->equiv(static_cast<const Complement*>(node)->expr_);
 
     return false;
@@ -317,19 +316,19 @@ bool Complement::equiv(const RegexNode* node) const
 
 Complement::~Complement() { delete expr_; }
 
-Complement::Complement(RegexNode* expr)
-        : RegexNode(Type::Complement), expr_(expr) { }
+Complement::Complement(Node* expr)
+        : Node(Type::Complement), expr_(expr) { }
 
-const RegexNode* Complement::expr() const { return expr_; }
+const Node* Complement::expr() const { return expr_; }
 
 std::string Complement::to_string() const
 {
     return "~(" + expr_->to_string() + ")";
 }
 
-bool Complement::compare(const RegexNode* node) const
+bool Complement::compare(const Node* node) const
 {
-    if (node->type() == RegexNode::Type::Complement)
+    if (node->type() == Type::Complement)
         return expr_->compare(static_cast<const Complement*>(node)->expr_);
 
     return type() < node->type();
@@ -345,9 +344,9 @@ Epsilon* Epsilon::clone() const
     return &instance;
 }
 
-bool Epsilon::equiv(const RegexNode* node) const
+bool Epsilon::equiv(const Node* node) const
 {
-    return node->type() == RegexNode::Type::Epsilon;
+    return node->type() == Type::Epsilon;
 }
 
 std::string Epsilon::to_string() const
@@ -355,13 +354,13 @@ std::string Epsilon::to_string() const
     return "\u03b5";
 }
 
-bool Epsilon::compare(const RegexNode* node) const
+bool Epsilon::compare(const Node* node) const
 {
     return type() < node->type();
 }
 
 Epsilon::Epsilon()
-        : RegexNode(Type::Epsilon)
+        : Node(Type::Epsilon)
 {
 }
 
@@ -370,14 +369,14 @@ void Empty::accept(RegexVisitor* v) const
     v->visit(this);
 }
 
-RegexNode* Empty::clone() const
+Node* Empty::clone() const
 {
     return &instance;
 }
 
-bool Empty::equiv(const RegexNode* node) const
+bool Empty::equiv(const Node* node) const
 {
-    return node->type() == RegexNode::Type::Empty;
+    return node->type() == Type::Empty;
 }
 
 std::string Empty::to_string() const
@@ -385,22 +384,22 @@ std::string Empty::to_string() const
     return "\u2205";
 }
 
-bool Empty::compare(const RegexNode* node) const
+bool Empty::compare(const Node* node) const
 {
     return type() < node->type();
 }
 
 Empty::Empty()
-        : RegexNode(Type::Empty)
+        : Node(Type::Empty)
 {
 }
 
-RegexNode* make_union(RegexNode* left, RegexNode* right)
+Node* make_union(Node* left, Node* right)
 {
-    if (left->type() == RegexNode::Type::Empty) {
+    if (left->type() == Type::Empty) {
         delete left;
         return right;
-    } else if (right->type() == RegexNode::Type::Empty) {
+    } else if (right->type() == Type::Empty) {
         delete right;
         return left;
     } else if (left->equiv(right)) {
@@ -411,18 +410,18 @@ RegexNode* make_union(RegexNode* left, RegexNode* right)
     }
 }
 
-RegexNode* make_cat(RegexNode* left, RegexNode* right)
+Node* make_cat(Node* left, Node* right)
 {
-    RegexNode::Type ltype = left->type();
-    RegexNode::Type rtype = right->type();
-    if (ltype == RegexNode::Type::Empty || rtype == RegexNode::Type::Empty) {
+    Type ltype = left->type();
+    Type rtype = right->type();
+    if (ltype == Type::Empty || rtype == Type::Empty) {
         delete left;
         delete right;
         return new Empty;
-    } else if (ltype == RegexNode::Type::Epsilon) {
+    } else if (ltype == Type::Epsilon) {
         delete left;
         return right;
-    } else if (rtype == RegexNode::Type::Epsilon) {
+    } else if (rtype == Type::Epsilon) {
         delete right;
         return left;
     } else {
@@ -430,16 +429,16 @@ RegexNode* make_cat(RegexNode* left, RegexNode* right)
     }
 }
 
-RegexNode* make_star(RegexNode* expr)
+Node* make_star(Node* expr)
 {
-    RegexNode::Type type = expr->type();
-    if (type == RegexNode::Type::Empty) {
+    Type type = expr->type();
+    if (type == Type::Empty) {
         delete expr;
         return new Epsilon;
-    } else if (type == RegexNode::Type::Epsilon) {
+    } else if (type == Type::Epsilon) {
         return expr;
-    } else if (type == RegexNode::Type::Closure) {
-        RegexNode* q = static_cast<Closure*>(expr)->expr()->clone();
+    } else if (type == Type::Closure) {
+        Node* q = static_cast<Closure*>(expr)->expr()->clone();
         delete expr;
         return make_star(q);
     } else {
@@ -447,12 +446,12 @@ RegexNode* make_star(RegexNode* expr)
     }
 }
 
-RegexNode* make_intersection(RegexNode* left, RegexNode* right)
+Node* make_intersection(Node* left, Node* right)
 {
-    if (left->type() == RegexNode::Type::Empty) {
+    if (left->type() == Type::Empty) {
         delete right;
         return left;
-    } else if (right->type() == RegexNode::Type::Empty) {
+    } else if (right->type() == Type::Empty) {
         delete left;
         return right;
     } else if (left->equiv(right)) {
@@ -463,10 +462,10 @@ RegexNode* make_intersection(RegexNode* left, RegexNode* right)
     }
 }
 
-RegexNode* make_complement(RegexNode* expr)
+Node* make_complement(Node* expr)
 {
-    if (expr->type() == RegexNode::Type::Complement) {
-        RegexNode* q = static_cast<Complement*>(expr)->expr()->clone();
+    if (expr->type() == Type::Complement) {
+        Node* q = static_cast<Complement*>(expr)->expr()->clone();
         delete expr;
         return q;
     } else {
@@ -576,10 +575,10 @@ std::ostream& operator<<(std::ostream& os, const Regexp& regexp)
     return os << regexp->to_string();
 }
 
-RegexNode* Regexp::get() noexcept { return ptr_.get(); }
+Node* Regexp::get() noexcept { return ptr_.get(); }
 
-RegexNode* Regexp::operator->() noexcept { return ptr_.get(); }
+Node* Regexp::operator->() noexcept { return ptr_.get(); }
 
-const RegexNode* Regexp::get() const noexcept { return ptr_.get(); }
+const Node* Regexp::get() const noexcept { return ptr_.get(); }
 
-const RegexNode* Regexp::operator->() const noexcept { return ptr_.get(); }
+const Node* Regexp::operator->() const noexcept { return ptr_.get(); }

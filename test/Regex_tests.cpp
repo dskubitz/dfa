@@ -11,56 +11,57 @@ protected:
 
 TEST_F(RegexTests, Cat)
 {
-    std::unique_ptr<RegexNode> re(
-            make_cat(new Empty, new Symbol('a')));
-    auto p = dynamic_cast<Empty*>(re.get());
+    std::unique_ptr<Regex::Node> re(
+            make_cat(new Regex::Empty, new Regex::Symbol('a')));
+    auto p = dynamic_cast<Regex::Empty*>(re.get());
     ASSERT_NE(p, nullptr);
-    re.reset(make_cat(new Epsilon, new Symbol('a')));
-    auto q = dynamic_cast<Symbol*>(re.get());
+    re.reset(make_cat(new Regex::Epsilon, new Regex::Symbol('a')));
+    auto q = dynamic_cast<Regex::Symbol*>(re.get());
     ASSERT_NE(q, nullptr);
     EXPECT_TRUE(q->values().test('a'));
 }
 
 TEST_F(RegexTests, Union)
 {
-    std::unique_ptr<RegexNode> re(
-            make_union(new Empty, new Symbol('a')));
-    auto p = dynamic_cast<Symbol*>(re.get());
+    std::unique_ptr<Regex::Node> re(
+            make_union(new Regex::Empty, new Regex::Symbol('a')));
+    auto p = dynamic_cast<Regex::Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_TRUE(p->values().test('a'));
-    re.reset(make_union(new Symbol('a'), new Symbol('a')));
-    p = dynamic_cast<Symbol*>(re.get());
+    re.reset(make_union(new Regex::Symbol('a'), new Regex::Symbol('a')));
+    p = dynamic_cast<Regex::Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_TRUE(p->values().test('a'));
 }
 
 TEST_F(RegexTests, Star)
 {
-    std::unique_ptr<RegexNode> re(
-            make_star(new Closure(new Closure(new Symbol('a')))));
-    auto p = dynamic_cast<Closure*>(re.get());
+    std::unique_ptr<Regex::Node> re(
+            make_star(new Regex::Closure(
+                    new Regex::Closure(new Regex::Symbol('a')))));
+    auto p = dynamic_cast<Regex::Closure*>(re.get());
     ASSERT_NE(p, nullptr);
-    auto q = dynamic_cast<const Symbol*>(p->expr());
+    auto q = dynamic_cast<const Regex::Symbol*>(p->expr());
     ASSERT_NE(q, nullptr);
 }
 
 TEST_F(RegexTests, Intersection)
 {
-    std::unique_ptr<RegexNode> re(
-            make_intersection(new Empty, new Symbol('a')));
-    auto p = dynamic_cast<Empty*>(re.get());
+    std::unique_ptr<Regex::Node> re(
+            make_intersection(new Regex::Empty, new Regex::Symbol('a')));
+    auto p = dynamic_cast<Regex::Empty*>(re.get());
     ASSERT_NE(p, nullptr);
-    re.reset(make_intersection(new Symbol('a'), new Symbol('a')));
-    auto p2 = dynamic_cast<Symbol*>(re.get());
+    re.reset(make_intersection(new Regex::Symbol('a'), new Regex::Symbol('a')));
+    auto p2 = dynamic_cast<Regex::Symbol*>(re.get());
     ASSERT_NE(p2, nullptr);
     EXPECT_TRUE(p2->values().test('a'));
 }
 
 TEST_F(RegexTests, Complement)
 {
-    std::unique_ptr<RegexNode> re(
-            make_complement(new Complement(new Symbol('a'))));
-    auto p = dynamic_cast<Symbol*>(re.get());
+    std::unique_ptr<Regex::Node> re(
+            make_complement(new Regex::Complement(new Regex::Symbol('a'))));
+    auto p = dynamic_cast<Regex::Symbol*>(re.get());
     ASSERT_NE(p, nullptr);
     EXPECT_TRUE(p->values().test('a'));
 }
@@ -126,8 +127,8 @@ TEST_F(RegexTests, StrictWeakOrder)
 
 TEST_F(RegexTests, SingletonEmpty)
 {
-    auto empty1 = new Empty;
-    auto empty2 = new Empty;
+    auto empty1 = new Regex::Empty;
+    auto empty2 = new Regex::Empty;
     EXPECT_EQ(empty1, empty2);
 }
 

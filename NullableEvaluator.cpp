@@ -1,51 +1,51 @@
 #include "NullableEvaluator.h"
 
-void NullableEvaluator::visit(const RegexNode* node)
+void NullableEvaluator::visit(const Regex::Node* node)
 {
     node->accept(this);
 }
 
-void NullableEvaluator::visit(const Closure* node)
+void NullableEvaluator::visit(const Regex::Closure* node)
 {
     stack.push_back(true);
 }
 
-void NullableEvaluator::visit(const Concat* node)
+void NullableEvaluator::visit(const Regex::Concat* node)
 {
     stack.push_back(evaluate(node->left()) && evaluate(node->right()));
 }
 
-void NullableEvaluator::visit(const Union* node)
+void NullableEvaluator::visit(const Regex::Union* node)
 {
     stack.push_back(evaluate(node->left()) || evaluate(node->right()));
 }
 
-void NullableEvaluator::visit(const Symbol* node)
+void NullableEvaluator::visit(const Regex::Symbol* node)
 {
     stack.push_back(false);
 }
 
-void NullableEvaluator::visit(const Epsilon* node)
+void NullableEvaluator::visit(const Regex::Epsilon* node)
 {
     stack.push_back(true);
 }
 
-void NullableEvaluator::visit(const Empty* node)
+void NullableEvaluator::visit(const Regex::Empty* node)
 {
     stack.push_back(false);
 }
 
-void NullableEvaluator::visit(const Intersection* node)
+void NullableEvaluator::visit(const Regex::Intersection* node)
 {
     stack.push_back(evaluate(node->left()) && evaluate(node->right()));
 }
 
-void NullableEvaluator::visit(const Complement* node)
+void NullableEvaluator::visit(const Regex::Complement* node)
 {
     stack.push_back(!evaluate(node->expr()));
 }
 
-bool NullableEvaluator::evaluate(const RegexNode* regex)
+bool NullableEvaluator::evaluate(const Regex::Node* regex)
 {
     stack.clear();
     visit(regex);
@@ -59,11 +59,11 @@ bool NullableEvaluator::evaluate(const Regexp& regex)
     return evaluate(regex.get());
 }
 
-RegexNode* helper(const RegexNode* node)
+Regex::Node* helper(const Regex::Node* node)
 {
     if (NullableEvaluator{}.evaluate(node))
-        return new Epsilon;
+        return new Regex::Epsilon;
     else
-        return new Empty;
+        return new Regex::Empty;
 }
 

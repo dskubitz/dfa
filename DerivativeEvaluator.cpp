@@ -2,12 +2,12 @@
 #include <NullableEvaluator.h>
 #include <algorithm>
 
-void DerivativeEvaluator::visit(const RegexNode* node)
+void DerivativeEvaluator::visit(const Regex::Node* node)
 {
     node->accept(this);
 }
 
-void DerivativeEvaluator::visit(const Closure* node)
+void DerivativeEvaluator::visit(const Regex::Closure* node)
 {
     stack.push_back(
             make_cat(
@@ -17,7 +17,7 @@ void DerivativeEvaluator::visit(const Closure* node)
                             node->expr()->clone())));
 }
 
-void DerivativeEvaluator::visit(const Concat* node)
+void DerivativeEvaluator::visit(const Regex::Concat* node)
 {
     stack.push_back(
             make_union(
@@ -29,7 +29,7 @@ void DerivativeEvaluator::visit(const Concat* node)
                             evaluate(node->right()))));
 }
 
-void DerivativeEvaluator::visit(const Union* node)
+void DerivativeEvaluator::visit(const Regex::Union* node)
 {
     stack.push_back(
             make_union(
@@ -37,7 +37,7 @@ void DerivativeEvaluator::visit(const Union* node)
                     evaluate(node->right())));
 }
 
-void DerivativeEvaluator::visit(const Intersection* node)
+void DerivativeEvaluator::visit(const Regex::Intersection* node)
 {
     stack.push_back(
             make_intersection(
@@ -45,40 +45,40 @@ void DerivativeEvaluator::visit(const Intersection* node)
                     evaluate(node->right())));
 }
 
-void DerivativeEvaluator::visit(const Complement* node)
+void DerivativeEvaluator::visit(const Regex::Complement* node)
 {
     stack.push_back(
             make_complement(
                     evaluate(node->expr()->clone())));
 }
 
-void DerivativeEvaluator::visit(const Symbol* node)
+void DerivativeEvaluator::visit(const Regex::Symbol* node)
 {
     if (node->values().test(dA))
-        stack.push_back(new Epsilon);
+        stack.push_back(new Regex::Epsilon);
     else
-        stack.push_back(new Empty);
+        stack.push_back(new Regex::Empty);
 }
 
-void DerivativeEvaluator::visit(const Epsilon* node)
+void DerivativeEvaluator::visit(const Regex::Epsilon* node)
 {
-    stack.push_back(new Empty);
+    stack.push_back(new Regex::Empty);
 }
 
-void DerivativeEvaluator::visit(const Empty* node)
+void DerivativeEvaluator::visit(const Regex::Empty* node)
 {
-    stack.push_back(new Empty);
+    stack.push_back(new Regex::Empty);
 }
 
-RegexNode* DerivativeEvaluator::derive_impl(const RegexNode* tree)
+Regex::Node* DerivativeEvaluator::derive_impl(const Regex::Node* tree)
 {
     return evaluate(tree);
 }
 
-RegexNode* DerivativeEvaluator::evaluate(const RegexNode* node)
+Regex::Node* DerivativeEvaluator::evaluate(const Regex::Node* node)
 {
     visit(node);
-    RegexNode* res = stack.back();
+    Regex::Node* res = stack.back();
     stack.pop_back();
     return res;
 }

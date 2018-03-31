@@ -19,14 +19,14 @@ bool is_char(char ch)
 }
 }
 
-RegexNode* Parser::parse_impl(const std::string& regexp)
+Regex::Node* Parser::parse_impl(const std::string& regexp)
 {
     expr = regexp;
     pos = 0;
     paren_count = 0;
     try {
         if (expr.empty())
-            return new Epsilon;
+            return new Regex::Epsilon;
         return union_or_intersection();
     }
     catch (std::out_of_range& e) {
@@ -37,18 +37,19 @@ RegexNode* Parser::parse_impl(const std::string& regexp)
     }
 }
 
-RegexNode* Parser::union_or_intersection()
+Regex::Node* Parser::union_or_intersection()
 {
-    std::unique_ptr<RegexNode> left(concatenation());
+    std::unique_ptr<Regex::Node> left(concatenation());
 
     while (true) {
         if (match('|')) {
-            std::unique_ptr<RegexNode> right(concatenation());
-            left.reset(new Union(left.release(), right.release()));
+            std::unique_ptr<Regex::Node> right(concatenation());
+            left.reset(new Regex::Union(left.release(), right.release()));
             continue;
         } else if (match('&')) {
-            std::unique_ptr<RegexNode> right(concatenation());
-            left.reset(new Intersection(left.release(), right.release()));
+            std::unique_ptr<Regex::Node> right(concatenation());
+            left.reset(
+                    new Regex::Intersection(left.release(), right.release()));
             continue;
         }
         break;
@@ -57,9 +58,9 @@ RegexNode* Parser::union_or_intersection()
     return left.release();
 }
 
-RegexNode* Parser::concatenation()
+Regex::Node* Parser::concatenation()
 {
-    std::unique_ptr<RegexNode> left(postfix());
+    std::unique_ptr<Regex::Node> left(postfix());
 
     while (!at_end()) {
         char c = peek();
@@ -72,43 +73,43 @@ RegexNode* Parser::concatenation()
             --paren_count;
             break;
         } else {
-            std::unique_ptr<RegexNode> right(postfix());
-            left.reset(new Concat(left.release(), right.release()));
+            std::unique_ptr<Regex::Node> right(postfix());
+            left.reset(new Regex::Concat(left.release(), right.release()));
         }
     }
 
     return left.release();
 }
 
-RegexNode* Parser::postfix()
+Regex::Node* Parser::postfix()
 {
-    std::unique_ptr<RegexNode> left(factor());
+    std::unique_ptr<Regex::Node> left(factor());
 
     if (match('*'))
-        left.reset(new Closure(left.release()));
+        left.reset(new Regex::Closure(left.release()));
     else if (match('+')) {
         auto p = left.release();
-        left.reset(new Concat(p, new Closure(p->clone())));
+        left.reset(new Regex::Concat(p, new Regex::Closure(p->clone())));
     }
     else if (match('?'))
-        left.reset(new Union(left.release(), new Epsilon));
+        left.reset(new Regex::Union(left.release(), new Regex::Epsilon));
 
     return left.release();
 }
 
-RegexNode* Parser::factor()
+Regex::Node* Parser::factor()
 {
     if (is_char(peek())) {
-        return new Symbol(advance());
+        return new Regex::Symbol(advance());
     } else if (match('\\')) {
-        return new Symbol(advance());
+        return new Regex::Symbol(advance());
     } else if (match('.')) {
         Bitset set;
         set.flip();
-        return new Symbol(set);
+        return new Regex::Symbol(set);
     } else if (match('(')) {
         ++paren_count;
-        std::unique_ptr<RegexNode> expr(union_or_intersection());
+        std::unique_ptr<Regex::Node> expr(union_or_intersection());
         consume(')', "unmatched parenthesis");
         return expr.release();
     } else if (match('[')) {
@@ -118,7 +119,7 @@ RegexNode* Parser::factor()
     }
 }
 
-RegexNode* Parser::character_class()
+Regex::Node* Parser::character_class()
 {
     Bitset set;
     if (match('^')) {
@@ -137,7 +138,7 @@ RegexNode* Parser::character_class()
     }
 
     consume(']', "unmatched bracket");
-    return new Symbol(set);
+    return new Regex::Symbol(set);
 }
 
 Bitset Parser::parse_character_class()

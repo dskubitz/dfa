@@ -17,17 +17,17 @@ cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r)
     return res;
 }
 
-void DerivativeClassEvaluator::visit(const RegexNode* node)
+void DerivativeClassEvaluator::visit(const Regex::Node* node)
 {
     node->accept(this);
 }
 
-void DerivativeClassEvaluator::visit(const Closure* closure)
+void DerivativeClassEvaluator::visit(const Regex::Closure* closure)
 {
     stack.push_back(evaluate(closure->expr()));
 }
 
-void DerivativeClassEvaluator::visit(const Concat* concat)
+void DerivativeClassEvaluator::visit(const Regex::Concat* concat)
 {
     if (nullable.evaluate(concat->left())) {
         stack.push_back(
@@ -39,7 +39,7 @@ void DerivativeClassEvaluator::visit(const Concat* concat)
     }
 }
 
-void DerivativeClassEvaluator::visit(const Union* anUnion)
+void DerivativeClassEvaluator::visit(const Regex::Union* anUnion)
 {
     stack.push_back(
             cross(
@@ -47,7 +47,7 @@ void DerivativeClassEvaluator::visit(const Union* anUnion)
                     evaluate(anUnion->right())));
 }
 
-void DerivativeClassEvaluator::visit(const Intersection* intersection)
+void DerivativeClassEvaluator::visit(const Regex::Intersection* intersection)
 {
     stack.push_back(
             cross(
@@ -55,12 +55,12 @@ void DerivativeClassEvaluator::visit(const Intersection* intersection)
                     evaluate(intersection->right())));
 }
 
-void DerivativeClassEvaluator::visit(const Complement* complement)
+void DerivativeClassEvaluator::visit(const Regex::Complement* complement)
 {
     stack.push_back(evaluate(complement->expr()));
 }
 
-void DerivativeClassEvaluator::visit(const Symbol* symbol)
+void DerivativeClassEvaluator::visit(const Regex::Symbol* symbol)
 {
     Bitset set;
     set.flip();
@@ -68,7 +68,7 @@ void DerivativeClassEvaluator::visit(const Symbol* symbol)
     stack.emplace_back(std::unordered_set<Bitset>{S, set & ~S});
 }
 
-void DerivativeClassEvaluator::visit(const Epsilon* epsilon)
+void DerivativeClassEvaluator::visit(const Regex::Epsilon* epsilon)
 {
     (void) epsilon;
     Bitset set;
@@ -76,7 +76,7 @@ void DerivativeClassEvaluator::visit(const Epsilon* epsilon)
     stack.emplace_back(std::unordered_set<Bitset>{set});
 }
 
-void DerivativeClassEvaluator::visit(const Empty* empty)
+void DerivativeClassEvaluator::visit(const Regex::Empty* empty)
 {
     (void) empty;
     Bitset set;
@@ -86,7 +86,7 @@ void DerivativeClassEvaluator::visit(const Empty* empty)
 }
 
 std::unordered_set<Bitset>
-DerivativeClassEvaluator::evaluate(const RegexNode* node)
+DerivativeClassEvaluator::evaluate(const Regex::Node* node)
 {
     stack.clear();
     visit(node);

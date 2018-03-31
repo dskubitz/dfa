@@ -4,23 +4,23 @@
 #include <vector>
 #include <Regexp.h>
 
-class NullableEvaluator : public RegexVisitor {
+class NullableEvaluator : public Regex::RegexVisitor {
 public:
-    bool evaluate(const RegexNode* regex);
+    bool evaluate(const Regex::Node* regex);
     bool evaluate(const Regexp& regex);
 private:
-    void visit(const RegexNode* node) override;
-    void visit(const Closure* node) override;
-    void visit(const Concat* node) override;
-    void visit(const Union* node) override;
-    void visit(const Symbol* node) override;
-    void visit(const Empty* node) override;
-    void visit(const Intersection* node) override;
-    void visit(const Complement* node) override;
-    void visit(const Epsilon* node) override;
+    void visit(const Regex::Node* node) override;
+    void visit(const Regex::Closure* node) override;
+    void visit(const Regex::Concat* node) override;
+    void visit(const Regex::Union* node) override;
+    void visit(const Regex::Symbol* node) override;
+    void visit(const Regex::Empty* node) override;
+    void visit(const Regex::Intersection* node) override;
+    void visit(const Regex::Complement* node) override;
+    void visit(const Regex::Epsilon* node) override;
     std::vector<bool> stack;
 };
 
-RegexNode* helper(const RegexNode* node);
+Regex::Node* helper(const Regex::Node* node);
 
 #endif //LEXER_NULLABLE_H

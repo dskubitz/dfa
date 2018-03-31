@@ -5,22 +5,22 @@
 #include <memory>
 #include <Regexp.h>
 
-class DerivativeEvaluator : public RegexVisitor {
+class DerivativeEvaluator : public Regex::RegexVisitor {
 public:
     Regexp derive(const Regexp& regex, char da);
 private:
-    void visit(const RegexNode* node) override;
-    void visit(const Closure* node) override;
-    void visit(const Concat* node) override;
-    void visit(const Union* node) override;
-    void visit(const Symbol* node) override;
-    void visit(const Intersection* node) override;
-    void visit(const Complement* node) override;
-    void visit(const Empty* node) override;
-    void visit(const Epsilon* node) override;
-    RegexNode* derive_impl(const RegexNode* tree);
-    std::vector<RegexNode*> stack;
-    RegexNode* evaluate(const RegexNode* node);
+    void visit(const Regex::Node* node) override;
+    void visit(const Regex::Closure* node) override;
+    void visit(const Regex::Concat* node) override;
+    void visit(const Regex::Union* node) override;
+    void visit(const Regex::Symbol* node) override;
+    void visit(const Regex::Intersection* node) override;
+    void visit(const Regex::Complement* node) override;
+    void visit(const Regex::Empty* node) override;
+    void visit(const Regex::Epsilon* node) override;
+    Regex::Node* derive_impl(const Regex::Node* tree);
+    std::vector<Regex::Node*> stack;
+    Regex::Node* evaluate(const Regex::Node* node);
     char dA;
 };
 

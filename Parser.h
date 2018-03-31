@@ -19,7 +19,7 @@ public:
     }
 
 private:
-    RegexNode* parse_impl(const std::string& regexp);
+    Regex::Node* parse_impl(const std::string& regexp);
 
     bool match(char ch);
     bool check(char ch);
@@ -29,11 +29,11 @@ private:
     char previous();
     char consume(char ch, const std::string& msg);
 
-    RegexNode* union_or_intersection();
-    RegexNode* concatenation();
-    RegexNode* postfix();
-    RegexNode* factor();
-    RegexNode* character_class();
+    Regex::Node* union_or_intersection();
+    Regex::Node* concatenation();
+    Regex::Node* postfix();
+    Regex::Node* factor();
+    Regex::Node* character_class();
 
     Bitset parse_character_class();
     Bitset range();

@@ -9,28 +9,18 @@
 #include <Regexp.h>
 #include <unordered_map>
 
-class TransitionTable : private std::vector<std::array<int, 128>> {
-    using base = std::vector<std::array<int, 128>>;
-public:
-    using base::vector;
-    using base::operator[];
-    using base::at;
-    using base::begin;
-    using base::end;
-    using base::size;
-
-    void add_state() { this->emplace_back(); }
-};
-
-using DFAState = std::vector<Regexp>;
-using StateMap = std::map<DFAState, int>;
-using AcceptMap = std::unordered_map<int, int>;
-
 struct DFA {
+    using Index = int;
+    using TransitionTable = std::vector<std::array<Index, 128> >;
+    using State = std::vector<Regexp>;
+    using StateMap = std::map<State, Index>;
+    using AcceptMap = std::unordered_map<Index, Index>;
+
     TransitionTable table;
     StateMap state_map;
     AcceptMap accept_map;
-    int dead_state{-1};
+    Index dead_state{-1};
+
     DFA() = default;
     DFA(DFA&&) = default;
     DFA& operator=(DFA&&) = default;

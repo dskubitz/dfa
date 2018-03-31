@@ -2,13 +2,11 @@
 
 #include <Parser.h>
 #include <DFA.h>
-#include <NullableEvaluator.h>
 #include <Lexer.h>
 
 TEST(TransitionTableTests, TransitionTableTest)
 {
     Parser parser;
-    NullableEvaluator nullable;
     std::vector<std::string> regexps = {
             "and",                          // 0
             "class",                        // 1
@@ -51,10 +49,7 @@ TEST(TransitionTableTests, TransitionTableTest)
             "[ \t\v\n\f]+",                 // 38
             ".",                            // 39
     };
-
-    std::vector<Regexp> regular_vector;
-    for (auto& i : regexps)
-        regular_vector.push_back(parser.parse(i));
+    std::vector<Regexp> regular_vector = make_regular_vector(regexps);
 
     DFA dfa = make_DFA(regular_vector);
     for (auto& i : dfa.accept_map) {
@@ -156,6 +151,28 @@ TEST(TransitionTableTests, TransitionTableTest)
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
         if (tok == error || tok == space) continue;
+        std::cout << lexer.lexeme() << " tok: " << tok
+                  << ' ' << lexer.lexeme_start_position()
+                  << ' ' << lexer.current_position() << '\n';
+    }
+}
+
+TEST(ScannerTests, ChangingInputStreams)
+{
+    std::vector<Regexp> vec = make_regular_vector({"abcd", "efgh", " "});
+    auto dfa = make_DFA(vec);
+    std::stringstream ss1("abcd abcd");
+    Lexer lexer(std::move(dfa), ss1);
+
+    while (!lexer.end_of_file()) {
+        auto tok = static_cast<unsigned>(lexer.scan());
+        std::cout << lexer.lexeme() << " tok: " << tok
+                  << ' ' << lexer.lexeme_start_position() << '\n';
+    }
+    std::stringstream ss2("efgh efgh");
+    lexer.reset_input_stream(ss2);
+    while (!lexer.end_of_file()) {
+        auto tok = static_cast<unsigned>(lexer.scan());
         std::cout << lexer.lexeme() << " tok: " << tok
                   << ' ' << lexer.lexeme_start_position() << '\n';
     }

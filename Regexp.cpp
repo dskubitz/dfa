@@ -511,6 +511,7 @@ inline int test(unsigned first, unsigned last, const Bitset& set)
     for (; first < last; ++first)
         if (set.test(first))
             return first;
+    return 0;
 }
 
 static Bitset lowerq{

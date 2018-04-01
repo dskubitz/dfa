@@ -37,9 +37,9 @@ enum class Type : uint8_t {
     Empty,
 };
 
-class RegexVisitor {
+class Visitor {
 public:
-    virtual ~RegexVisitor() = default;
+    virtual ~Visitor() = default;
     virtual void visit(const Node*)=0;
     virtual void visit(const Closure*)=0;
     virtual void visit(const Concat*)=0;
@@ -53,9 +53,8 @@ public:
 
 class Node {
 public:
-
     virtual ~Node() = default;
-    virtual void accept(RegexVisitor* v) const =0;
+    virtual void accept(Visitor* v) const =0;
     virtual Node* clone() const = 0;
     virtual bool equiv(const Node* node) const =0;
     virtual bool compare(const Node* node) const =0;
@@ -76,7 +75,7 @@ public:
     explicit Closure(Node* node);
     Closure(nullptr_t) = delete;
     ~Closure() override;
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     const Node* expr() const;
     bool equiv(const Node* node) const override;
     bool compare(const Node* node) const override;
@@ -94,7 +93,7 @@ public:
     template<typename T>
     Concat(nullptr_t, T* right) = delete;
     ~Concat() override;
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Concat* clone() const override;
     bool equiv(const Node* node) const override;
     bool compare(const Node* node) const override;
@@ -115,7 +114,7 @@ public:
     template<typename T>
     Union(nullptr_t, T* right) = delete;
     ~Union() override;
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Union* clone() const override;
     bool compare(const Node* node) const override;
     bool equiv(const Node* node) const override;
@@ -136,7 +135,7 @@ public:
     template<typename T>
     Intersection(nullptr_t, T* right) = delete;
     ~Intersection() override;
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Intersection* clone() const override;
     bool compare(const Node* node) const override;
     bool equiv(const Node* node) const override;
@@ -154,7 +153,7 @@ public:
     explicit Complement(Node* expr);
     Complement(nullptr_t) = delete;
     ~Complement() override;
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Complement* clone() const override;
     bool compare(const Node* node) const override;
     bool equiv(const Node* node) const override;
@@ -169,7 +168,7 @@ class Symbol : public Node {
 public:
     explicit Symbol(char value);
     explicit Symbol(Bitset values);
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Symbol* clone() const override;
     bool equiv(const Node* node) const override;
     bool compare(const Node* node) const override;
@@ -181,33 +180,23 @@ private:
 };
 
 class Epsilon : public Node {
-    static Epsilon instance;
 public:
     Epsilon();
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Epsilon* clone() const override;
     bool equiv(const Node* node) const override;
     bool compare(const Node* node) const override;
     std::string to_string() const override;
-
-    static void* operator new(std::size_t sz) { return &instance; }
-
-    static void operator delete(void* p) { }
 };
 
 class Empty : public Node {
-    static Empty instance;
 public:
     Empty();
-    void accept(RegexVisitor* v) const override;
+    void accept(Visitor* v) const override;
     Node* clone() const override;
     bool compare(const Node* node) const override;
     bool equiv(const Node* node) const override;
     std::string to_string() const override;
-
-    static void* operator new(std::size_t sz) { return &instance; }
-
-    static void operator delete(void* p) { }
 };
 }// namespace Regex
 

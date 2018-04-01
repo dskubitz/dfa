@@ -5,7 +5,7 @@
 #include <memory>
 #include <Regexp.h>
 
-class DerivativeEvaluator : public Regex::RegexVisitor {
+class DerivativeEvaluator : public Regex::Visitor {
 public:
     Regexp derive(const Regexp& regex, char da);
 private:

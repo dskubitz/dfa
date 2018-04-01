@@ -125,13 +125,6 @@ TEST_F(RegexTests, StrictWeakOrder)
     EXPECT_TRUE(((re0 < re1) && (re2 < re3)) == (re0 < re3));
 }
 
-TEST_F(RegexTests, SingletonEmpty)
-{
-    auto empty1 = new Regex::Empty;
-    auto empty2 = new Regex::Empty;
-    EXPECT_EQ(empty1, empty2);
-}
-
 TEST_F(RegexTests, Swap)
 {
     Regexp re1 = parser.parse("[aeiou]");

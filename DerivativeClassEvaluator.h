@@ -6,7 +6,7 @@
 #include "Regexp.h"
 #include "NullableEvaluator.h"
 
-class DerivativeClassEvaluator : Regex::RegexVisitor {
+class DerivativeClassEvaluator : Regex::Visitor {
 public:
     std::unordered_set<Bitset> evaluate(const Regexp& regex);
 private:

@@ -19,15 +19,12 @@ const std::array<int, 100>
                  120, 121, 122, 123, 124, 125, 126,
 };
 
-Empty Empty::instance;
-Epsilon Epsilon::instance;
-
 Closure::Closure(Node* node)
         : Node(Type::Closure), expr_(node)
 {
 }
 
-void Closure::accept(RegexVisitor* v) const
+void Closure::accept(Visitor* v) const
 {
     v->visit(this);
 }
@@ -70,7 +67,7 @@ Concat::Concat(Node* left, Node* right)
 {
 }
 
-void Concat::accept(RegexVisitor* v) const
+void Concat::accept(Visitor* v) const
 {
     v->visit(this);
 }
@@ -118,7 +115,7 @@ Union::Union(Node* left, Node* right)
 {
 }
 
-void Union::accept(RegexVisitor* v) const
+void Union::accept(Visitor* v) const
 {
     v->visit(this);
 }
@@ -161,7 +158,7 @@ bool Union::compare(const Node* node) const
     return type() < node->type();
 }
 
-void Intersection::accept(RegexVisitor* v) const { v->visit(this); }
+void Intersection::accept(Visitor* v) const { v->visit(this); }
 
 Intersection* Intersection::clone() const
 {
@@ -219,7 +216,7 @@ Symbol::Symbol(Bitset values)
 {
 }
 
-void Symbol::accept(RegexVisitor* v) const
+void Symbol::accept(Visitor* v) const
 {
     v->visit(this);
 }
@@ -299,7 +296,7 @@ const Bitset& Symbol::values() const
     return set_;
 }
 
-void Complement::accept(RegexVisitor* v) const { v->visit(this); }
+void Complement::accept(Visitor* v) const { v->visit(this); }
 
 Complement* Complement::clone() const
 {
@@ -334,14 +331,14 @@ bool Complement::compare(const Node* node) const
     return type() < node->type();
 }
 
-void Epsilon::accept(RegexVisitor* v) const
+void Epsilon::accept(Visitor* v) const
 {
     v->visit(this);
 }
 
 Epsilon* Epsilon::clone() const
 {
-    return &instance;
+    return new Epsilon;
 }
 
 bool Epsilon::equiv(const Node* node) const
@@ -364,14 +361,14 @@ Epsilon::Epsilon()
 {
 }
 
-void Empty::accept(RegexVisitor* v) const
+void Empty::accept(Visitor* v) const
 {
     v->visit(this);
 }
 
 Node* Empty::clone() const
 {
-    return &instance;
+    return new Empty;
 }
 
 bool Empty::equiv(const Node* node) const

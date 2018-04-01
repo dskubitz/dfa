@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <DFA.h>
 #include <ostream>
+#include <stack>
 
 struct SourceLocation {
     int line;
@@ -42,11 +43,13 @@ private:
     std::string lexeme_;
     SourceLocation start_;
     SourceLocation current_;
+    std::stack<int, std::vector<int>> previous_line_length_;
     int last_match_{0};
     int backup_{0};
     bool encountered_eof_{false};
 
     int advance();
+    void retract();
 };
 
 #endif //LEXER_H

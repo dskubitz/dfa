@@ -2,47 +2,48 @@
 #define LEXER_H
 
 #include <tuple>
-#include <istream>
-#include <stdexcept>
-#include <unordered_map>
-#include <DFA.h>
-#include <ostream>
 #include <stack>
+#include <utility>
+#include <istream>
+#include <ostream>
+#include <functional>
 
-struct SourceLocation {
+#include <lexer/dfa.h>
+
+struct source_location {
     int line;
     int column;
 
-    SourceLocation(int l = {}, int c = {})
+    source_location(int l = {}, int c = {})
             : line(l), column(c) { }
 
     friend std::ostream&
-    operator<<(std::ostream& os, const SourceLocation& location)
+    operator<<(std::ostream& os, const source_location& location)
     {
         return os << location.line << ":"
                   << location.column;
     }
 };
 
-class Lexer {
+class lexer {
 public:
-    Lexer(DFA&& dfa, std::istream& i);
+    lexer(dfa&& dfa, std::istream& i);
 
     int scan();
 
     const std::string& lexeme() const;
-    const SourceLocation& current_position() const;
-    const SourceLocation& lexeme_start_position() const;
+    const source_location& current_position() const;
+    const source_location& lexeme_start_position() const;
     bool end_of_file();
-    Lexer& reset_input_stream(std::istream& input);
+    lexer& reset_input_stream(std::istream& input);
 
 private:
-    DFA dfa_;
+    dfa dfa_;
     std::reference_wrapper<std::istream> input_;
 
     std::string lexeme_;
-    SourceLocation start_;
-    SourceLocation current_;
+    source_location start_;
+    source_location current_;
     std::stack<int, std::vector<int>> previous_line_length_;
     int last_match_{0};
     int backup_{0};

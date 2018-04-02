@@ -1,12 +1,12 @@
-#include <Derivative.h>
+#include <lexer/derivative.h>
 #include <algorithm>
 
-void Derivative::visit(const Regex::Node* node)
+void derivative::visit(const Regex::Node* node)
 {
     node->accept(this);
 }
 
-void Derivative::visit(const Regex::Closure* node)
+void derivative::visit(const Regex::Closure* node)
 {
     stack.push_back(
             make_concatenation(
@@ -16,7 +16,7 @@ void Derivative::visit(const Regex::Closure* node)
                             node->expr()->clone())));
 }
 
-void Derivative::visit(const Regex::Concat* node)
+void derivative::visit(const Regex::Concat* node)
 {
     stack.push_back(
             make_union(
@@ -28,7 +28,7 @@ void Derivative::visit(const Regex::Concat* node)
                             evaluate(node->right()))));
 }
 
-void Derivative::visit(const Regex::Union* node)
+void derivative::visit(const Regex::Union* node)
 {
     stack.push_back(
             make_union(
@@ -36,7 +36,7 @@ void Derivative::visit(const Regex::Union* node)
                     evaluate(node->right())));
 }
 
-void Derivative::visit(const Regex::Intersection* node)
+void derivative::visit(const Regex::Intersection* node)
 {
     stack.push_back(
             make_intersection(
@@ -44,14 +44,14 @@ void Derivative::visit(const Regex::Intersection* node)
                     evaluate(node->right())));
 }
 
-void Derivative::visit(const Regex::Complement* node)
+void derivative::visit(const Regex::Complement* node)
 {
     stack.push_back(
             make_complement(
                     evaluate(node->expr()->clone())));
 }
 
-void Derivative::visit(const Regex::Symbol* node)
+void derivative::visit(const Regex::Symbol* node)
 {
     if (node->values().test(dA))
         stack.push_back(new Regex::Epsilon);
@@ -59,22 +59,22 @@ void Derivative::visit(const Regex::Symbol* node)
         stack.push_back(new Regex::Empty);
 }
 
-void Derivative::visit(const Regex::Epsilon* node)
+void derivative::visit(const Regex::Epsilon* node)
 {
     stack.push_back(new Regex::Empty);
 }
 
-void Derivative::visit(const Regex::Empty* node)
+void derivative::visit(const Regex::Empty* node)
 {
     stack.push_back(new Regex::Empty);
 }
 
-Regex::Node* Derivative::derive_impl(const Regex::Node* tree)
+Regex::Node* derivative::derive_impl(const Regex::Node* tree)
 {
     return evaluate(tree);
 }
 
-Regex::Node* Derivative::evaluate(const Regex::Node* node)
+Regex::Node* derivative::evaluate(const Regex::Node* node)
 {
     visit(node);
     Regex::Node* res = stack.back();
@@ -82,17 +82,17 @@ Regex::Node* Derivative::evaluate(const Regex::Node* node)
     return res;
 }
 
-Regexp Derivative::derive(const Regexp& regex, char da)
+regexp derivative::derive(const regexp& regex, char da)
 {
     stack.clear();
     dA = da;
-    return Regexp(derive_impl(regex.get()));
+    return regexp(derive_impl(regex.get()));
 }
 
-std::vector<Regexp> make_derivative(const std::vector<Regexp>& rvector, char da)
+std::vector<regexp> make_derivative(const std::vector<regexp>& rvector, char da)
 {
-    Derivative D;
-    std::vector<Regexp> res;
+    derivative D;
+    std::vector<regexp> res;
     for (auto& re : rvector) {
         res.push_back(D.derive(re, da));
     }
@@ -193,13 +193,13 @@ DerivativeClass::evaluate(const Regex::Node* node)
 }
 
 std::unordered_set<Bitset>
-DerivativeClass::evaluate(const Regexp& regex)
+DerivativeClass::evaluate(const regexp& regex)
 {
     return evaluate(regex.get());
 }
 
 std::unordered_set<Bitset>
-make_derivative_class(const std::vector<Regexp>& rvector)
+make_derivative_class(const std::vector<regexp>& rvector)
 {
     DerivativeClass derivativeClass;
     std::unordered_set<Bitset> res;
@@ -263,7 +263,7 @@ bool Nullable::evaluate(const Regex::Node* regex)
     return res;
 }
 
-bool Nullable::evaluate(const Regexp& regex)
+bool Nullable::evaluate(const regexp& regex)
 {
     return evaluate(regex.get());
 }

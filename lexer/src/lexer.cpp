@@ -1,12 +1,12 @@
-#include <Lexer.h>
+#include <lexer/lexer.h>
 #include <iostream>
 
-Lexer::Lexer(DFA&& dfa, std::istream& i)
+lexer::lexer(dfa&& dfa, std::istream& i)
         : dfa_(std::move(dfa)), input_(i), current_(1, 0)
 {
 }
 
-int Lexer::scan()
+int lexer::scan()
 {
     if (encountered_eof_)
         return dfa_.accept_map.at(last_match_);
@@ -48,7 +48,7 @@ int Lexer::scan()
     return dfa_.accept_map.at(last_match_);
 }
 
-int Lexer::advance()
+int lexer::advance()
 {
     int c = input_.get().get();
     if (c == '\n') {
@@ -61,7 +61,7 @@ int Lexer::advance()
     return c;
 }
 
-void Lexer::retract()
+void lexer::retract()
 {
     auto& input = input_.get();
 
@@ -78,27 +78,27 @@ void Lexer::retract()
     }
 }
 
-const std::string& Lexer::lexeme() const
+const std::string& lexer::lexeme() const
 {
     return lexeme_;
 }
 
-const SourceLocation& Lexer::lexeme_start_position() const
+const source_location& lexer::lexeme_start_position() const
 {
     return start_;
 }
 
-const SourceLocation& Lexer::current_position() const
+const source_location& lexer::current_position() const
 {
     return current_;
 }
 
-bool Lexer::end_of_file()
+bool lexer::end_of_file()
 {
     return encountered_eof_;
 }
 
-Lexer& Lexer::reset_input_stream(std::istream& input)
+lexer& lexer::reset_input_stream(std::istream& input)
 {
     input_ = input;
     start_ = current_ = {1, 0};

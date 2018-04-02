@@ -4,18 +4,18 @@
 #include <string>
 #include <memory>
 
-#include <Regexp.h>
+#include <lexer/regexp.h>
 
-struct ParserError : std::runtime_error {
+struct parser_error : std::runtime_error {
     using std::runtime_error::runtime_error;
     using std::runtime_error::what;
 };
 
-class Parser {
+class parser {
 public:
-    Regexp parse(const std::string& regexp)
+    regexp parse(const std::string& expression)
     {
-        return Regexp(parse_impl(regexp));
+        return regexp(parse_impl(expression));
     }
 
 private:
@@ -55,7 +55,7 @@ Out make_regular_vector(In beg, In end, Out it)
             typename std::iterator_traits<Out>::iterator_category,
             std::output_iterator_tag>, "Invalid output iterator");
 
-    Parser parser;
+    parser parser;
 
     for (; beg != end; ++beg)
         *it++ = parser.parse(*beg);
@@ -64,9 +64,9 @@ Out make_regular_vector(In beg, In end, Out it)
 }
 
 template<template<typename, typename...> class Cont, typename T, typename ...A>
-std::vector<Regexp> make_regular_vector(const Cont<T, A...>& cont)
+std::vector<regexp> make_regular_vector(const Cont<T, A...>& cont)
 {
-    std::vector<Regexp> res;
+    std::vector<regexp> res;
     res.reserve(std::size(cont));
     make_regular_vector(std::begin(cont), std::end(cont),
                         std::back_inserter(res));
@@ -75,9 +75,9 @@ std::vector<Regexp> make_regular_vector(const Cont<T, A...>& cont)
 }
 
 template<typename T>
-std::vector<Regexp> make_regular_vector(std::initializer_list<T> list)
+std::vector<regexp> make_regular_vector(std::initializer_list<T> list)
 {
-    std::vector<Regexp> res;
+    std::vector<regexp> res;
     res.reserve(list.size());
     make_regular_vector(list.begin(), list.end(), std::back_inserter(res));
 

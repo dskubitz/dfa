@@ -206,19 +206,19 @@ Regex::Node* make_closure(Regex::Node* expr);
 Regex::Node* make_intersection(Regex::Node* left, Regex::Node* right);
 Regex::Node* make_complement(Regex::Node* expr);
 
-class Regexp {
+class regexp {
 public:
-    explicit Regexp(Regex::Node* ptr)
+    explicit regexp(Regex::Node* ptr)
             : ptr_(ptr) { }
 
-    void swap(Regexp& other) noexcept;
+    void swap(regexp& other) noexcept;
 
-    friend bool operator==(const Regexp& lhs, const Regexp& rhs);
-    friend bool operator!=(const Regexp& lhs, const Regexp& rhs);
-    friend bool operator<(const Regexp& lhs, const Regexp& rhs);
-    friend bool operator>(const Regexp& lhs, const Regexp& rhs);
-    friend bool operator<=(const Regexp& lhs, const Regexp& rhs);
-    friend bool operator>=(const Regexp& lhs, const Regexp& rhs);
+    friend bool operator==(const regexp& lhs, const regexp& rhs);
+    friend bool operator!=(const regexp& lhs, const regexp& rhs);
+    friend bool operator<(const regexp& lhs, const regexp& rhs);
+    friend bool operator>(const regexp& lhs, const regexp& rhs);
+    friend bool operator<=(const regexp& lhs, const regexp& rhs);
+    friend bool operator>=(const regexp& lhs, const regexp& rhs);
 
     Regex::Node* get() noexcept;
     Regex::Node* operator->() noexcept;
@@ -230,9 +230,9 @@ private:
     std::shared_ptr<Regex::Node> ptr_;
 };
 
-std::ostream& operator<<(std::ostream& os, const Regexp& regexp);
+std::ostream& operator<<(std::ostream& os, const regexp& regexp);
 
-inline void swap(Regexp& lhs, Regexp& rhs) noexcept
+inline void swap(regexp& lhs, regexp& rhs) noexcept
 {
     lhs.swap(rhs);
 }

@@ -1,5 +1,4 @@
-#include <iostream>
-#include "Parser.h"
+#include <lexer/parser.h>
 
 namespace {
 bool is_meta(char ch)
@@ -16,11 +15,11 @@ bool is_char(char ch)
 
 [[noreturn]] void error(const std::string& msg)
 {
-    throw ParserError{msg};
+    throw parser_error{msg};
 }
 }
 
-Regex::Node* Parser::parse_impl(const std::string& regexp)
+Regex::Node* parser::parse_impl(const std::string& regexp)
 {
     expr = regexp;
     pos = 0;
@@ -36,14 +35,14 @@ Regex::Node* Parser::parse_impl(const std::string& regexp)
         return union_or_intersection();
     }
     catch (std::out_of_range& e) {
-        throw ParserError(e.what());
+        throw parser_error(e.what());
     }
-    catch (ParserError&) {
+    catch (parser_error&) {
         throw;
     }
 }
 
-Regex::Node* Parser::union_or_intersection()
+Regex::Node* parser::union_or_intersection()
 {
     std::unique_ptr<Regex::Node> left(concatenation());
 
@@ -63,7 +62,7 @@ Regex::Node* Parser::union_or_intersection()
     return left.release();
 }
 
-Regex::Node* Parser::concatenation()
+Regex::Node* parser::concatenation()
 {
     std::unique_ptr<Regex::Node> left(prefix());
 
@@ -86,7 +85,7 @@ Regex::Node* Parser::concatenation()
     return left.release();
 }
 
-Regex::Node* Parser::prefix()
+Regex::Node* parser::prefix()
 {
     if (match('~')) {
         std::unique_ptr<Regex::Node> right(prefix());
@@ -95,7 +94,7 @@ Regex::Node* Parser::prefix()
     return postfix();
 }
 
-Regex::Node* Parser::postfix()
+Regex::Node* parser::postfix()
 {
     std::unique_ptr<Regex::Node> left(factor());
 
@@ -110,7 +109,7 @@ Regex::Node* Parser::postfix()
     return left.release();
 }
 
-Regex::Node* Parser::factor()
+Regex::Node* parser::factor()
 {
     if (is_char(peek())) {
         return new Regex::Symbol(advance());
@@ -132,7 +131,7 @@ Regex::Node* Parser::factor()
     }
 }
 
-Regex::Node* Parser::character_class()
+Regex::Node* parser::character_class()
 {
     Bitset set;
     if (match('^')) {
@@ -154,7 +153,7 @@ Regex::Node* Parser::character_class()
     return new Regex::Symbol(set);
 }
 
-Bitset Parser::parse_character_class()
+Bitset parser::parse_character_class()
 {
     Bitset set = range();
 
@@ -164,7 +163,7 @@ Bitset Parser::parse_character_class()
     return set;
 }
 
-Bitset Parser::range()
+Bitset parser::range()
 {
     Bitset set;
 
@@ -193,7 +192,7 @@ Bitset Parser::range()
     return set;
 }
 
-bool Parser::match(char ch)
+bool parser::match(char ch)
 {
     if (check(ch)) {
         advance();
@@ -202,33 +201,33 @@ bool Parser::match(char ch)
     return false;
 }
 
-bool Parser::check(char ch)
+bool parser::check(char ch)
 {
     return !at_end() && peek() == ch;
 }
 
-char Parser::advance()
+char parser::advance()
 {
     ++pos;
     return previous();
 }
 
-bool Parser::at_end()
+bool parser::at_end()
 {
     return pos == expr.length();
 }
 
-char Parser::peek()
+char parser::peek()
 {
     return expr.at(pos);
 }
 
-char Parser::previous()
+char parser::previous()
 {
     return expr.at(pos - 1);
 }
 
-char Parser::consume(char ch, const std::string& msg)
+char parser::consume(char ch, const std::string& msg)
 {
     if (check(ch))
         return advance();

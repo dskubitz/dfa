@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 #include <fstream>
 
-#include <Parser.h>
-#include <DFA.h>
-#include <Lexer.h>
+#include <lexer/parser.h>
+#include <lexer/dfa.h>
+#include <lexer/lexer.h>
 
 TEST(TransitionTableTests, TransitionTableTest)
 {
-    Parser parser;
+    parser parser;
     std::vector<std::string> regexps = {
             "and",                          // 0
             "class",                        // 1
@@ -50,9 +50,9 @@ TEST(TransitionTableTests, TransitionTableTest)
             "[ \t\v\n\f]+",                 // 38
             ".",                            // 39
     };
-    std::vector<Regexp> regular_vector = make_regular_vector(regexps);
+    std::vector<regexp> regular_vector = make_regular_vector(regexps);
 
-    DFA dfa = make_DFA(regular_vector);
+    dfa dfa = make_DFA(regular_vector);
 
     //@formatter:off
     std::string str {
@@ -131,7 +131,7 @@ TEST(TransitionTableTests, TransitionTableTest)
     //@formatter:on
     std::stringstream iss(str);
 
-    Lexer lexer(std::move(dfa), iss);
+    lexer lexer(std::move(dfa), iss);
 
     auto error = regexps.size() - 1;
     auto space = regexps.size() - 2;
@@ -147,10 +147,10 @@ TEST(TransitionTableTests, TransitionTableTest)
 
 TEST(ScannerTests, ChangingInputStreams)
 {
-    std::vector<Regexp> vec = make_regular_vector({"abcd", "efgh", " "});
+    std::vector<regexp> vec = make_regular_vector({"abcd", "efgh", " "});
     auto dfa = make_DFA(vec);
     std::stringstream ss1("abcd abcd");
-    Lexer lexer(std::move(dfa), ss1);
+    lexer lexer(std::move(dfa), ss1);
 
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
@@ -166,35 +166,12 @@ TEST(ScannerTests, ChangingInputStreams)
     }
 }
 
-TEST(SerializationTest, Functions)
-{
-    std::vector<Regexp> vec = make_regular_vector({"abcd", "efgh", " "});
-    auto dfa1 = make_DFA(vec);
-    {
-        std::ofstream ofs("test.dfa");
-        ASSERT_TRUE(ofs.good());
-        boost::archive::text_oarchive oa(ofs);
-        oa << dfa1;
-    }
-
-    DFA dfa2;
-    {
-        std::ifstream ifs("test.dfa");
-        ASSERT_TRUE(ifs.good());
-        boost::archive::text_iarchive ia(ifs);
-        ia >> dfa2;
-    }
-    EXPECT_EQ(dfa1.table, dfa2.table);
-    EXPECT_EQ(dfa1.accept_map, dfa2.accept_map);
-    EXPECT_EQ(dfa1.dead_state, dfa2.dead_state);
-}
-
 TEST(ScannerTests, BackedUpLexeme)
 {
-    std::vector<Regexp> vec = make_regular_vector({"a", "aaa", " "});
+    std::vector<regexp> vec = make_regular_vector({"a", "aaa", " "});
     auto dfa = make_DFA(vec);
     std::stringstream ss1("a aa aaa aaaa");
-    Lexer lexer(std::move(dfa), ss1);
+    lexer lexer(std::move(dfa), ss1);
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
 
@@ -208,10 +185,10 @@ TEST(ScannerTests, BackedUpLexeme)
 
 TEST(ScannerTests, Complement)
 {
-    std::vector<Regexp> vec = make_regular_vector({"~( )", " "});
-    DFA dfa = make_DFA(vec);
+    std::vector<regexp> vec = make_regular_vector({"~( )", " "});
+    dfa dfa = make_DFA(vec);
     std::istringstream input("abc def ");
-    Lexer lexer(std::move(dfa), input);
+    lexer lexer(std::move(dfa), input);
     while (!lexer.end_of_file()) {
         int tok = lexer.scan();
         std::cout << tok << ' ' << lexer.lexeme() << '\n';

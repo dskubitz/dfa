@@ -7,10 +7,8 @@ add_subdirectory(test)
 
 set(SOURCES Regexp.cpp Regexp.h
         Parser.cpp Parser.h
-        DerivativeEvaluator.cpp DerivativeEvaluator.h
-        NullableEvaluator.cpp NullableEvaluator.h
+        Derivative.cpp Derivative.h
         DFA.cpp DFA.h
-        DerivativeClassEvaluator.cpp DerivativeClassEvaluator.h
         Lexer.cpp Lexer.h
         )
 add_library(core STATIC ${SOURCES})
@@ -25,6 +23,6 @@ include_directories(${Boost_INCLUDE_DIR})
 # Note: a target should be already defined using 'add_executable' or 'add_library'
 target_link_libraries(core ${Boost_LIBRARIES})
 
-add_executable(main main.cpp Regexp.cpp Parser.cpp DerivativeEvaluator.cpp DerivativeClassEvaluator.cpp Lexer.cpp NullableEvaluator.cpp DFA.cpp)
+add_executable(main main.cpp Regexp.cpp Parser.cpp Derivative.cpp Lexer.cpp DFA.cpp)
 target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR})
 

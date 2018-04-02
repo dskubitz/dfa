@@ -1,5 +1,4 @@
 #include <Lexer.h>
-#include <iostream>
 
 Lexer::Lexer(DFA&& dfa, std::istream& i)
         : dfa_(std::move(dfa)), input_(i), current_(1, 0) { }

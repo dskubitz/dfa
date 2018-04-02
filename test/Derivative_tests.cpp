@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
-#include <DerivativeEvaluator.h>
-#include <DerivativeClassEvaluator.h>
+#include <Derivative.h>
 #include <Parser.h>
 class DerivativeTests : public ::testing::Test {
 protected:
-    DerivativeEvaluator derivative;
+    Derivative derivative;
     Parser parser;
 };
 
@@ -20,7 +19,7 @@ TEST_F(DerivativeTests, BasicFunctionality)
 
 TEST_F(DerivativeTests, MatchSimple)
 {
-    NullableEvaluator nullable;
+    Nullable nullable;
     auto re = parser.parse("abc+");
     auto r = re;
     EXPECT_FALSE(nullable.evaluate(r.get()));
@@ -39,22 +38,22 @@ TEST_F(DerivativeTests, MatchSimple)
 TEST_F(DerivativeTests, Nullable)
 {
     auto re = parser.parse("a*");
-    EXPECT_TRUE(NullableEvaluator{}.evaluate(re.get()));
+    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
     re = parser.parse("(a*|b)");
-    EXPECT_TRUE(NullableEvaluator{}.evaluate(re.get()));
+    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
     re = parser.parse("a|b");
-    EXPECT_FALSE(NullableEvaluator{}.evaluate(re.get()));
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
     re = parser.parse("(a*b)");
-    EXPECT_FALSE(NullableEvaluator{}.evaluate(re.get()));
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
     re = parser.parse("ab");
-    EXPECT_FALSE(NullableEvaluator{}.evaluate(re.get()));
+    EXPECT_FALSE(Nullable{}.evaluate(re.get()));
     re = parser.parse("");
-    EXPECT_TRUE(NullableEvaluator{}.evaluate(re.get()));
+    EXPECT_TRUE(Nullable{}.evaluate(re.get()));
 }
 
 TEST_F(DerivativeTests, RVectorTests)
 {
-    DerivativeClassEvaluator derivativeClass;
+    DerivativeClass derivativeClass;
     auto re = Parser{}.parse("[A-Za-z_][A-Za-z_0-9]*");
     auto re2 = Parser{}.parse("[0-9]+(\\.[0-9]+)?");
     auto set1 = derivativeClass.evaluate(re);

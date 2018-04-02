@@ -2,7 +2,6 @@
 #include "Regexp.h"
 #include "Parser.h"
 #include "Lexer.h"
-#include "DerivativeClassEvaluator.h"
 #include <iostream>
 #include <chrono>
 

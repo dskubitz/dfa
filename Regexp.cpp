@@ -502,68 +502,11 @@ bool operator>=(const Regexp& lhs, const Regexp& rhs)
     return !(lhs < rhs);
 }
 
-inline int test(unsigned first, unsigned last, const Bitset& set)
-{
-    for (; first < last; ++first)
-        if (set.test(first))
-            return first;
-    return 0;
-}
-
-static Bitset lowerq{
-        "00000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111"
-};
-static Bitset upperq{
-        "11111111111111111111111111111111111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000000"
-};
-static Bitset firstw{
-        "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111"
-};
-static Bitset firsth{
-        "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111"
-};
-static Bitset thirdh{
-        "00000000000000000000000000000000000000000000000000000000000000000000000000000000111111111111111100000000000000000000000000000000"
-};
-static Bitset thirdw{
-        "00000000000000000000000000000000111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000000"
-};
-static Bitset fifthh{
-        "00000000000000000000000000000000000000000000000011111111111111110000000000000000000000000000000000000000000000000000000000000000"
-};
-static Bitset svnthh{
-        "00000000000000001111111111111111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-};
-
 int first_occurring(const Bitset& set)
 {
-    if ((set & lowerq).any()) {
-        if ((set & firstw).any()) {
-            if ((set & firsth).any())
-                return test(0, 16, set);
-            else
-                return test(16, 32, set);
-
-        } else {
-            if ((set & thirdh).any())
-                return test(32, 48, set);
-            else
-                return test(48, 64, set);
-        }
-    } else if ((set & upperq).any()) {
-        if ((set & thirdw).any()) {
-            if ((set & fifthh).any())
-                return test(64, 80, set);
-            else
-                return test(80, 96, set);
-
-        } else {
-            if ((set & svnthh).any())
-                return test(96, 112, set);
-            else
-                return test(112, 128, set);
-        }
-    }
+    for (size_t i = 0; i < set.size(); ++i)
+        if (set.test(i))
+            return static_cast<int>(i);
     return 0;
 }
 

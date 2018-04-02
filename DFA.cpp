@@ -1,8 +1,7 @@
 #include <map>
 #include <DFA.h>
 #include <Regexp.h>
-#include <DerivativeEvaluator.h>
-#include <DerivativeClassEvaluator.h>
+#include <Derivative.h>
 
 using State = std::vector<Regexp>;
 using StateMap = std::map<State, DFA::Index>;
@@ -10,7 +9,7 @@ using StateMap = std::map<State, DFA::Index>;
 namespace {
 std::tuple<bool, bool, int> accepting(const State& state)
 {
-    NullableEvaluator N;
+    Nullable N;
 
     int index = 0;
     int nempty = 0;
@@ -38,8 +37,8 @@ DFA make_DFA(const std::vector<Regexp>& regex)
 
     dstates.insert({regex, 0});
 
-    DerivativeEvaluator deriv;
-    DerivativeClassEvaluator derivativeClass;
+    Derivative deriv;
+    DerivativeClass derivativeClass;
 
     std::vector<State> unmarked{regex};
     size_t num = 1;

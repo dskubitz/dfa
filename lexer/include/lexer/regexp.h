@@ -198,13 +198,13 @@ public:
     bool equiv(const Node* node) const override;
     std::string to_string() const override;
 };
-}// namespace Regex
 
 Regex::Node* make_union(Regex::Node* left, Regex::Node* right);
 Regex::Node* make_concatenation(Regex::Node* left, Regex::Node* right);
 Regex::Node* make_closure(Regex::Node* expr);
 Regex::Node* make_intersection(Regex::Node* left, Regex::Node* right);
 Regex::Node* make_complement(Regex::Node* expr);
+}// namespace Regex
 
 class regexp {
 public:
@@ -236,5 +236,4 @@ inline void swap(regexp& lhs, regexp& rhs) noexcept
 {
     lhs.swap(rhs);
 }
-
 #endif //RE_H

@@ -3,7 +3,7 @@
 
 #include <lexer/parser.h>
 #include <lexer/dfa.h>
-#include <lexer/lexer.h>
+#include <lexer/scanner.h>
 
 TEST(TransitionTableTests, TransitionTableTest)
 {
@@ -131,7 +131,7 @@ TEST(TransitionTableTests, TransitionTableTest)
     //@formatter:on
     std::stringstream iss(str);
 
-    lexer lexer(std::move(dfa), iss);
+    scanner lexer(std::move(dfa), iss);
 
     auto error = regexps.size() - 1;
     auto space = regexps.size() - 2;
@@ -150,7 +150,7 @@ TEST(ScannerTests, ChangingInputStreams)
     std::vector<regexp> vec = make_regular_vector({"abcd", "efgh", " "});
     auto dfa = make_DFA(vec);
     std::stringstream ss1("abcd abcd");
-    lexer lexer(std::move(dfa), ss1);
+    scanner lexer(std::move(dfa), ss1);
 
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
@@ -171,7 +171,7 @@ TEST(ScannerTests, BackedUpLexeme)
     std::vector<regexp> vec = make_regular_vector({"a", "aaa", " "});
     auto dfa = make_DFA(vec);
     std::stringstream ss1("a aa aaa aaaa");
-    lexer lexer(std::move(dfa), ss1);
+    scanner lexer(std::move(dfa), ss1);
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
 
@@ -188,7 +188,7 @@ TEST(ScannerTests, Complement)
     std::vector<regexp> vec = make_regular_vector({"~( )", " "});
     dfa dfa = make_DFA(vec);
     std::istringstream input("abc def ");
-    lexer lexer(std::move(dfa), input);
+    scanner lexer(std::move(dfa), input);
     while (!lexer.end_of_file()) {
         int tok = lexer.scan();
         std::cout << tok << ' ' << lexer.lexeme() << '\n';

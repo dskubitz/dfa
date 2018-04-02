@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <lexer/regexp.h>
-
 struct parser_error : std::runtime_error {
     using std::runtime_error::runtime_error;
     using std::runtime_error::what;
@@ -39,9 +38,9 @@ private:
     Bitset parse_character_class();
     Bitset range();
 
-    std::string expr {};
-    std::string::size_type pos {0};
-    int paren_count {0};
+    std::string expr{};
+    std::string::size_type pos{0};
+    int paren_count{0};
 };
 
 template<typename In, typename Out,
@@ -83,5 +82,4 @@ std::vector<regexp> make_regular_vector(std::initializer_list<T> list)
 
     return res;
 }
-
 #endif //LEXER_PARSER_H

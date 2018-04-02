@@ -25,9 +25,9 @@ struct source_location {
     }
 };
 
-class lexer {
+class scanner {
 public:
-    lexer(dfa&& dfa, std::istream& i);
+    scanner(dfa&& dfa, std::istream& i);
 
     int scan();
 
@@ -35,7 +35,7 @@ public:
     const source_location& current_position() const;
     const source_location& lexeme_start_position() const;
     bool end_of_file();
-    lexer& reset_input_stream(std::istream& input);
+    scanner& reset_input_stream(std::istream& input);
 
 private:
     dfa dfa_;
@@ -52,5 +52,4 @@ private:
     int advance();
     void retract();
 };
-
 #endif //LEXER_H

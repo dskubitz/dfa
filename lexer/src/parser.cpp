@@ -1,6 +1,5 @@
 #include <lexer/parser.h>
 
-namespace {
 bool is_meta(char ch)
 {
     return ch == '*' || ch == '+' || ch == '-' || ch == '|' || ch == '.'
@@ -16,7 +15,6 @@ bool is_char(char ch)
 [[noreturn]] void error(const std::string& msg)
 {
     throw parser_error{msg};
-}
 }
 
 Regex::Node* parser::parse_impl(const std::string& regexp)

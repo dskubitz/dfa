@@ -61,3 +61,13 @@ TEST_F(DerivativeTests, RVectorTests)
     std::vector<Regexp> regular_vector{re, re2};
     auto set = make_derivative_class(regular_vector);
 }
+
+TEST_F(DerivativeTests, Complement)
+{
+    auto re = Parser{}.parse("~abc");
+    auto set = make_derivative_class({re});
+    for (auto& i : set) {
+        auto derivative = Derivative{}.derive(re, first_occurring(i));
+        std::cout << derivative << '\n';
+    }
+}

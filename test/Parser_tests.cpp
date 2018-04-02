@@ -55,3 +55,11 @@ TEST_F(ParserTests, Intersection)
     auto r1 = parser.parse("ab&cd");
     EXPECT_EQ(r1->to_string(), "((a.b)&(c.d))");
 }
+
+TEST_F(ParserTests, Complement)
+{
+    auto r = parser.parse("~(abc)");
+    EXPECT_EQ(r->to_string(), "~(((a.b).c))");
+    auto r2 = parser.parse("~abc");
+    EXPECT_EQ(r2->to_string(), "((~(a).b).c)");
+}

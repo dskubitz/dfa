@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Parser.h"
 
 namespace {
@@ -27,6 +28,11 @@ Regex::Node* Parser::parse_impl(const std::string& regexp)
     try {
         if (expr.empty())
             return new Regex::Epsilon;
+        else if (expr == ".") {
+            Bitset set;
+            set.flip();
+            return new Regex::Symbol(set);
+        }
         return union_or_intersection();
     }
     catch (std::out_of_range& e) {
@@ -59,7 +65,7 @@ Regex::Node* Parser::union_or_intersection()
 
 Regex::Node* Parser::concatenation()
 {
-    std::unique_ptr<Regex::Node> left(postfix());
+    std::unique_ptr<Regex::Node> left(prefix());
 
     while (!at_end()) {
         char c = peek();
@@ -72,12 +78,21 @@ Regex::Node* Parser::concatenation()
             --paren_count;
             break;
         } else {
-            std::unique_ptr<Regex::Node> right(postfix());
+            std::unique_ptr<Regex::Node> right(prefix());
             left.reset(make_concatenation(left.release(), right.release()));
         }
     }
 
     return left.release();
+}
+
+Regex::Node* Parser::prefix()
+{
+    if (match('~')) {
+        std::unique_ptr<Regex::Node> right(prefix());
+        return make_complement(right.release());
+    }
+    return postfix();
 }
 
 Regex::Node* Parser::postfix()
@@ -89,8 +104,7 @@ Regex::Node* Parser::postfix()
     else if (match('+')) {
         auto p = left.release();
         left.reset(make_concatenation(p, make_closure(p->clone())));
-    }
-    else if (match('?'))
+    } else if (match('?'))
         left.reset(make_union(left.release(), new Regex::Epsilon));
 
     return left.release();
@@ -220,3 +234,5 @@ char Parser::consume(char ch, const std::string& msg)
         return advance();
     error(msg);
 }
+
+

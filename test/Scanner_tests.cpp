@@ -205,3 +205,17 @@ TEST(ScannerTests, BackedUpLexeme)
                   << ' ' << lexer.current_position() << '\n';
     }
 }
+
+TEST(ScannerTests, Complement)
+{
+    std::vector<Regexp> vec = make_regular_vector({"~( )", " "});
+    DFA dfa = make_DFA(vec);
+    std::istringstream input("abc def ");
+    Lexer lexer(std::move(dfa), input);
+    while (!lexer.end_of_file()) {
+        int tok = lexer.scan();
+        std::cout << tok << ' ' << lexer.lexeme() << '\n';
+
+    }
+
+}

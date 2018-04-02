@@ -2,6 +2,7 @@
 #include <DFA.h>
 #include <Regexp.h>
 #include <Derivative.h>
+#include <iostream>
 
 using State = std::vector<Regexp>;
 using StateMap = std::map<State, DFA::Index>;

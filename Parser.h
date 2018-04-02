@@ -31,6 +31,7 @@ private:
 
     Regex::Node* union_or_intersection();
     Regex::Node* concatenation();
+    Regex::Node* prefix();
     Regex::Node* postfix();
     Regex::Node* factor();
     Regex::Node* character_class();

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(lexer)
-add_definitions(-std=c++1z -Wall -Wno-missing-braces -O3)
+add_definitions(-std=c++1z -Wall -Wno-missing-braces -Og)
 
 add_subdirectory(cmake)
 add_subdirectory(test)
@@ -23,6 +23,7 @@ include_directories(${Boost_INCLUDE_DIR})
 # Note: a target should be already defined using 'add_executable' or 'add_library'
 target_link_libraries(core ${Boost_LIBRARIES})
 
-add_executable(main main.cpp Regexp.cpp Parser.cpp Derivative.cpp Lexer.cpp DFA.cpp)
+add_executable(main main.cpp)
+target_link_libraries(main core)
 target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR})
 

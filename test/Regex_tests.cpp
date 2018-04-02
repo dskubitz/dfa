@@ -12,10 +12,10 @@ protected:
 TEST_F(RegexTests, Cat)
 {
     std::unique_ptr<Regex::Node> re(
-            make_cat(new Regex::Empty, new Regex::Symbol('a')));
+            make_concatenation(new Regex::Empty, new Regex::Symbol('a')));
     auto p = dynamic_cast<Regex::Empty*>(re.get());
     ASSERT_NE(p, nullptr);
-    re.reset(make_cat(new Regex::Epsilon, new Regex::Symbol('a')));
+    re.reset(make_concatenation(new Regex::Epsilon, new Regex::Symbol('a')));
     auto q = dynamic_cast<Regex::Symbol*>(re.get());
     ASSERT_NE(q, nullptr);
     EXPECT_TRUE(q->values().test('a'));
@@ -37,7 +37,7 @@ TEST_F(RegexTests, Union)
 TEST_F(RegexTests, Star)
 {
     std::unique_ptr<Regex::Node> re(
-            make_star(new Regex::Closure(
+            make_closure(new Regex::Closure(
                     new Regex::Closure(new Regex::Symbol('a')))));
     auto p = dynamic_cast<Regex::Closure*>(re.get());
     ASSERT_NE(p, nullptr);

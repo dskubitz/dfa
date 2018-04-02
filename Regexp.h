@@ -201,8 +201,8 @@ public:
 }// namespace Regex
 
 Regex::Node* make_union(Regex::Node* left, Regex::Node* right);
-Regex::Node* make_cat(Regex::Node* left, Regex::Node* right);
-Regex::Node* make_star(Regex::Node* expr);
+Regex::Node* make_concatenation(Regex::Node* left, Regex::Node* right);
+Regex::Node* make_closure(Regex::Node* expr);
 Regex::Node* make_intersection(Regex::Node* left, Regex::Node* right);
 Regex::Node* make_complement(Regex::Node* expr);
 

@@ -44,12 +44,11 @@ Regex::Node* Parser::union_or_intersection()
     while (true) {
         if (match('|')) {
             std::unique_ptr<Regex::Node> right(concatenation());
-            left.reset(new Regex::Union(left.release(), right.release()));
+            left.reset(make_union(left.release(), right.release()));
             continue;
         } else if (match('&')) {
             std::unique_ptr<Regex::Node> right(concatenation());
-            left.reset(
-                    new Regex::Intersection(left.release(), right.release()));
+            left.reset(make_intersection(left.release(), right.release()));
             continue;
         }
         break;
@@ -74,7 +73,7 @@ Regex::Node* Parser::concatenation()
             break;
         } else {
             std::unique_ptr<Regex::Node> right(postfix());
-            left.reset(new Regex::Concat(left.release(), right.release()));
+            left.reset(make_concatenation(left.release(), right.release()));
         }
     }
 
@@ -86,13 +85,13 @@ Regex::Node* Parser::postfix()
     std::unique_ptr<Regex::Node> left(factor());
 
     if (match('*'))
-        left.reset(new Regex::Closure(left.release()));
+        left.reset(make_closure(left.release()));
     else if (match('+')) {
         auto p = left.release();
-        left.reset(new Regex::Concat(p, new Regex::Closure(p->clone())));
+        left.reset(make_concatenation(p, make_closure(p->clone())));
     }
     else if (match('?'))
-        left.reset(new Regex::Union(left.release(), new Regex::Epsilon));
+        left.reset(make_union(left.release(), new Regex::Epsilon));
 
     return left.release();
 }

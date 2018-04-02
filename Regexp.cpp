@@ -407,7 +407,7 @@ Node* make_union(Node* left, Node* right)
     }
 }
 
-Node* make_cat(Node* left, Node* right)
+Node* make_concatenation(Node* left, Node* right)
 {
     Type ltype = left->type();
     Type rtype = right->type();
@@ -426,7 +426,7 @@ Node* make_cat(Node* left, Node* right)
     }
 }
 
-Node* make_star(Node* expr)
+Node* make_closure(Node* expr)
 {
     Type type = expr->type();
     if (type == Type::Empty) {
@@ -437,7 +437,7 @@ Node* make_star(Node* expr)
     } else if (type == Type::Closure) {
         Node* q = static_cast<Closure*>(expr)->expr()->clone();
         delete expr;
-        return make_star(q);
+        return make_closure(q);
     } else {
         return new Closure(expr);
     }

@@ -9,10 +9,10 @@ void Derivative::visit(const Regex::Node* node)
 void Derivative::visit(const Regex::Closure* node)
 {
     stack.push_back(
-            make_cat(
+            make_concatenation(
                     evaluate(
                             node->expr()),
-                    make_star(
+                    make_closure(
                             node->expr()->clone())));
 }
 
@@ -20,10 +20,10 @@ void Derivative::visit(const Regex::Concat* node)
 {
     stack.push_back(
             make_union(
-                    make_cat(
+                    make_concatenation(
                             evaluate(node->left()),
                             node->right()->clone()),
-                    make_cat(
+                    make_concatenation(
                             helper(node->left()),
                             evaluate(node->right()))));
 }

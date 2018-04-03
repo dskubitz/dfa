@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <unordered_set>
-#include <lexer/parser.h>
-#include <lexer/regexp.h>
+#include <lexer/Parser.h>
+#include <lexer/Regexp.h>
 
 class RegexTests : public ::testing::Test {
 protected:
-    parser parser_;
+    Parser parser_;
 };
 
 TEST_F(RegexTests, Cat)
@@ -85,18 +85,18 @@ TEST_F(RegexTests, Test)
 
 TEST_F(RegexTests, WrapperClass)
 {
-    regexp regex(parser_.parse("(a|b)*abb"));
-    regexp re2 = regex;
+    Regexp regex(parser_.parse("(a|b)*abb"));
+    Regexp re2 = regex;
     EXPECT_EQ(regex, re2);
-    regexp re3 = std::move(re2);
-    re2 = regexp(parser_.parse("(ab*|cd*)"));
+    Regexp re3 = std::move(re2);
+    re2 = Regexp(parser_.parse("(ab*|cd*)"));
     EXPECT_NE(regex, re2);
     EXPECT_EQ(regex, re3);
 }
 
 TEST_F(RegexTests, Hash)
 {
-    std::set<regexp> regexes;
+    std::set<Regexp> regexes;
     auto && [it, inserted] = regexes.insert(parser_.parse("(a|b)*abb"));
     EXPECT_TRUE(inserted);
     std::tie(it, inserted) = regexes.insert(parser_.parse("(a|b)*abb"));
@@ -107,11 +107,11 @@ TEST_F(RegexTests, Hash)
 
 TEST_F(RegexTests, StrictWeakOrder)
 {
-    regexp re0 = parser_.parse(".");
-    regexp re1 = parser_.parse("[aeiou]");
-    regexp re2 = parser_.parse("[0-9]");
-    regexp re3 = parser_.parse("[aeiou]");
-    regexp re4 = parser_.parse("[A-Z_a-z_0-9]");
+    Regexp re0 = parser_.parse(".");
+    Regexp re1 = parser_.parse("[aeiou]");
+    Regexp re2 = parser_.parse("[0-9]");
+    Regexp re3 = parser_.parse("[aeiou]");
+    Regexp re4 = parser_.parse("[A-Z_a-z_0-9]");
     // for all a, comp(a,a)==false
     EXPECT_FALSE(re0 < re0);
     EXPECT_FALSE(re1 < re1);
@@ -127,10 +127,10 @@ TEST_F(RegexTests, StrictWeakOrder)
 
 TEST_F(RegexTests, Swap)
 {
-    regexp re1 = parser_.parse("[aeiou]");
-    regexp re2 = parser_.parse("[A-Z_a-z_0-9]");
-    regexp re3 = parser_.parse("[aeiou]");
-    regexp re4 = parser_.parse("[A-Z_a-z_0-9]");
+    Regexp re1 = parser_.parse("[aeiou]");
+    Regexp re2 = parser_.parse("[A-Z_a-z_0-9]");
+    Regexp re3 = parser_.parse("[aeiou]");
+    Regexp re4 = parser_.parse("[A-Z_a-z_0-9]");
     using std::swap;
     swap(re1, re2);
     EXPECT_EQ(re2, re3);

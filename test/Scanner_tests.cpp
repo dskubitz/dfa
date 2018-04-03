@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 #include <fstream>
 
-#include <lexer/parser.h>
-#include <lexer/dfa.h>
-#include <lexer/scanner.h>
+#include <lexer/Parser.h>
+#include <lexer/DFA.h>
+#include <lexer/Scanner.h>
 
-TEST(TransitionTableTests, TransitionTableTest)
+TEST(ScannerTests, CanReconstructInput)
 {
-    parser parser;
+    Parser parser;
     std::vector<std::string> regexps = {
             "and",                          // 0
             "class",                        // 1
@@ -50,12 +50,12 @@ TEST(TransitionTableTests, TransitionTableTest)
             "[ \t\v\n\f]+",                 // 38
             ".",                            // 39
     };
-    std::vector<regexp> regular_vector = make_regular_vector(regexps);
+    std::vector<Regexp> regular_vector = make_regular_vector(regexps);
 
-    dfa dfa = make_DFA(regular_vector);
+    DFA dfa = make_DFA(regular_vector);
 
     //@formatter:off
-    std::string str {
+    const std::string str {
              "class Tree {\n"
              "  init(item, depth) {\n"
              "    this.item = item;\n"
@@ -129,70 +129,66 @@ TEST(TransitionTableTests, TransitionTableTest)
              "print clock() - start;"
     };
     //@formatter:on
+    std::string result(str);
+    result.clear();
+
     std::stringstream iss(str);
+    Scanner scanner(std::move(dfa), iss);
 
-    scanner lexer(std::move(dfa), iss);
-
-    auto error = regexps.size() - 1;
-    auto space = regexps.size() - 2;
-
-    while (!lexer.end_of_file()) {
-        auto tok = static_cast<unsigned>(lexer.scan());
-        if (tok == error || tok == space) continue;
-        std::cout << lexer.lexeme() << " tok: " << tok
-                  << ' ' << lexer.lexeme_start_position()
-                  << ' ' << lexer.current_position() << '\n';
+    int num = 0;
+    while (!scanner.end_of_file()) {
+        scanner.scan();
+        auto& lexeme = scanner.lexeme();
+        for (auto& c : lexeme) {
+            result.push_back(c);
+        }
+        num++;
     }
+    EXPECT_GT(num, 1);
+    EXPECT_EQ(str, result);
 }
 
 TEST(ScannerTests, ChangingInputStreams)
 {
-    std::vector<regexp> vec = make_regular_vector({"abcd", "efgh", " "});
+    std::vector<Regexp> vec = make_regular_vector({"abcd", "efgh", " "});
     auto dfa = make_DFA(vec);
     std::stringstream ss1("abcd abcd");
-    scanner lexer(std::move(dfa), ss1);
+    Scanner lexer(std::move(dfa), ss1);
 
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
-        std::cout << lexer.lexeme() << " tok: " << tok
-                  << ' ' << lexer.lexeme_start_position() << '\n';
+        EXPECT_TRUE(tok == 0 || tok == 2);
     }
     std::stringstream ss2("efgh efgh");
     lexer.reset_input_stream(ss2);
+
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
-        std::cout << lexer.lexeme() << " tok: " << tok
-                  << ' ' << lexer.lexeme_start_position() << '\n';
+        EXPECT_TRUE(tok == 1 || tok == 2);
     }
 }
 
 TEST(ScannerTests, BackedUpLexeme)
 {
-    std::vector<regexp> vec = make_regular_vector({"a", "aaa", " "});
+    std::vector<Regexp> vec = make_regular_vector({"a", "aaa", " "});
+    std::vector<std::pair<SourceLocation, SourceLocation>> expects = {
+            {{1, 1},  {1, 1}},
+            {{1, 3},  {1, 3}},
+            {{1, 4},  {1, 4}},
+            {{1, 6},  {1, 8}},
+            {{1, 10}, {1, 12}},
+            {{1, 13}, {1, 13}},
+    };
     auto dfa = make_DFA(vec);
     std::stringstream ss1("a aa aaa aaaa");
-    scanner lexer(std::move(dfa), ss1);
+    Scanner lexer(std::move(dfa), ss1);
+    int i = 0;
     while (!lexer.end_of_file()) {
         auto tok = static_cast<unsigned>(lexer.scan());
-
         if (tok == 2)
             continue;
-        std::cout << lexer.lexeme() << " tok: " << tok
-                  << ' ' << lexer.lexeme_start_position()
-                  << ' ' << lexer.current_position() << '\n';
+        EXPECT_EQ(expects.at(i).first, lexer.lexeme_start_position());
+        EXPECT_EQ(expects.at(i).second, lexer.current_position());
+        i++;
     }
-}
-
-TEST(ScannerTests, Complement)
-{
-    std::vector<regexp> vec = make_regular_vector({"~( )", " "});
-    dfa dfa = make_DFA(vec);
-    std::istringstream input("abc def ");
-    scanner lexer(std::move(dfa), input);
-    while (!lexer.end_of_file()) {
-        int tok = lexer.scan();
-        std::cout << tok << ' ' << lexer.lexeme() << '\n';
-
-    }
-
 }

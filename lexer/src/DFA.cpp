@@ -1,11 +1,10 @@
 #include <map>
-#include <lexer/dfa.h>
-#include <lexer/regexp.h>
-#include <lexer/derivative.h>
-#include <iostream>
+#include "lexer/DFA.h"
+#include "lexer/Regexp.h"
+#include "lexer/Derivative.h"
 
-using State = std::vector<regexp>;
-using StateMap = std::map<State, dfa::Index>;
+using State = std::vector<Regexp>;
+using StateMap = std::map<State, DFA::Index>;
 
 namespace {
 std::tuple<bool, bool, int> accepting(const State& state)
@@ -27,18 +26,18 @@ std::tuple<bool, bool, int> accepting(const State& state)
 }
 }
 
-dfa make_DFA(const std::vector<regexp>& regex)
+DFA make_DFA(const std::vector<Regexp>& regex)
 {
-    dfa res;
-    dfa::TransitionTable& table = res.table;
+    DFA res;
+    DFA::TransitionTable& table = res.table;
 
     StateMap dstates;
-    dfa::AcceptMap& accepts = res.accept_map;
+    DFA::AcceptMap& accepts = res.accept_map;
     int& dead_state_index = res.dead_state;
 
     dstates.insert({regex, 0});
 
-    derivative deriv;
+    Derivative deriv;
     DerivativeClass derivativeClass;
 
     std::vector<State> unmarked{regex};

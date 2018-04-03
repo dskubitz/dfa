@@ -1,4 +1,4 @@
-#include <lexer/regexp.h>
+#include "lexer/Regexp.h"
 #include <sstream>
 
 
@@ -469,34 +469,34 @@ Regex::Node* Regex::make_complement(Node* expr)
     }
 }
 
-void regexp::swap(regexp& other) noexcept { ptr_.swap(other.ptr_); }
+void Regexp::swap(Regexp& other) noexcept { ptr_.swap(other.ptr_); }
 
-bool operator==(const regexp& lhs, const regexp& rhs)
+bool operator==(const Regexp& lhs, const Regexp& rhs)
 {
     return lhs.ptr_->equiv(rhs.ptr_.get());
 }
 
-bool operator!=(const regexp& lhs, const regexp& rhs)
+bool operator!=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(rhs == lhs);
 }
 
-bool operator<(const regexp& lhs, const regexp& rhs)
+bool operator<(const Regexp& lhs, const Regexp& rhs)
 {
     return lhs.ptr_->compare(rhs.get());
 }
 
-bool operator>(const regexp& lhs, const regexp& rhs)
+bool operator>(const Regexp& lhs, const Regexp& rhs)
 {
     return rhs < lhs;
 }
 
-bool operator<=(const regexp& lhs, const regexp& rhs)
+bool operator<=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(rhs < lhs);
 }
 
-bool operator>=(const regexp& lhs, const regexp& rhs)
+bool operator>=(const Regexp& lhs, const Regexp& rhs)
 {
     return !(lhs < rhs);
 }
@@ -509,15 +509,15 @@ int first_occurring(const Bitset& set)
     return 0;
 }
 
-std::ostream& operator<<(std::ostream& os, const regexp& regexp)
+std::ostream& operator<<(std::ostream& os, const Regexp& regexp)
 {
     return os << regexp->to_string();
 }
 
-Regex::Node* regexp::get() noexcept { return ptr_.get(); }
+Regex::Node* Regexp::get() noexcept { return ptr_.get(); }
 
-Regex::Node* regexp::operator->() noexcept { return ptr_.get(); }
+Regex::Node* Regexp::operator->() noexcept { return ptr_.get(); }
 
-const Regex::Node* regexp::get() const noexcept { return ptr_.get(); }
+const Regex::Node* Regexp::get() const noexcept { return ptr_.get(); }
 
-const Regex::Node* regexp::operator->() const noexcept { return ptr_.get(); }
+const Regex::Node* Regexp::operator->() const noexcept { return ptr_.get(); }

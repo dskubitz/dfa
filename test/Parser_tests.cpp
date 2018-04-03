@@ -1,46 +1,46 @@
 #include <gtest/gtest.h>
-#include <lexer/parser.h>
+#include <lexer/Parser.h>
 
 class ParserTests : public ::testing::Test {
 protected:
-    parser parser_;
+    Parser parser_;
     std::ostringstream out;
 };
 TEST_F(ParserTests, SingleCharactersBad)
 {
-    EXPECT_THROW(parser_.parse("*"), parser_error);
-    EXPECT_THROW(parser_.parse("["), parser_error);
-    EXPECT_THROW(parser_.parse("]"), parser_error);
-    EXPECT_THROW(parser_.parse("|"), parser_error);
-    EXPECT_THROW(parser_.parse("+"), parser_error);
-    EXPECT_THROW(parser_.parse("?"), parser_error);
-    EXPECT_THROW(parser_.parse("("), parser_error);
-    EXPECT_THROW(parser_.parse(")"), parser_error);
+    EXPECT_THROW(parser_.parse("*"), ParserError);
+    EXPECT_THROW(parser_.parse("["), ParserError);
+    EXPECT_THROW(parser_.parse("]"), ParserError);
+    EXPECT_THROW(parser_.parse("|"), ParserError);
+    EXPECT_THROW(parser_.parse("+"), ParserError);
+    EXPECT_THROW(parser_.parse("?"), ParserError);
+    EXPECT_THROW(parser_.parse("("), ParserError);
+    EXPECT_THROW(parser_.parse(")"), ParserError);
 }
 
 TEST_F(ParserTests, EmptyCharacterClass)
 {
-    EXPECT_THROW(parser_.parse("[]"), parser_error);
-    EXPECT_THROW(parser_.parse("[^]"), parser_error);
+    EXPECT_THROW(parser_.parse("[]"), ParserError);
+    EXPECT_THROW(parser_.parse("[^]"), ParserError);
 }
 
 TEST_F(ParserTests, UnmatchedParenthesisOrBracket)
 {
-    EXPECT_THROW(parser_.parse("(abcd"), parser_error);
-    EXPECT_THROW(parser_.parse("[abcd"), parser_error);
-    EXPECT_THROW(parser_.parse("abcd)"), parser_error);
-    EXPECT_THROW(parser_.parse("abcd]"), parser_error);
+    EXPECT_THROW(parser_.parse("(abcd"), ParserError);
+    EXPECT_THROW(parser_.parse("[abcd"), ParserError);
+    EXPECT_THROW(parser_.parse("abcd)"), ParserError);
+    EXPECT_THROW(parser_.parse("abcd]"), ParserError);
 }
 
 TEST_F(ParserTests, TrailingEscape)
 {
-    EXPECT_THROW(parser_.parse("\\"), parser_error);
+    EXPECT_THROW(parser_.parse("\\"), ParserError);
 
 }
 
 TEST_F(ParserTests, InvalidRange)
 {
-    EXPECT_THROW(parser_.parse("[b-a]"), parser_error);
+    EXPECT_THROW(parser_.parse("[b-a]"), ParserError);
 }
 
 TEST_F(ParserTests, MinusInCharacterClass)

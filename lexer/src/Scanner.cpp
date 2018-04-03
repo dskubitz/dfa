@@ -1,12 +1,11 @@
-#include <lexer/scanner.h>
-#include <iostream>
+#include "lexer/Scanner.h"
 
-scanner::scanner(dfa&& dfa, std::istream& i)
+Scanner::Scanner(DFA&& dfa, std::istream& i)
         : dfa_(std::move(dfa)), input_(i), current_(1, 0)
 {
 }
 
-int scanner::scan()
+int Scanner::scan()
 {
     if (encountered_eof_)
         return dfa_.accept_map.at(last_match_);
@@ -48,7 +47,7 @@ int scanner::scan()
     return dfa_.accept_map.at(last_match_);
 }
 
-int scanner::advance()
+int Scanner::advance()
 {
     int c = input_.get().get();
     if (c == '\n') {
@@ -61,7 +60,7 @@ int scanner::advance()
     return c;
 }
 
-void scanner::retract()
+void Scanner::retract()
 {
     auto& input = input_.get();
 
@@ -78,27 +77,27 @@ void scanner::retract()
     }
 }
 
-const std::string& scanner::lexeme() const
+const std::string& Scanner::lexeme() const
 {
     return lexeme_;
 }
 
-const source_location& scanner::lexeme_start_position() const
+const SourceLocation& Scanner::lexeme_start_position() const
 {
     return start_;
 }
 
-const source_location& scanner::current_position() const
+const SourceLocation& Scanner::current_position() const
 {
     return current_;
 }
 
-bool scanner::end_of_file()
+bool Scanner::end_of_file()
 {
     return encountered_eof_;
 }
 
-scanner& scanner::reset_input_stream(std::istream& input)
+Scanner& Scanner::reset_input_stream(std::istream& input)
 {
     input_ = input;
     start_ = current_ = {1, 0};

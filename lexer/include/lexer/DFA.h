@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-struct dfa {
+struct DFA {
     using Index = int;
     using TransitionTable = std::vector<std::array<Index, 128> >;
     using AcceptMap = std::unordered_map<Index, Index>;
@@ -16,7 +16,7 @@ struct dfa {
     Index dead_state{-1};
 };
 
-class regexp;
+class Regexp;
 
-dfa make_DFA(const std::vector<regexp>& regex);
+DFA make_DFA(const std::vector<Regexp>& regex);
 #endif //DFA_H

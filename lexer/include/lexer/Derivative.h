@@ -5,11 +5,11 @@
 #include <memory>
 #include <unordered_set>
 
-#include <lexer/regexp.h>
+#include <lexer/Regexp.h>
 
-class derivative : public Regex::Visitor {
+class Derivative : public Regex::Visitor {
 public:
-    regexp derive(const regexp& regex, char da);
+    Regexp derive(const Regexp& regex, char da);
 private:
     void visit(const Regex::Node* node) override;
     void visit(const Regex::Closure* node) override;
@@ -29,7 +29,7 @@ private:
 class Nullable : public Regex::Visitor {
 public:
     bool evaluate(const Regex::Node* regex);
-    bool evaluate(const regexp& regex);
+    bool evaluate(const Regexp& regex);
 private:
     void visit(const Regex::Node* node) override;
     void visit(const Regex::Closure* node) override;
@@ -45,12 +45,12 @@ private:
 
 Regex::Node* helper(const Regex::Node* node);
 
-std::vector<regexp>
-make_derivative(const std::vector<regexp>& rvector, char da);
+std::vector<Regexp>
+make_derivative(const std::vector<Regexp>& rvector, char da);
 
 class DerivativeClass : Regex::Visitor {
 public:
-    std::unordered_set<Bitset> evaluate(const regexp& regex);
+    std::unordered_set<Bitset> evaluate(const Regexp& regex);
 private:
     void visit(const Regex::Node* node) override;
     void visit(const Regex::Closure* closure) override;
@@ -67,7 +67,7 @@ private:
 };
 
 std::unordered_set<Bitset>
-make_derivative_class(const std::vector<regexp>& rvector);
+make_derivative_class(const std::vector<Regexp>& rvector);
 
 std::unordered_set<Bitset>
 cross(const std::unordered_set<Bitset>& l, const std::unordered_set<Bitset>& r);

@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
-#include <lexer/derivative.h>
-#include <lexer/parser.h>
+#include <lexer/Derivative.h>
+#include <lexer/Parser.h>
 
 class DerivativeTests : public ::testing::Test {
 protected:
-    derivative derivative_;
-    parser parser_;
+    Derivative derivative_;
+    Parser parser_;
 };
 
 TEST_F(DerivativeTests, BasicFunctionality)
@@ -55,20 +55,10 @@ TEST_F(DerivativeTests, Nullable)
 TEST_F(DerivativeTests, RVectorTests)
 {
     DerivativeClass derivativeClass;
-    auto re = parser{}.parse("[A-Za-z_][A-Za-z_0-9]*");
-    auto re2 = parser{}.parse("[0-9]+(\\.[0-9]+)?");
+    auto re = Parser{}.parse("[A-Za-z_][A-Za-z_0-9]*");
+    auto re2 = Parser{}.parse("[0-9]+(\\.[0-9]+)?");
     auto set1 = derivativeClass.evaluate(re);
     auto set2 = derivativeClass.evaluate(re);
-    std::vector<regexp> regular_vector{re, re2};
+    std::vector<Regexp> regular_vector{re, re2};
     auto set = make_derivative_class(regular_vector);
-}
-
-TEST_F(DerivativeTests, Complement)
-{
-    auto re = parser{}.parse("~abc");
-    auto set = make_derivative_class({re});
-    for (auto& i : set) {
-        auto deriv = derivative{}.derive(re, first_occurring(i));
-        std::cout << deriv << '\n';
-    }
 }

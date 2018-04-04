@@ -61,5 +61,6 @@ private:
 
     int advance();
     void retract();
+
 };
 #endif //LEXER_H

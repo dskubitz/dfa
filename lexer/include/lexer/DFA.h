@@ -19,4 +19,5 @@ struct DFA {
 class Regexp;
 
 DFA make_DFA(const std::vector<Regexp>& regex);
+
 #endif //DFA_H

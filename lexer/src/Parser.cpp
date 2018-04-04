@@ -25,11 +25,8 @@ Regex::Node* Parser::parse_impl(const std::string& regexp)
     try {
         if (expr.empty())
             return new Regex::Epsilon;
-        else if (expr == ".") {
-            Bitset set;
-            set.flip();
-            return new Regex::Symbol(set);
-        }
+        if (expr.size() == 1 && !is_meta(expr.at(0)))
+            return new Regex::Symbol(expr.at(0));
         return union_or_intersection();
     }
     catch (std::out_of_range& e) {

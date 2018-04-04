@@ -236,4 +236,10 @@ inline void swap(Regexp& lhs, Regexp& rhs) noexcept
 {
     lhs.swap(rhs);
 }
+
+inline Regexp unify(const Regexp& lhs, const Regexp& rhs)
+{
+    return Regexp(Regex::make_union(lhs->clone(), rhs->clone()));
+}
+
 #endif //RE_H

@@ -136,3 +136,12 @@ TEST_F(RegexTests, Swap)
     EXPECT_EQ(re2, re3);
     EXPECT_EQ(re1, re4);
 }
+
+TEST_F(RegexTests, RegexpUnion)
+{
+    Regexp re1 = parser_.parse("[aeiou]");
+    Regexp re2 = parser_.parse("[A-Z_a-z_0-9]");
+    Regexp re3 = parser_.parse("[aeiou]|[A-Z_a-z_0-9]");
+    Regexp re4 = unify(re1, re2);
+    EXPECT_EQ(re3, re4);
+}

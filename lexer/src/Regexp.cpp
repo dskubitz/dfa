@@ -1,7 +1,6 @@
 #include "lexer/Regexp.h"
 #include <sstream>
 
-
 const std::array<int, 100>
         alphabet{9, 10, 11, 12, 13, 32, 33, 34,
                  35, 36, 37, 38, 39, 40, 41, 42,

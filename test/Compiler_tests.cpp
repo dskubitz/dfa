@@ -4,14 +4,16 @@
 
 TEST(CompilerTests, TestTests)
 {
+    //@formatter:off
     std::string str(
             "NL          \\n\n"
-                    "WS          [ \\t]+\n"
-                    "AND         and\n"
-                    "IDENTIFIER  [A-Za-z_][A-Za-z_0-9]*\n"
-                    "CONSTANT    0[0-7]*\n"
-                    "CONSTANT    0x[A-Fa-f0-9]*\n"
+            "WS          [ \\t]+\n"
+            "AND         and\n"
+            "IDENTIFIER  [A-Za-z_][A-Za-z_0-9]*\n"
+            "CONSTANT    0[0-7]*\n"
+            "CONSTANT    0x[A-Fa-f0-9]*\n"
     );
+    //@formatter:on
     std::stringstream input(str);
     std::stringstream output;
     Compiler compiler;

@@ -5,6 +5,9 @@
 #include <array>
 #include <string>
 #include <unordered_map>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/unordered_map.hpp>
 
 struct DFA {
     using Index = int;

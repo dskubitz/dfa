@@ -199,11 +199,11 @@ public:
     std::string to_string() const override;
 };
 
-Regex::Node* make_union(Regex::Node* left, Regex::Node* right);
-Regex::Node* make_concatenation(Regex::Node* left, Regex::Node* right);
-Regex::Node* make_closure(Regex::Node* expr);
-Regex::Node* make_intersection(Regex::Node* left, Regex::Node* right);
-Regex::Node* make_complement(Regex::Node* expr);
+Node* make_union(Node* left, Node* right);
+Node* make_concatenation(Node* left, Node* right);
+Node* make_closure(Node* expr);
+Node* make_intersection(Node* left, Node* right);
+Node* make_complement(Node* expr);
 }// namespace Regex
 
 class Regexp {
